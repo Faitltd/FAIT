@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emergency Access</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1 {
+            color: #2563eb;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .card {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            background-color: #f9fafb;
+        }
+        button {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 8px;
+        }
+        button.admin {
+            background-color: #dc2626;
+        }
+        button.client {
+            background-color: #059669;
+        }
+        button.service {
+            background-color: #7c3aed;
+        }
+        button:hover {
+            opacity: 0.9;
+        }
+        .success {
+            background-color: #d1fae5;
+            border: 1px solid #059669;
+            color: #065f46;
+            padding: 8px 16px;
+            border-radius: 4px;
+            margin-top: 16px;
+            display: none;
+        }
+        .dashboard-link {
+            display: inline-block;
+            margin-top: 16px;
+            padding: 8px 16px;
+            background-color: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            text-decoration: none;
+            color: #374151;
+        }
+        .dashboard-link:hover {
+            background-color: #e5e7eb;
+        }
+    </style>
+</head>
+<body>
+    <h1>Emergency Access Tool</h1>
+    <p>This tool will set up emergency access credentials in your browser's localStorage, allowing you to bypass the normal authentication flow.</p>
+    
+    <div class="card">
+        <h2>Choose a User Type</h2>
+        <p>Click one of the buttons below to set up emergency access for that user type:</p>
+        
+        <button class="admin" onclick="setupEmergencyAccess('admin@itsfait.com', 'admin')">Admin Access</button>
+        <button class="client" onclick="setupEmergencyAccess('client@itsfait.com', 'client')">Client Access</button>
+        <button class="service" onclick="setupEmergencyAccess('service@itsfait.com', 'service_agent')">Service Agent Access</button>
+        
+        <div id="success" class="success">
+            <p>Emergency access set up successfully!</p>
+            <p>You can now access the dashboard:</p>
+            <a id="dashboard-link" href="#" class="dashboard-link">Go to Dashboard</a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Clear Emergency Access</h2>
+        <p>If you want to remove emergency access and return to normal authentication:</p>
+        <button onclick="clearEmergencyAccess()">Clear Emergency Access</button>
+    </div>
+
+    <script>
+        function setupEmergencyAccess(email, userType) {
+            // Create emergency auth object
+            const emergencyAuth = {
+                email: email,
+                userType: userType,
+                isEmergencyLogin: true
+            };
+            
+            // Store in localStorage
+            localStorage.setItem('emergency_auth', JSON.stringify(emergencyAuth));
+            
+            // Show success message
+            const successElement = document.getElementById('success');
+            successElement.style.display = 'block';
+            
+            // Set dashboard link
+            const dashboardLink = document.getElementById('dashboard-link');
+            dashboardLink.href = `/dashboard/${userType === 'service_agent' ? 'service-agent' : userType}`;
+            
+            console.log(`Emergency access set up for ${userType}`);
+        }
+        
+        function clearEmergencyAccess() {
+            // Remove from localStorage
+            localStorage.removeItem('emergency_auth');
+            
+            // Hide success message
+            const successElement = document.getElementById('success');
+            successElement.style.display = 'none';
+            
+            console.log('Emergency access cleared');
+            alert('Emergency access has been cleared.');
+        }
+    </script>
+</body>
+</html>
