@@ -386,9 +386,9 @@ const ServiceAgentMessages = () => {
                 bookings.map((booking) => (
                   <button
                     key={booking.id}
-                    className={`w-full text-left p-4 hover:bg-gray-50 focus:outline-none ${
+                    className={"w-full text-left p-4 hover:bg-gray-50 focus:outline-none " + (
                       selectedBookingId === booking.id ? 'bg-blue-50' : ''
-                    }`}
+                    }}
                     onClick={() => setSelectedBookingId(booking.id)}
                   >
                     <div className="flex items-center">
