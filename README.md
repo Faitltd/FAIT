@@ -22,6 +22,14 @@ This is the MVP (Minimum Viable Product) for the FAIT Co-op platform, a cooperat
    VITE_SUPABASE_URL=your_supabase_url
    VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
    VITE_GOOGLE_CLIENT_ID=your_google_client_id
+   VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
+   ```
+
+4. Set up the Stripe integration:
+   ```bash
+   export STRIPE_SECRET_KEY=your_stripe_secret_key
+   node scripts/setup_stripe_products.js
+   ./scripts/setup_stripe_webhook.sh
    ```
 
 ### Development
@@ -37,6 +45,20 @@ Build for production:
 ```bash
 npm run build
 ```
+
+### Deployment
+
+This project is deployed using Vercel. To deploy your own instance:
+
+1. Fork this repository
+2. Create an account on [Vercel](https://vercel.com/)
+3. Import your forked repository
+4. Configure the following environment variables in Vercel:
+   - `VITE_SUPABASE_URL`
+   - `VITE_SUPABASE_ANON_KEY`
+   - `VITE_GOOGLE_CLIENT_ID`
+   - `VITE_STRIPE_PUBLIC_KEY`
+5. Deploy!
 
 ## Google OAuth Setup
 
@@ -78,14 +100,21 @@ For a comprehensive testing guide, see [Testing OAuth Integration](docs/testing-
 - Admin dashboard
 - Points and rewards system
 - Governance and voting
+- Pricing and Monetization Subsystem
+  - Subscription billing
+  - Feature unlocks based on tier
+  - Supplier commission tracking
+  - Warranty registration based on subscription
+  - Admin panel for pricing control
 
 ## Tech Stack
 
 - React
 - TypeScript
 - Vite
-- Supabase (Auth, Database, Storage)
+- Supabase (Auth, Database, Storage, Edge Functions)
 - Tailwind CSS
+- Stripe (Subscription Billing, Webhooks)
 
 ## Project Structure
 
@@ -96,6 +125,8 @@ For a comprehensive testing guide, see [Testing OAuth Integration](docs/testing-
   - `pages/` - Application pages
 - `public/` - Static assets
 - `supabase/` - Supabase functions and migrations
+- `scripts/` - Setup and utility scripts
+- `docs/` - Documentation
 
 ## License
 
