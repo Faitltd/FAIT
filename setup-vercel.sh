@@ -3,7 +3,7 @@
 # This script helps you deploy your project to Vercel
 # You'll need to have the Vercel CLI installed
 
-echo "Setting up Vercel deployment for FAIT Co-op Platform"
+echo "Setting up Vercel deployment for FAIT Co-op"
 echo "==================================================="
 echo ""
 
@@ -28,7 +28,7 @@ mkdir -p .vercel
 # Create project.json file
 cat > .vercel/project.json << EOF
 {
-  "projectId": "fait-coop-platform",
+  "projectId": "fait-coop",
   "orgId": "personal",
   "settings": {
     "framework": "vite",

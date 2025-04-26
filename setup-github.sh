@@ -3,7 +3,7 @@
 # This script helps you push your code to GitHub
 # You'll need to have a GitHub account and a personal access token
 
-echo "Setting up GitHub repository for FAIT Co-op Platform"
+echo "Setting up GitHub repository for FAIT Co-op"
 echo "===================================================="
 echo ""
 
@@ -11,8 +11,8 @@ echo ""
 read -p "Enter your GitHub username: " GITHUB_USERNAME
 
 # Ask for repository name
-read -p "Enter repository name (default: fait-coop-platform): " REPO_NAME
-REPO_NAME=${REPO_NAME:-fait-coop-platform}
+read -p "Enter repository name (default: fait-coop): " REPO_NAME
+REPO_NAME=${REPO_NAME:-fait-coop}
 
 # Ask if the repository should be public or private
 read -p "Should the repository be public? (y/n, default: y): " IS_PUBLIC
@@ -35,7 +35,7 @@ RESPONSE=$(curl -s -X POST \
   -H "Authorization: token $GITHUB_TOKEN" \
   -H "Accept: application/vnd.github.v3+json" \
   https://api.github.com/user/repos \
-  -d "{\"name\":\"$REPO_NAME\",\"private\":$([ "$VISIBILITY" == "private" ] && echo "true" || echo "false"),\"description\":\"FAIT Co-op Platform - A cooperative marketplace connecting clients with service agents\"}")
+  -d "{\"name\":\"$REPO_NAME\",\"private\":$([ "$VISIBILITY" == "private" ] && echo "true" || echo "false"),\"description\":\"FAIT Co-op - A cooperative marketplace connecting clients with service agents\"}")
 
 # Check if repository was created successfully
 if echo "$RESPONSE" | grep -q "\"name\":\"$REPO_NAME\""; then

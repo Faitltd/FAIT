@@ -1,6 +1,6 @@
-# FAIT Co-op MVP
+# FAIT Co-op
 
-This is the MVP (Minimum Viable Product) for the FAIT Co-op platform, a cooperative marketplace connecting clients with contractors.
+This is the FAIT Co-op platform, a cooperative marketplace connecting clients with service agents.
 
 ## Getting Started
 
@@ -25,108 +25,141 @@ This is the MVP (Minimum Viable Product) for the FAIT Co-op platform, a cooperat
    VITE_STRIPE_PUBLIC_KEY=your_stripe_public_key
    ```
 
-4. Set up the Stripe integration:
-   ```bash
-   export STRIPE_SECRET_KEY=your_stripe_secret_key
-   node scripts/setup_stripe_products.js
-   ./scripts/setup_stripe_webhook.sh
-   ```
-
 ### Development
 
-Run the development server:
 ```bash
+# Start development server with Vite
 npm run dev
+
+# Start development server (simple mode) with Vite
+npm run dev:simple
+
+# Start development server with Webpack
+npm run webpack:dev
 ```
 
 ### Build
 
-Build for production:
 ```bash
+# Build for production with Vite
 npm run build
+
+# Build simple version with Vite
+npm run build:simple
+
+# Build for production with Webpack
+npm run webpack:build
+
+# Build for production with Webpack and analyze the bundle
+npm run webpack:analyze
 ```
 
-### Deployment
-
-This project is deployed using Vercel. To deploy your own instance:
-
-1. Fork this repository
-2. Create an account on [Vercel](https://vercel.com/)
-3. Import your forked repository
-4. Configure the following environment variables in Vercel:
-   - `VITE_SUPABASE_URL`
-   - `VITE_SUPABASE_ANON_KEY`
-   - `VITE_GOOGLE_CLIENT_ID`
-   - `VITE_STRIPE_PUBLIC_KEY`
-5. Deploy!
-
-## Google OAuth Setup
-
-This project uses Google OAuth for authentication. Follow these steps to set it up:
-
-1. Configure your Google OAuth credentials in the Supabase dashboard:
-   - Go to Authentication > Providers > Google
-   - Enable Google authentication
-   - Enter your Google Client ID and Client Secret
-   - Set the authorized redirect URL to: `https://[YOUR_PROJECT_REF].supabase.co/auth/v1/callback`
-
-2. Make sure your Google OAuth credentials are properly configured in the Google Cloud Console:
-   - Add the Supabase callback URL to the authorized redirect URIs
-
-For detailed instructions, see the [Google OAuth Setup Guide](docs/google-oauth-setup.md).
-
-### Testing OAuth Integration
-
-To verify your OAuth configuration is working correctly:
+### Bundler Comparison
 
 ```bash
-npm run verify:oauth
+# Compare Vite and Webpack builds
+./compare-builds.sh
+
+# Switch between bundlers for development
+./switch-bundler.sh vite    # Use Vite
+./switch-bundler.sh webpack # Use Webpack
 ```
 
-To test the full OAuth flow in the application:
+### Database Management
 
-1. Start the development server: `npm run dev`
-2. Navigate to the login page and click "Sign in with Google"
-3. Complete the Google authentication process
+```bash
+# Backup database
+npm run db:backup
 
-For a comprehensive testing guide, see [Testing OAuth Integration](docs/testing-oauth.md).
+# Restore database
+npm run db:restore
+
+# Apply migrations
+npm run db:migrate
+```
+
+### Testing
+
+```bash
+# Run all tests
+npm test
+
+# Run tests with coverage
+npm run test:coverage
+
+# Test OAuth integration
+npm run test:oauth
+```
 
 ## Features
 
 - User authentication (email/password and Google OAuth)
-- Client and contractor profiles
+- Client and service agent profiles
 - Service booking system
-- Contractor verification
+- Service agent verification
 - Admin dashboard
 - Points and rewards system
 - Governance and voting
-- Pricing and Monetization Subsystem
-  - Subscription billing
+- Subscription Management
+  - Tiered subscription plans
   - Feature unlocks based on tier
-  - Supplier commission tracking
-  - Warranty registration based on subscription
-  - Admin panel for pricing control
+  - Service limits per subscription
+  - Featured listings for premium tiers
 
 ## Tech Stack
 
-- React
+- React 18
 - TypeScript
-- Vite
+- Vite & Webpack (dual bundler support)
 - Supabase (Auth, Database, Storage, Edge Functions)
 - Tailwind CSS
-- Stripe (Subscription Billing, Webhooks)
+- Stripe (Subscription Billing)
 
 ## Project Structure
 
-- `src/` - Source code
-  - `components/` - Reusable UI components
-  - `contexts/` - React context providers
-  - `lib/` - Utility functions and libraries
-  - `pages/` - Application pages
-- `public/` - Static assets
-- `supabase/` - Supabase functions and migrations
-- `scripts/` - Setup and utility scripts
-- `docs/` - Documentation
+```
+├── docs/                 # Documentation
+├── migrations/          # Database migrations
+├── public/              # Static assets
+├── scripts/             # Utility scripts
+├── src/                 # Source code
+│   ├── api/            # API integration
+│   ├── components/     # Reusable components
+│   ├── contexts/       # React contexts
+│   ├── hooks/          # Custom hooks
+│   ├── lib/            # Utility functions
+│   ├── pages/          # Application pages
+│   └── utils/          # Helper utilities
+└── supabase/           # Supabase configuration
+```
+
+## Database Migrations
+
+All database migrations are consolidated in `essential_migrations.sql`. This includes:
+- Base tables setup (messages, subscriptions)
+- Profile enhancements
+- Service agent portfolio system
+- Warranty claims system
+- Work history tracking
+- References management
+- Subscription management
+- Security policies (RLS)
+
+## Configuration
+
+### Vite Configuration
+The project uses a Vite configuration file (`vite.config.ts`) that supports different modes:
+- Default mode: Standard development/production setup
+- Simple mode: Lightweight version with minimal features
+
+### Webpack Configuration
+The project also includes a Webpack configuration file (`webpack.config.js`) that provides:
+- Production-ready bundling
+- Bundle analysis
+- Code splitting
+- Asset optimization
+
+For more details on the Webpack integration, see [WEBPACK_INTEGRATION.md](WEBPACK_INTEGRATION.md).
 
 ## License
 

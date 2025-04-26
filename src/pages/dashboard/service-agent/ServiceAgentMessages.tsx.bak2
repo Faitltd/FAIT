@@ -1,0 +1,557 @@
+import React, { useState, useEffect, useRef } from 'react';
+import { Link " +  from 'react-router-dom';
+import { supabase " +  from '../../../lib/supabase';
+import { useAuth " +  from '../../../contexts/AuthContext';
+import { Send, User, ArrowLeft, Calendar " +  from 'lucide-react';
+import type { Database " +  from '../../../lib/database.types';
+
+type Booking = Database['public']['Tables']['bookings']['Row'] & {
+  client: Pick<Database['public']['Tables']['profiles']['Row'], 'full_name' | 'avatar_url'>;
+  service_package: Pick<Database['public']['Tables']['service_packages']['Row'], 'title'>;
+" + ;
+
+type Message = {
+  id: string;
+  booking_id: string;
+  sender_id: string;
+  recipient_id: string;
+  content: string;
+  is_read: boolean;
+  created_at: string;
+  updated_at: string;
+  sender?: {
+    full_name: string;
+    avatar_url: string | null;
+  " + ;
+  is_from_me?: boolean;
+  sender_name?: string;
+  sender_avatar?: string | null;
+" + ;
+
+const ServiceAgentMessages = () => {
+  const { user " +  = useAuth();
+  const [bookings, setBookings] = useState<Booking[]>([]);
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null);
+  const [messagesByBookingId, setMessagesByBookingId] = useState<Record<string, Message[]>>({" + );
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [sendingMessage, setSendingMessage] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Fetch bookings for service agent
+  useEffect(() => {
+    const fetchBookings = async () => {
+      if (!user) return;
+
+      try {
+        // Get service packages for this service agent
+        const { data: servicePackages, error: packageError " +  = await supabase
+          .from('service_packages')
+          .select('id')
+          .eq('service_agent_id', user.id);
+
+        if (packageError) throw packageError;
+
+        if (!servicePackages || servicePackages.length === 0) {
+          setLoading(false);
+          return;
+        " +
+
+        // Get bookings for these service packages
+        const packageIds = servicePackages.map(pkg => pkg.id);
+        const { data: bookingsData, error: bookingsError " +  = await supabase
+          .from('bookings')
+          .select(`
+            id,
+            client_id,
+            service_package_id,
+            scheduled_date,
+            status,
+            total_amount,
+            notes,
+            created_at,
+            updated_at,
+            client:client_id(full_name, avatar_url),
+            service_package:service_package_id(title)
+          `)
+          .in('service_package_id', packageIds)
+          .order('created_at', { ascending: false " + );
+
+        if (bookingsError) throw bookingsError;
+
+        // Process bookings to handle any missing data
+        const processedBookings = bookingsData.map(booking => ({
+          ...booking,
+          client: booking.client || { full_name: 'Unknown Client', avatar_url: null " + ,
+          service_package: booking.service_package || { title: 'Unknown Service' " +
+        " + ));
+
+        setBookings(processedBookings);
+
+        // If no booking is selected but we have bookings, select the first one
+        if (!selectedBookingId && processedBookings.length > 0) {
+          setSelectedBookingId(processedBookings[0].id);
+        " +
+
+        setLoading(false);
+      " +  catch (error) {
+        console.error('Error fetching bookings:', error);
+        setLoading(false);
+      " +
+    " + ;
+
+    fetchBookings();
+  " + , [user, selectedBookingId]);
+
+  // Effect to load messages when selected booking changes
+  useEffect(() => {
+    if (!selectedBookingId || !user) return;
+
+    // If we already have messages for this booking, use them
+    if (messagesByBookingId[selectedBookingId]) {
+      setMessages(messagesByBookingId[selectedBookingId]);
+
+      // Scroll to bottom when loading existing messages
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' " + );
+        " +
+      " + , 100);
+
+      return;
+    " +
+
+    const fetchMessages = async () => {
+      try {
+        console.log('Fetching messages for booking ID:', selectedBookingId);
+
+        // Fetch messages from the database with a more detailed query
+        const { data: messagesData, error: messagesError " +  = await supabase
+          .from('messages')
+          .select(`
+            id,
+            booking_id,
+            sender_id,
+            recipient_id,
+            content,
+            is_read,
+            created_at,
+            updated_at,
+            sender:profiles!messages_sender_id_fkey(full_name, avatar_url)
+          `)
+          .eq('booking_id', selectedBookingId)
+          .order('created_at', { ascending: true " + );
+
+        if (messagesError) {
+          console.error('Error fetching messages:', messagesError);
+          throw messagesError;
+        " +
+
+        console.log('Messages fetched:', messagesData);
+
+        // Process each message to ensure we have sender information
+        const data = messagesData.map((message) => {
+          return {
+            ...message,
+            sender: message.sender || {
+              full_name: 'Unknown User',
+              avatar_url: null
+            " +
+          " + ;
+        " + );
+
+        // Format messages with additional fields needed for UI
+        const formattedMessages = data.map(msg => ({
+          id: msg.id,
+          booking_id: msg.booking_id,
+          sender_id: msg.sender_id,
+          recipient_id: msg.recipient_id,
+          content: msg.content,
+          created_at: msg.created_at,
+          updated_at: msg.updated_at,
+          is_read: msg.is_read,
+          is_from_me: msg.sender_id === user.id,
+          sender_name: msg.sender.full_name,
+          sender_avatar: msg.sender.avatar_url
+        " + ));
+
+        // Store messages by booking ID and update current messages
+        setMessagesByBookingId(prev => ({
+          ...prev,
+          [selectedBookingId]: formattedMessages
+        " + ));
+        setMessages(formattedMessages);
+
+        // Scroll to bottom when loading new messages
+        setTimeout(() => {
+          if (messagesEndRef.current) {
+            messagesEndRef.current.scrollIntoView({ behavior: 'smooth' " + );
+          " +
+        " + , 100);
+      " +  catch (error) {
+        console.error('Error fetching messages:', error);
+      " +
+    " + ;
+
+    fetchMessages();
+
+    // Set up subscription for real-time updates
+    console.log('Setting up real-time subscription for booking ID:', selectedBookingId);
+    const channelName = `messages-" + (selectedBookingId" + `;
+
+    const subscription = supabase
+      .channel(channelName)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'messages',
+          filter: `booking_id=eq." + (selectedBookingId" + `
+        " + , async (payload) => {
+          console.log('New message received:', payload.new);
+
+          try {
+            // Get sender info
+            const { data: senderData, error: senderError " +  = await supabase
+              .from('profiles')
+              .select('full_name, avatar_url')
+              .eq('id', payload.new.sender_id)
+              .single();
+
+            if (senderError) {
+              console.error('Error fetching sender info:', senderError);
+            " +
+
+            const newMsg = {
+              ...payload.new,
+              is_from_me: payload.new.sender_id === user.id,
+              sender_name: senderData?.full_name || 'Unknown User',
+              sender_avatar: senderData?.avatar_url
+            " + ;
+
+            console.log('Formatted new message:', newMsg);
+
+            // Update both the current messages and stored messages
+            setMessages(prevMessages => {
+              const updatedMessages = [...prevMessages, newMsg];
+
+              // Also update the stored messages
+              setMessagesByBookingId(prev => ({
+                ...prev,
+                [selectedBookingId]: updatedMessages
+              " + ));
+
+              return updatedMessages;
+            " + );
+
+            // Scroll to the new message
+            setTimeout(() => {
+              if (messagesEndRef.current) {
+                messagesEndRef.current.scrollIntoView({ behavior: 'smooth' " + );
+              " +
+            " + , 100);
+          " +  catch (error) {
+            console.error('Error processing new message:', error);
+          " +
+        " + )
+      .subscribe();
+
+    console.log('Subscription created for channel:', channelName);
+
+    return () => {
+      subscription.unsubscribe();
+    " + ;
+  " + , [selectedBookingId, user, messages, messagesByBookingId]);
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMessage.trim() || !user || !selectedBookingId) return;
+
+    setSendingMessage(true);
+
+    try {
+      // Get the client ID from the selected booking
+      const selectedBooking = bookings.find(b => b.id === selectedBookingId);
+      if (!selectedBooking) throw new Error('Booking not found');
+
+      const clientId = selectedBooking.client_id;
+      console.log('Sending message to client:', clientId);
+
+      // Insert the message into the database
+      const { data: messageData, error: messageError " +  = await supabase
+        .from('messages')
+        .insert({
+          booking_id: selectedBookingId,
+          sender_id: user.id,
+          recipient_id: clientId,
+          content: newMessage.trim(),
+          is_read: false
+        " + )
+        .select()
+        .single();
+
+      if (messageError) {
+        console.error('Error inserting message:', messageError);
+        throw messageError;
+      " +
+
+      console.log('Message inserted successfully:', messageData);
+
+      // The real-time subscription should handle adding the message to the UI,
+      // but we'll add it manually as a fallback
+      const newMessageObj = {
+        id: messageData.id,
+        booking_id: messageData.booking_id,
+        sender_id: messageData.sender_id,
+        recipient_id: messageData.recipient_id,
+        content: messageData.content,
+        is_read: messageData.is_read,
+        created_at: messageData.created_at,
+        updated_at: messageData.updated_at,
+        sender: {
+          full_name: 'You',
+          avatar_url: null
+        " + ,
+        is_from_me: true,
+        sender_name: 'You',
+        sender_avatar: null
+      " + ;
+
+      // Add the message to both the current messages and the stored messages by booking ID
+      const updatedMessages = [...messages, newMessageObj];
+      setMessages(updatedMessages);
+
+      // Update the stored messages for this booking
+      setMessagesByBookingId(prev => ({
+        ...prev,
+        [selectedBookingId]: updatedMessages
+      " + ));
+
+      // Scroll to the bottom of the chat
+      setTimeout(() => {
+        if (messagesEndRef.current) {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' " + );
+        " +
+      " + , 100);
+
+      setNewMessage('');
+    " +  catch (error) {
+      console.error('Error sending message:', error);
+    " +  finally {
+      setSendingMessage(false);
+    " +
+  " + ;
+
+  const getSelectedBooking = () => {
+    return bookings.find(b => b.id === selectedBookingId);
+  " + ;
+
+  // Check if the selected booking is completed
+  const isBookingCompleted = () => {
+    const booking = getSelectedBooking();
+    return booking?.status === 'completed';
+  " + ;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  " +
+
+  return (
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="mb-6">
+        <Link to="/dashboard/service-agent" className="inline-flex items-center text-blue-600 hover:text-blue-800">
+          <ArrowLeft className="h-4 w-4 mr-1" />
+          Back to Dashboard
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900 mt-2">Messages</h1>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm overflow-hidden">
+        <div className="grid grid-cols-1 md:grid-cols-4">
+          {/* Bookings Sidebar */" +
+          <div className="border-r border-gray-200">
+            <div className="p-4 border-b border-gray-200">
+              <h2 className="text-lg font-medium text-gray-900">Conversations</h2>
+            </div>
+            <div className="divide-y divide-gray-200 max-h-[600px] overflow-y-auto">
+              {bookings.length === 0 ? (
+                <div className="p-4 text-center text-gray-500">No bookings found</div>
+              ) : (
+                bookings.map((booking) => (
+                  <button
+                    key={booking.id" +
+                    className={"w-full text-left p-4 hover:bg-gray-50 focus:outline-none " + (
+                      selectedBookingId === booking.id ? 'bg-blue-50' : ''
+                    " + " +
+                    onClick={() => setSelectedBookingId(booking.id)" +
+                  >
+                    <div className="flex items-center">
+                      {booking.client?.avatar_url ? (
+                        <img
+                          src={booking.client.avatar_url" +
+                          alt={booking.client.full_name" +
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-400" />
+                        </div>
+                      )" +
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">
+                          {booking.client?.full_name || 'Client'" +
+                        </p>
+                        <p className="text-xs text-gray-500">{booking.service_package.title" + </p>
+                        <div className="flex items-center mt-1">
+                          <Calendar className="h-3 w-3 text-gray-400 mr-1" />
+                          <p className="text-xs text-gray-500">
+                            {new Date(booking.scheduled_date).toLocaleDateString()" +
+                          </p>
+                        </div>
+                        <div className="mt-1">
+                          <span className={"inline-flex items-center px-2 py-0.5 rounded text-xs font-medium " + (
+                            booking.status === 'completed'
+                              ? 'bg-green-100 text-green-800'
+                              : booking.status === 'cancelled'
+                              ? 'bg-red-100 text-red-800'
+                              : 'bg-blue-100 text-blue-800'
+                          " + ")" + >
+                            {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)" +
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </button>
+                ))
+              )" +
+            </div>
+          </div>
+
+          {/* Messages Area */" +
+          <div className="col-span-3 flex flex-col h-[700px]">
+            {selectedBookingId ? (
+              <>
+                {/* Conversation Header */" +
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center">
+                    {getSelectedBooking()?.client?.avatar_url ? (
+                      <img
+                        src={getSelectedBooking()?.client?.avatar_url" +
+                        alt={getSelectedBooking()?.client?.full_name" +
+                        className="h-10 w-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                        <User className="h-5 w-5 text-gray-400" />
+                      </div>
+                    )" +
+                    <div className="ml-3">
+                      <p className="text-sm font-medium text-gray-900">
+                        {getSelectedBooking()?.client?.full_name || 'Client'" +
+                      </p>
+                      <p className="text-xs text-gray-500">{getSelectedBooking()?.service_package.title" + </p>
+                    </div>
+                    <div className="ml-auto">
+                      <span className={"inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium " + (
+                        getSelectedBooking()?.status === 'completed'
+                          ? 'bg-green-100 text-green-800'
+                          : getSelectedBooking()?.status === 'cancelled'
+                          ? 'bg-red-100 text-red-800'
+                          : 'bg-blue-100 text-blue-800'
+                      " + ")" + >
+                        {getSelectedBooking()?.status.charAt(0).toUpperCase() + getSelectedBooking()?.status.slice(1)" +
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Messages */" +
+                <div className="flex-1 p-4 overflow-y-auto">
+                  {messages.length === 0 ? (
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-gray-500">No messages yet</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      {messages.map((message) => (
+                        <div
+                          key={message.id" +
+                          className={"flex " + (message.is_from_me ? 'justify-end' : 'justify-start'" + ")" +
+                        >
+                          <div
+                            className={"max-w-[75%] rounded-lg px-4 py-2 " + (
+                              message.is_from_me
+                                ? 'bg-blue-600 text-white'
+                                : 'bg-white border border-gray-200 text-gray-800'
+                            " + ")" +
+                          >
+                            <div className="text-sm">{message.content" + </div>
+                            <div
+                              className={"text-xs mt-1 " + (
+                                message.is_from_me ? 'text-blue-200' : 'text-gray-500'
+                              " + ")" +
+                            >
+                              {new Date(message.created_at).toLocaleTimeString([], {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                              " + )" +
+                            </div>
+                          </div>
+                        </div>
+                      ))" +
+                      <div ref={messagesEndRef" +  />
+                    </div>
+                  )" +
+                </div>
+
+                {/* Message Input */" +
+                <div className="p-4 border-t border-gray-200">
+                  {isBookingCompleted() ? (
+                    <div className="bg-yellow-50 border border-yellow-200 rounded-md p-3 text-sm text-yellow-800">
+                      This project has been completed. The conversation is now closed.
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSendMessage" +  className="flex">
+                      <input
+                        type="text"
+                        value={newMessage" +
+                        onChange={(e) => setNewMessage(e.target.value)" +
+                        placeholder="Type a message..."
+                        className="flex-1 border border-gray-300 rounded-l-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      <button
+                        type="submit"
+                        disabled={!newMessage.trim() || sendingMessage" +
+                        className="bg-blue-600 text-white px-4 py-2 rounded-r-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+                      >
+                        {sendingMessage ? (
+                          <div className="h-5 w-5 border-t-2 border-white rounded-full animate-spin" />
+                        ) : (
+                          <Send className="h-5 w-5" />
+                        )" +
+                      </button>
+                    </form>
+                  )" +
+                </div>
+              </>
+            ) : (
+              <div className="flex-1 flex items-center justify-center">
+                <div className="text-center text-gray-500">
+                  <p>Select a conversation to view messages</p>
+                </div>
+              </div>
+            )" +
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+" + ;
+
+export default ServiceAgentMessages;

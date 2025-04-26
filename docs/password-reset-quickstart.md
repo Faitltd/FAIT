@@ -6,7 +6,7 @@ This guide provides quick steps to test the password reset functionality with yo
 
 1. **Generate Google App Password**:
    - Go to [myaccount.google.com](https://myaccount.google.com) → Security → App passwords
-   - Create a new App Password for "Mail" named "FAIT Password Reset"
+   - Create a new App Password for "Mail" named "FAIT Co-op Password Reset"
    - Copy the 16-character password
 
 2. **Update Environment File**:
@@ -31,9 +31,9 @@ This guide provides quick steps to test the password reset functionality with yo
 
 - **SMTP Server**: smtp.gmail.com
 - **Port**: 587
-- **Username**: admin@itsfait.com
-- **From Email**: admin@itsfait.com
-- **Sender Name**: FAIT
+- **Username**: admin@fait-coop.com
+- **From Email**: admin@fait-coop.com
+- **Sender Name**: FAIT Co-op
 - **TLS**: Enabled
 - **Custom Template**: Enabled (./supabase/templates/password-reset.html)
 

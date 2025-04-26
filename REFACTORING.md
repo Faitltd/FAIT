@@ -1,6 +1,6 @@
-# FAIT Co-Op Platform Refactoring
+# FAIT Co-op Refactoring
 
-This document outlines the refactoring changes made to the FAIT Co-Op platform codebase.
+This document outlines the refactoring changes made to the FAIT Co-op platform codebase.
 
 ## Database Migrations Refactoring
 

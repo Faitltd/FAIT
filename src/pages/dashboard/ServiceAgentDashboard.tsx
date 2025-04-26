@@ -2,25 +2,25 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../lib/hooks/useAuth';
 import { useApi } from '../../lib/hooks/useApi';
-import { 
-  servicePackagesApi, 
-  reviewsApi, 
+import {
+  servicePackagesApi,
+  reviewsApi,
   externalReviewsApi,
   type ServicePackage,
   type Review,
   type ExternalReview,
   type ServiceAgentVerification
 } from '../../lib/api';
-import { 
-  Card, 
-  CardHeader, 
-  CardTitle, 
-  CardContent, 
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
   CardFooter,
   Button,
   Badge
 } from '../../components/common';
-import { Calendar, MessageSquare, Star, Tool, Settings, Briefcase, Clock, Shield } from 'lucide-react';
+import { Calendar, MessageSquare, Wrench, Users, BarChart3, Settings, LogOut, Briefcase, Star, Shield, Clock } from 'lucide-react';
 import ServicePackageForm from '../../components/ServicePackageForm';
 import ReviewsList from '../../components/ReviewsList';
 import ExternalReviewsForm from '../../components/ExternalReviewsForm';
@@ -84,7 +84,7 @@ const ServiceAgentDashboard: React.FC = () => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         if (!user) return;
 
         // Fetch verification status
@@ -210,7 +210,7 @@ const ServiceAgentDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Link>
-        
+
         <Link to="/dashboard/service-agent/jobs" className="block">
           <Card variant="default" className="h-full hover:shadow-md transition-shadow">
             <CardContent className="p-6">
@@ -224,12 +224,12 @@ const ServiceAgentDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Link>
-        
+
         <Link to="/dashboard/service-agent/listings" className="block">
           <Card variant="default" className="h-full hover:shadow-md transition-shadow">
             <CardContent className="p-6">
               <div className="flex items-center">
-                <Tool className="h-8 w-8 text-purple-600" />
+                <Wrench className="h-8 w-8 text-purple-600" />
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Services</h3>
                   <p className="text-sm text-gray-500">Manage your service listings</p>
@@ -238,7 +238,7 @@ const ServiceAgentDashboard: React.FC = () => {
             </CardContent>
           </Card>
         </Link>
-        
+
         <Link to="/settings/profile" className="block">
           <Card variant="default" className="h-full hover:shadow-md transition-shadow">
             <CardContent className="p-6">
@@ -259,7 +259,7 @@ const ServiceAgentDashboard: React.FC = () => {
         <Card variant="default">
           <CardContent className="p-6 flex items-start">
             <div className="mr-4">
-              <Tool className="h-6 w-6 text-blue-600" />
+              <Wrench className="h-6 w-6 text-blue-600" />
             </div>
             <div>
               <h3 className="text-lg font-medium text-gray-900 mb-2">Active Services</h3>
@@ -272,7 +272,7 @@ const ServiceAgentDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card variant="default">
           <CardContent className="p-6 flex items-start">
             <div className="mr-4">
@@ -289,7 +289,7 @@ const ServiceAgentDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card variant="default">
           <CardContent className="p-6 flex items-start">
             <div className="mr-4">
@@ -307,7 +307,7 @@ const ServiceAgentDashboard: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card variant="default">
           <CardContent className="p-6 flex items-start">
             <div className="mr-4">
@@ -332,8 +332,8 @@ const ServiceAgentDashboard: React.FC = () => {
           <CardHeader>
             <div className="flex justify-between items-center w-full">
               <CardTitle>External Reviews</CardTitle>
-              <Button 
-                variant="default" 
+              <Button
+                variant="default"
                 size="sm"
                 onClick={() => setShowExternalReviewForm(true)}
               >
@@ -374,8 +374,8 @@ const ServiceAgentDashboard: React.FC = () => {
               <CardHeader>
                 <div className="flex justify-between items-center w-full">
                   <CardTitle>Your Service Packages</CardTitle>
-                  <Button 
-                    variant="default" 
+                  <Button
+                    variant="default"
                     size="sm"
                     onClick={() => setShowServiceForm(true)}
                   >
@@ -397,7 +397,7 @@ const ServiceAgentDashboard: React.FC = () => {
                           <p className="text-sm text-gray-500">${service.price}</p>
                         </div>
                         <div className="flex items-center space-x-3">
-                          <Badge 
+                          <Badge
                             variant={service.is_active ? 'success' : 'default'}
                           >
                             {service.is_active ? 'Active' : 'Inactive'}

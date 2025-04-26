@@ -169,14 +169,14 @@ otp_expiry = 3600
 enabled = true
 host = "smtp.gmail.com"
 port = 587
-user = "admin@itsfait.com"  # Your Google Workspace email
+user = "admin@fait-coop.com"  # Your Google Workspace email
 pass = "env(GOOGLE_APP_PASSWORD)"  # Will be set in .env file
-admin_email = "admin@itsfait.com"  # Your Google Workspace email
-sender_name = "FAIT Password Reset"
+admin_email = "admin@fait-coop.com"  # Your Google Workspace email
+sender_name = "FAIT Co-op Password Reset"
 
 # Custom email templates
 [auth.email.template.reset_password]
-subject = "Reset Your FAIT Password"
+subject = "Reset Your FAIT Co-op Password"
 content_path = "./supabase/templates/password-reset.html"
 
 # [auth.email.template.invite]

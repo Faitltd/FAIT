@@ -38,15 +38,15 @@ const VerificationBadge: React.FC<VerificationBadgeProps> = ({ verification, sta
     <div className="inline-flex items-center gap-1">
       {isVerified ? (
         <>
-          <ShieldCheck className={`${sizeClasses[size]} text-green-500`} />
-          <span className={`${textClasses[size]} font-medium text-green-700`}>
+          <ShieldCheck className={`${sizeClasses[size]} text-company-lightpink`} />
+          <span className={`${textClasses[size]} font-medium text-gray-800`}>
             FAIT Verified
           </span>
         </>
       ) : (
         <>
-          <Shield className={`${sizeClasses[size]} text-yellow-500`} />
-          <span className={`${textClasses[size]} font-medium text-yellow-700`}>
+          <Shield className={`${sizeClasses[size]} text-company-lightorange`} />
+          <span className={`${textClasses[size]} font-medium text-gray-800`}>
             Verification Pending
           </span>
         </>

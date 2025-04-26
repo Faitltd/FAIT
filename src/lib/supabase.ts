@@ -1,65 +1,49 @@
 import { createClient } from '@supabase/supabase-js';
 import { Database } from './Database.types';
-import { localSupabase, shouldUseLocalAuth, setLocalAuthMode } from './localSupabase';
+import { localSupabase } from './localSupabase';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-// Create the real Supabase client
+// Use local auth for development simplicity (can be toggled)
+let useLocalAuth = true;
+
+// Create the Supabase client (will only be used if not in local auth mode)
 let realSupabase: any;
 
-try {
-  if (!supabaseUrl || !supabaseAnonKey) {
-    console.warn('Missing Supabase environment variables. Using local auth.');
-    setLocalAuthMode(true);
-  } else {
-    realSupabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
-      auth: {
-        autoRefreshToken: true,
-        persistSession: true,
-        detectSessionInUrl: true,
-        flowType: 'pkce',
-      }
-    });
+if (!useLocalAuth) {
+  try {
+    if (supabaseUrl && supabaseAnonKey) {
+      realSupabase = createClient<Database>(supabaseUrl, supabaseAnonKey, {
+        auth: {
+          autoRefreshToken: true,
+          persistSession: true,
+          detectSessionInUrl: true,
+          flowType: 'pkce',
+        }
+      });
+    } else {
+      console.warn('Missing Supabase environment variables.');
+    }
+  } catch (error) {
+    console.error('Failed to initialize Supabase client:', error);
   }
-} catch (error) {
-  console.error('Failed to initialize Supabase client:', error);
-  console.warn('Falling back to local authentication.');
-  setLocalAuthMode(true);
 }
 
-// Export a proxy that will use either the real Supabase client or the local one
-export const supabase = new Proxy({}, {
-  get: (target, prop) => {
-    // Check if we should use local auth
-    if (shouldUseLocalAuth()) {
-      console.log(`Using local auth for ${String(prop)}`);
-      return localSupabase[prop as keyof typeof localSupabase];
-    }
-
-    // Try to use the real Supabase client
-    try {
-      if (!realSupabase) {
-        throw new Error('Supabase client not initialized');
-      }
-
-      return realSupabase[prop as keyof typeof realSupabase];
-    } catch (error) {
-      console.error(`Error accessing Supabase ${String(prop)}:`, error);
-      console.warn(`Falling back to local auth for ${String(prop)}`);
-      setLocalAuthMode(true);
-      return localSupabase[prop as keyof typeof localSupabase];
-    }
-  }
-}) as typeof realSupabase;
-
-// Helper function to toggle between local and remote auth
-export const toggleAuthMode = (useLocal: boolean): void => {
-  setLocalAuthMode(useLocal);
-  console.log(`Switched to ${useLocal ? 'local' : 'remote'} authentication mode`);
-};
+// Export either the real Supabase client or the local one
+export const supabase = useLocalAuth ? localSupabase : realSupabase;
 
 // Helper function to check current auth mode
 export const isUsingLocalAuth = (): boolean => {
-  return shouldUseLocalAuth();
+  return useLocalAuth;
+};
+
+// Helper function to toggle auth mode
+export const toggleAuthMode = (newMode?: boolean): boolean => {
+  if (newMode !== undefined) {
+    useLocalAuth = newMode;
+  } else {
+    useLocalAuth = !useLocalAuth;
+  }
+  return useLocalAuth;
 };

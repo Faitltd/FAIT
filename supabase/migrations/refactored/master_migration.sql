@@ -1,6 +1,6 @@
 /*
-  # Master Migration for FAIT Co-Op
-  
+  # Master Migration for FAIT Co-op
+
   This file runs all the refactored migrations in order:
   1. 00_utility_functions.sql - Utility functions for migrations
   2. 01_rename_contractor_tables.sql - Rename contractor tables to service_agent

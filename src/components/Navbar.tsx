@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Building2, Gift, Vote, UserCircle, Menu, X, Shield, PenTool as Tool, Settings } from 'lucide-react';
+import { Building2, Gift, Vote, UserCircle, Menu, X, Shield, PenTool as Tool, Settings, Search, Calendar, MessageSquare, FileText, Award, Home, DollarSign, MessageCircle } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import NotificationBell from './NotificationBell';
@@ -55,7 +55,7 @@ const Navbar = () => {
     navigate('/');
   };
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
     <nav className="bg-white shadow-sm">
@@ -63,20 +63,166 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <Building2 className="h-8 w-8 text-blue-600" />
+              <img src="/fait-logo.svg" alt="FAIT Co-Op Logo" className="h-8 w-8" />
               <span className="ml-2 text-xl font-bold text-gray-900">FAIT Co-Op</span>
             </Link>
             <div className="hidden md:ml-6 md:flex md:space-x-4">
               <Link
-                to="/services"
+                to="/"
                 className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
-                  isActive('/services') ? 'bg-gray-100' : ''
+                  isActive('/') && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/services') ? 'bg-gray-100' : ''
                 }`}
               >
-                <span className="flex items-center">
-                  <Tool className="h-4 w-4 mr-1" />
-                  Services
-                </span>
+                Home
+              </Link>
+              <Link
+                to="/projects"
+                className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                  location.pathname.startsWith('/projects') ? 'bg-gray-100' : ''
+                }`}
+              >
+                Projects
+              </Link>
+              <Link
+                to="/services"
+                className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/services') || isActive('/services/search') ? 'bg-gray-100' : ''
+                }`}
+              >
+                Services
+              </Link>
+              <Link
+                to="/forum"
+                className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/forum') ? 'bg-gray-100' : ''
+                }`}
+              >
+                Community
+              </Link>
+
+              {/* Show these links only for authenticated clients */}
+              {user && userType === 'client' && (
+                <>
+                  <Link
+                    to="/dashboard/client/bookings"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/bookings') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Bookings
+                  </Link>
+                  <Link
+                    to="/dashboard/client/messages"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/messages') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Messages
+                  </Link>
+                  <Link
+                    to="/dashboard/client/warranty"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/warranty') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Warranty
+                  </Link>
+                  <Link
+                    to="/dashboard/client/enhanced"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/enhanced') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Enhanced Dashboard
+                  </Link>
+                  <Link
+                    to="/dashboard/client/referrals"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/referrals') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Referrals
+                  </Link>
+                  <Link
+                    to="/dashboard/client/points"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/points') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Points
+                  </Link>
+                  <Link
+                    to="/dashboard/client/achievements"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/client/achievements') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Achievements
+                  </Link>
+                </>
+              )}
+
+              {/* Show these links only for service agents */}
+              {userType === 'service_agent' && (
+                <>
+                  <Link
+                    to="/dashboard/service-agent/listings"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/service-agent/listings') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    My Services
+                  </Link>
+                  <Link
+                    to="/dashboard/service-agent/messages"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/service-agent/messages') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Messages
+                  </Link>
+                  <Link
+                    to="/dashboard/service-agent/referrals"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/service-agent/referrals') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Grow Your Network
+                  </Link>
+                  <Link
+                    to="/dashboard/service-agent/points"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/service-agent/points') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Points
+                  </Link>
+                  <Link
+                    to="/dashboard/service-agent/achievements"
+                    className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                      isActive('/dashboard/service-agent/achievements') ? 'bg-gray-100' : ''
+                    }`}
+                  >
+                    Achievements
+                  </Link>
+                </>
+              )}
+
+              <Link
+                to="/messaging/sms"
+                className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/messaging/sms') ? 'bg-gray-100' : ''
+                }`}
+              >
+                SMS
+              </Link>
+              <Link
+                to="/subscription/dashboard"
+                className={`text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium ${
+                  isActive('/subscription') ? 'bg-gray-100' : ''
+                }`}
+              >
+                Membership
               </Link>
               {user && (
                 <>
@@ -86,10 +232,7 @@ const Navbar = () => {
                       isActive('/points') ? 'bg-gray-100' : ''
                     }`}
                   >
-                    <span className="flex items-center">
-                      <Gift className="h-4 w-4 mr-1" />
-                      Points & Rewards
-                    </span>
+                    Points
                   </Link>
                   <Link
                     to="/governance"
@@ -97,10 +240,7 @@ const Navbar = () => {
                       isActive('/governance') ? 'bg-gray-100' : ''
                     }`}
                   >
-                    <span className="flex items-center">
-                      <Vote className="h-4 w-4 mr-1" />
-                      Governance
-                    </span>
+                    Governance
                   </Link>
                 </>
               )}
@@ -119,10 +259,7 @@ const Navbar = () => {
                         location.pathname.startsWith('/dashboard/admin') ? 'bg-gray-100' : ''
                       }`}
                     >
-                      <span className="flex items-center">
-                        <Shield className="h-4 w-4 mr-1" />
-                        Admin Dashboard
-                      </span>
+                      Admin Dashboard
                     </Link>
                   ) : userType === 'service_agent' ? (
                     <Link
@@ -131,10 +268,7 @@ const Navbar = () => {
                         location.pathname.startsWith('/dashboard/service-agent') ? 'bg-gray-100' : ''
                       }`}
                     >
-                      <span className="flex items-center">
-                        <Tool className="h-4 w-4 mr-1" />
-                        Service Agent Dashboard
-                      </span>
+                      Service Agent Dashboard
                     </Link>
                   ) : (
                     <Link
@@ -143,10 +277,7 @@ const Navbar = () => {
                         location.pathname.startsWith('/dashboard/client') ? 'bg-gray-100' : ''
                       }`}
                     >
-                      <span className="flex items-center">
-                        <UserCircle className="h-4 w-4 mr-1" />
-                        Client Dashboard
-                      </span>
+                      Client Dashboard
                     </Link>
                   )}
                   <Link
@@ -155,10 +286,7 @@ const Navbar = () => {
                       location.pathname.startsWith('/settings') ? 'bg-gray-100' : ''
                     }`}
                   >
-                    <span className="flex items-center">
-                      <Settings className="h-4 w-4 mr-1" />
-                      Settings
-                    </span>
+                    Settings
                   </Link>
                   <button
                     onClick={handleLogout}
@@ -205,13 +333,89 @@ const Navbar = () => {
         <div className="md:hidden">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
+              to="/"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              Home
+            </Link>
+            <Link
+              to="/projects"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              Projects
+            </Link>
+            <Link
               to="/services"
               className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
             >
-              <span className="flex items-center">
-                <Tool className="h-5 w-5 mr-2" />
-                Services
-              </span>
+              Services
+            </Link>
+            <Link
+              to="/forum"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              Community
+            </Link>
+
+            {/* Show these links only for authenticated clients */}
+            {user && userType === 'client' && (
+              <>
+                <Link
+                  to="/dashboard/client/bookings"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  Bookings
+                </Link>
+                <Link
+                  to="/dashboard/client/messages"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  Messages
+                </Link>
+                <Link
+                  to="/dashboard/client/warranty"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  Warranty
+                </Link>
+                <Link
+                  to="/dashboard/client/enhanced"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  Enhanced Dashboard
+                </Link>
+              </>
+            )}
+
+            {/* Show these links only for service agents */}
+            {userType === 'service_agent' && (
+              <>
+                <Link
+                  to="/dashboard/service-agent/listings"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  My Services
+                </Link>
+                <Link
+                  to="/dashboard/service-agent/messages"
+                  className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                >
+                  Messages
+                </Link>
+              </>
+            )}
+
+            <Link
+              to="/messaging/sms"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              SMS
+            </Link>
+            <Link
+              to="/subscription/dashboard"
+              className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+            >
+              Membership
             </Link>
             {user && (
               <>
@@ -219,59 +423,41 @@ const Navbar = () => {
                   to="/points"
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                 >
-                  <span className="flex items-center">
-                    <Gift className="h-5 w-5 mr-2" />
-                    Points & Rewards
-                  </span>
+                  Points
                 </Link>
                 <Link
                   to="/governance"
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                 >
-                  <span className="flex items-center">
-                    <Vote className="h-5 w-5 mr-2" />
-                    Governance
-                  </span>
+                  Governance
                 </Link>
                 {isAdminUser ? (
                   <Link
                     to="/dashboard/admin"
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                   >
-                    <span className="flex items-center">
-                      <Shield className="h-5 w-5 mr-2" />
-                      Admin Dashboard
-                    </span>
+                    Admin Dashboard
                   </Link>
                 ) : userType === 'service_agent' ? (
                   <Link
                     to="/dashboard/service-agent"
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                   >
-                    <span className="flex items-center">
-                      <Tool className="h-5 w-5 mr-2" />
-                      Service Agent Dashboard
-                    </span>
+                    Service Agent Dashboard
                   </Link>
                 ) : (
                   <Link
                     to="/dashboard/client"
                     className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                   >
-                    <span className="flex items-center">
-                      <UserCircle className="h-5 w-5 mr-2" />
-                      Client Dashboard
-                    </span>
+                    Client Dashboard
                   </Link>
                 )}
                 <Link
                   to="/settings/profile"
                   className="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-gray-900 hover:bg-gray-100"
                 >
-                  <span className="flex items-center">
-                    <Settings className="h-5 w-5 mr-2" />
-                    Settings
-                  </span>
+                  Settings
                 </Link>
                 <button
                   onClick={handleLogout}

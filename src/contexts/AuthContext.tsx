@@ -1,77 +1,137 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User } from '@supabase/supabase-js';
+import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-
-// Define an interface for emergency user
-interface EmergencyUser {
-  email: string;
-  userType: string;
-  isEmergencyLogin: boolean;
-}
+import { User, Session } from '@supabase/supabase-js';
 
 interface AuthContextType {
   user: User | null;
-  emergencyUser: EmergencyUser | null;
+  session: Session | null;
   loading: boolean;
-  isEmergencyMode: boolean;
+  signIn: (email: string, password: string) => Promise<{
+    error: Error | null;
+    data: { user: User | null; session: Session | null } | null;
+  }>;
+  signUp: (email: string, password: string, userData?: object) => Promise<{
+    error: Error | null;
+    data: { user: User | null; session: Session | null } | null;
+  }>;
+  signOut: () => Promise<{ error: Error | null }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null }>;
 }
 
-const AuthContext = createContext<AuthContextType>({
-  user: null,
-  emergencyUser: null,
-  loading: true,
-  isEmergencyMode: false
-});
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = (): AuthContextType => {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [emergencyUser, setEmergencyUser] = useState<EmergencyUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isEmergencyMode, setIsEmergencyMode] = useState(false);
 
   useEffect(() => {
-    // Check for emergency login first
-    const emergencyAuth = localStorage.getItem('emergency_auth');
-    if (emergencyAuth) {
+    // Get initial session
+    const getInitialSession = async () => {
       try {
-        const parsedAuth = JSON.parse(emergencyAuth) as EmergencyUser;
-        setEmergencyUser(parsedAuth);
-        setIsEmergencyMode(true);
-        setLoading(false);
-        console.log('Using emergency authentication mode');
-        return; // Skip Supabase auth if we're in emergency mode
+        const { data: { session } } = await supabase.auth.getSession();
+        setSession(session);
+        setUser(session?.user ?? null);
       } catch (error) {
-        console.error('Error parsing emergency auth:', error);
-        localStorage.removeItem('emergency_auth');
+        console.error('Error getting initial session:', error);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
 
-    // If no emergency login, proceed with normal Supabase auth
-    // Check active sessions and sets the user
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    }).catch(error => {
-      console.error('Error getting session:', error);
-      setLoading(false);
-    });
+    getInitialSession();
 
-    // Listen for changes on auth state
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
 
+    // Cleanup subscription
     return () => {
       subscription.unsubscribe();
     };
   }, []);
 
+  const signIn = async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      return { data, error };
+    } catch (error) {
+      console.error('Error signing in:', error);
+      return { data: null, error: error as Error };
+    }
+  };
+
+  const signUp = async (email: string, password: string, userData?: object) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: userData,
+        },
+      });
+
+      return { data, error };
+    } catch (error) {
+      console.error('Error signing up:', error);
+      return { data: null, error: error as Error };
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      return { error };
+    } catch (error) {
+      console.error('Error signing out:', error);
+      return { error: error as Error };
+    }
+  };
+
+  const resetPassword = async (email: string) => {
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      return { error };
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      return { error: error as Error };
+    }
+  };
+
+  const value = {
+    user,
+    session,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    resetPassword,
+  };
+
   return (
-    <AuthContext.Provider value={{ user, emergencyUser, loading, isEmergencyMode }}>
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
+
+export default AuthContext;

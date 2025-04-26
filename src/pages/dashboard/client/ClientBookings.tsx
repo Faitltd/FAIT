@@ -179,7 +179,8 @@ const ClientBookings = () => {
             </div>
           ) : (
             filteredBookings.map((booking) => (
-              <div key={booking.id} className="p-6">
+              <div key={booking.id} className="p-6 hover:bg-gray-50 transition-colors duration-150">
+                <Link to={`/dashboard/client/bookings/${booking.id}/enhanced`} className="block">
                 <div className="flex justify-between items-start">
                   <div>
                     <h3 className="text-lg font-medium text-gray-900">
@@ -214,6 +215,7 @@ const ClientBookings = () => {
                     {booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}
                   </span>
                 </div>
+                </Link>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Link
                     to={`/dashboard/client/bookings/${booking.id}`}

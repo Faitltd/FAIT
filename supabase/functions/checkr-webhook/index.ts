@@ -13,11 +13,11 @@ const CHECKR_WEBHOOK_SECRET = Deno.env.get('CHECKR_WEBHOOK_SECRET');
 // Verify Checkr webhook signature
 const verifySignature = (payload: string, signature: string): boolean => {
   if (!CHECKR_WEBHOOK_SECRET) return false;
-  
+
   const hmac = createHmac('sha256', CHECKR_WEBHOOK_SECRET);
   hmac.update(payload);
   const calculatedSignature = hmac.digest('hex');
-  
+
   return crypto.timingSafeEqual(
     Buffer.from(signature, 'hex'),
     Buffer.from(calculatedSignature, 'hex')
@@ -48,9 +48,9 @@ Deno.serve(async (req) => {
 
     if (event.type === 'report.completed') {
       const { report } = event.data;
-      
+
       const { data: verification, error: findError } = await supabase
-        .from('contractor_verifications')
+        .from('service_agent_verifications')
         .select('*')
         .eq('checkr_report_id', report.id)
         .single();
@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
       }
 
       const { error: updateError } = await supabase
-        .from('contractor_verifications')
+        .from('service_agent_verifications')
         .update({
           background_check_status: status,
           is_verified: isVerified,

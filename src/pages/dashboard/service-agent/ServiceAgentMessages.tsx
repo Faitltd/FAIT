@@ -2,12 +2,18 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../../../lib/supabase';
 import { useAuth } from '../../../contexts/AuthContext';
-import { Send, User, ArrowLeft, Calendar } from 'lucide-react';
+import { Send, User, ArrowLeft, Calendar, Info } from 'lucide-react';
 import type { Database } from '../../../lib/database.types';
+import BookingDetailsPopup from '../../../components/BookingDetailsPopup';
 
 type Booking = Database['public']['Tables']['bookings']['Row'] & {
-  client: Pick<Database['public']['Tables']['profiles']['Row'], 'full_name' | 'avatar_url'>;
-  service_package: Pick<Database['public']['Tables']['service_packages']['Row'], 'title'>;
+  client: Pick<Database['public']['Tables']['profiles']['Row'], 'full_name' | 'avatar_url' | 'email' | 'phone'>;
+  service_package: {
+    title: string;
+    price: number;
+    duration: number;
+    duration_unit: string;
+  };
 };
 
 type Message = {
@@ -37,6 +43,7 @@ const ServiceAgentMessages = () => {
   const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [sendingMessage, setSendingMessage] = useState(false);
+  const [showBookingDetails, setShowBookingDetails] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   // Fetch bookings for service agent
@@ -59,7 +66,7 @@ const ServiceAgentMessages = () => {
         }
 
         // Get bookings for these service packages
-        const packageIds = servicePackages.map(pkg => pkg.id);
+        const packageIds = servicePackages.map((pkg: any) => pkg.id);
         const { data: bookingsData, error: bookingsError } = await supabase
           .from('bookings')
           .select(`
@@ -72,8 +79,8 @@ const ServiceAgentMessages = () => {
             notes,
             created_at,
             updated_at,
-            client:client_id(full_name, avatar_url),
-            service_package:service_package_id(title)
+            client:client_id(full_name, avatar_url, email, phone),
+            service_package:service_package_id(title, price, duration)
           `)
           .in('service_package_id', packageIds)
           .order('created_at', { ascending: false });
@@ -81,10 +88,13 @@ const ServiceAgentMessages = () => {
         if (bookingsError) throw bookingsError;
 
         // Process bookings to handle any missing data
-        const processedBookings = bookingsData.map(booking => ({
+        const processedBookings = bookingsData.map((booking: any) => ({
           ...booking,
-          client: booking.client || { full_name: 'Unknown Client', avatar_url: null },
-          service_package: booking.service_package || { title: 'Unknown Service' }
+          client: booking.client || { full_name: 'Unknown Client', avatar_url: null, email: '', phone: null },
+          service_package: booking.service_package ? {
+            ...booking.service_package,
+            duration_unit: booking.service_package.duration_unit || 'hours'
+          } : { title: 'Unknown Service', price: 0, duration: 0, duration_unit: 'hours' }
         }));
 
         setBookings(processedBookings);
@@ -151,7 +161,7 @@ const ServiceAgentMessages = () => {
         console.log('Messages fetched:', messagesData);
 
         // Process each message to ensure we have sender information
-        const data = messagesData.map((message) => {
+        const data = messagesData.map((message: any) => {
           return {
             ...message,
             sender: message.sender || {
@@ -162,7 +172,7 @@ const ServiceAgentMessages = () => {
         });
 
         // Format messages with additional fields needed for UI
-        const formattedMessages = data.map(msg => ({
+        const formattedMessages = data.map((msg: any) => ({
           id: msg.id,
           booking_id: msg.booking_id,
           sender_id: msg.sender_id,
@@ -209,7 +219,7 @@ const ServiceAgentMessages = () => {
           schema: 'public',
           table: 'messages',
           filter: `booking_id=eq.${selectedBookingId}`
-        }, async (payload) => {
+        }, async (payload: any) => {
           console.log('New message received:', payload.new);
 
           try {
@@ -354,6 +364,11 @@ const ServiceAgentMessages = () => {
     return booking?.status === 'completed';
   };
 
+  // Toggle booking details popup
+  const toggleBookingDetails = () => {
+    setShowBookingDetails(!showBookingDetails);
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -386,9 +401,9 @@ const ServiceAgentMessages = () => {
                 bookings.map((booking) => (
                   <button
                     key={booking.id}
-                    className={"w-full text-left p-4 hover:bg-gray-50 focus:outline-none " + (
+                    className={`w-full text-left p-4 hover:bg-gray-50 focus:outline-none ${
                       selectedBookingId === booking.id ? 'bg-blue-50' : ''
-                    }}
+                    }`}
                     onClick={() => setSelectedBookingId(booking.id)}
                   >
                     <div className="flex items-center">
@@ -439,25 +454,27 @@ const ServiceAgentMessages = () => {
               <>
                 {/* Conversation Header */}
                 <div className="p-4 border-b border-gray-200">
-                  <div className="flex items-center">
-                    {getSelectedBooking()?.client?.avatar_url ? (
-                      <img
-                        src={getSelectedBooking()?.client?.avatar_url}
-                        alt={getSelectedBooking()?.client?.full_name}
-                        className="h-10 w-10 rounded-full object-cover"
-                      />
-                    ) : (
-                      <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
-                        <User className="h-5 w-5 text-gray-400" />
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center">
+                      {getSelectedBooking()?.client?.avatar_url ? (
+                        <img
+                          src={getSelectedBooking()?.client?.avatar_url || ''}
+                          alt={getSelectedBooking()?.client?.full_name || 'Client'}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                          <User className="h-5 w-5 text-gray-400" />
+                        </div>
+                      )}
+                      <div className="ml-3">
+                        <p className="text-sm font-medium text-gray-900">
+                          {getSelectedBooking()?.client?.full_name || 'Client'}
+                        </p>
+                        <p className="text-xs text-gray-500">{getSelectedBooking()?.service_package.title}</p>
                       </div>
-                    )}
-                    <div className="ml-3">
-                      <p className="text-sm font-medium text-gray-900">
-                        {getSelectedBooking()?.client?.full_name || 'Client'}
-                      </p>
-                      <p className="text-xs text-gray-500">{getSelectedBooking()?.service_package.title}</p>
                     </div>
-                    <div className="ml-auto">
+                    <div className="ml-auto flex items-center space-x-3">
                       <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
                         getSelectedBooking()?.status === 'completed'
                           ? 'bg-green-100 text-green-800'
@@ -465,8 +482,27 @@ const ServiceAgentMessages = () => {
                           ? 'bg-red-100 text-red-800'
                           : 'bg-blue-100 text-blue-800'
                       }`}>
-                        {getSelectedBooking()?.status.charAt(0).toUpperCase() + getSelectedBooking()?.status.slice(1)}
+                        {getSelectedBooking()?.status ?
+                          `${getSelectedBooking()?.status.charAt(0).toUpperCase()}${getSelectedBooking()?.status.slice(1)}` :
+                          'Unknown'}
                       </span>
+
+                      <button
+                        onClick={toggleBookingDetails}
+                        className="inline-flex items-center px-2.5 py-1.5 border border-gray-300 text-xs font-medium rounded text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                      >
+                        <Info className="mr-1 h-3 w-3" />
+                        Details
+                      </button>
+
+                      {getSelectedBooking()?.status !== 'completed' && getSelectedBooking()?.status !== 'cancelled' && (
+                        <Link
+                          to={`/dashboard/service-agent/estimate/${selectedBookingId}`}
+                          className="inline-flex items-center px-2.5 py-1.5 border border-blue-300 text-xs font-medium rounded text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        >
+                          Create Estimate
+                        </Link>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -550,6 +586,13 @@ const ServiceAgentMessages = () => {
           </div>
         </div>
       </div>
+
+      {/* Booking Details Popup */}
+      <BookingDetailsPopup
+        booking={getSelectedBooking()}
+        isOpen={showBookingDetails}
+        onClose={() => setShowBookingDetails(false)}
+      />
     </div>
   );
 };

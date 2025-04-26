@@ -1,10 +1,10 @@
-# Setting Up Google App Password for FAIT Password Reset
+# Setting Up Google App Password for FAIT Co-op Password Reset
 
-This guide will walk you through the process of creating a Google App Password for your admin@itsfait.com account to enable password reset emails.
+This guide will walk you through the process of creating a Google App Password for your admin@fait-coop.com account to enable password reset emails.
 
 ## Prerequisites
 
-- Access to your admin@itsfait.com Google Workspace account
+- Access to your admin@fait-coop.com Google Workspace account
 - 2-Step Verification enabled on your Google account (required for App Passwords)
 
 ## Step 1: Enable 2-Step Verification (if not already enabled)
@@ -23,7 +23,7 @@ This guide will walk you through the process of creating a Google App Password f
    - Note: This option only appears if 2-Step Verification is enabled
 4. At the bottom, click **Select app** and choose **Mail**
 5. Click **Select device** and choose **Other (Custom name)**
-6. Enter "FAIT Password Reset" as the name
+6. Enter "FAIT Co-op Password Reset" as the name
 7. Click **Generate**
 8. The App Password is the 16-character code that appears on your screen
 9. Copy this password (you won't be able to see it again)

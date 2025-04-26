@@ -2,7 +2,7 @@ import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const selectVariants = cva(
-  'block w-full rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+  'block w-full rounded-md shadow-sm focus:outline-none focus:ring-company-lightpink focus:border-company-lightpink sm:text-sm',
   {
     variants: {
       variant: {
@@ -40,24 +40,24 @@ export interface SelectProps
 }
 
 const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
-  ({ 
-    className, 
-    variant, 
-    size, 
-    label, 
-    helperText, 
-    errorText, 
+  ({
+    className,
+    variant,
+    size,
+    label,
+    helperText,
+    errorText,
     options,
     fullWidth = true,
     id,
-    ...props 
+    ...props
   }, ref) => {
     // Generate a unique ID if one is not provided
     const selectId = id || `select-${Math.random().toString(36).substring(2, 9)}`;
-    
+
     // Determine if we should show the error variant
     const selectVariant = errorText ? 'error' : variant;
-    
+
     return (
       <div className={fullWidth ? 'w-full' : ''}>
         {label && (
@@ -68,9 +68,9 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <div className="relative">
           <select
             id={selectId}
-            className={selectVariants({ 
-              variant: selectVariant, 
-              size, 
+            className={selectVariants({
+              variant: selectVariant,
+              size,
               className
             })}
             ref={ref}
@@ -79,8 +79,8 @@ const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             {...props}
           >
             {options.map((option) => (
-              <option 
-                key={option.value} 
+              <option
+                key={option.value}
                 value={option.value}
                 disabled={option.disabled}
               >

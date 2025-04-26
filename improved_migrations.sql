@@ -1,10 +1,10 @@
 /*
-  # Combined Platform Updates for FAIT Co-Op
+  # Combined Platform Updates for FAIT Co-op
 
   1. New Tables
     - `messages`: For the messaging system between clients and service agents
     - `service_agent_portfolio_items`: For service agents to showcase their work
-  
+
   2. Updates
     - Add photo_urls to warranty_claims table
     - Update RLS policies for new tables
@@ -46,19 +46,19 @@ RETURNS boolean AS $$
 BEGIN
   -- First check admin_users table (preferred method)
   IF EXISTS (
-    SELECT 1 
-    FROM admin_users 
-    WHERE user_id = $1 
+    SELECT 1
+    FROM admin_users
+    WHERE user_id = $1
     AND is_active = true
   ) THEN
     RETURN true;
   END IF;
-  
+
   -- Fallback to profiles table check
   RETURN EXISTS (
-    SELECT 1 
+    SELECT 1
     FROM profiles
-    WHERE id = $1 
+    WHERE id = $1
     AND user_type = 'admin'
   );
 END;
@@ -73,11 +73,11 @@ BEGIN
     FROM information_schema.table_constraints
     WHERE constraint_name = 'profiles_user_type_check'
   ) THEN
-    ALTER TABLE profiles 
+    ALTER TABLE profiles
       DROP CONSTRAINT profiles_user_type_check;
-      
-    ALTER TABLE profiles 
-      ADD CONSTRAINT profiles_user_type_check 
+
+    ALTER TABLE profiles
+      ADD CONSTRAINT profiles_user_type_check
       CHECK (user_type IN ('client', 'service_agent', 'admin'));
   END IF;
 END $$;
@@ -169,15 +169,15 @@ $$ LANGUAGE plpgsql;
 CREATE OR REPLACE FUNCTION safe_rename_column(table_name text, old_column text, new_column text) RETURNS void AS $$
 BEGIN
     IF EXISTS (
-        SELECT 1 
-        FROM information_schema.columns 
-        WHERE table_name = $1 
+        SELECT 1
+        FROM information_schema.columns
+        WHERE table_name = $1
         AND column_name = $2
     ) THEN
         IF NOT EXISTS (
-            SELECT 1 
-            FROM information_schema.columns 
-            WHERE table_name = $1 
+            SELECT 1
+            FROM information_schema.columns
+            WHERE table_name = $1
             AND column_name = $3
         ) THEN
             EXECUTE 'ALTER TABLE ' || table_name || ' RENAME COLUMN ' || old_column || ' TO ' || new_column;
@@ -217,8 +217,8 @@ SELECT safe_rename_column('service_agent_references', 'contractor_id', 'service_
 SELECT safe_rename_column('external_reviews', 'contractor_id', 'service_agent_id');
 
 -- Update user_type in profiles
-UPDATE profiles 
-SET user_type = 'service_agent' 
+UPDATE profiles
+SET user_type = 'service_agent'
 WHERE user_type = 'contractor';
 
 -- Create service_agent_work_history table if it doesn't exist
@@ -379,7 +379,7 @@ DO $$
 BEGIN
     -- Drop old policies if they exist
     DROP POLICY IF EXISTS "Contractors can view own verification" ON service_agent_verifications;
-    
+
     -- Create new policies
     CREATE POLICY "Service agents can view own verification"
       ON service_agent_verifications FOR SELECT
@@ -395,7 +395,7 @@ DO $$
 BEGIN
     -- Drop old policies if they exist
     DROP POLICY IF EXISTS "Contractors can manage own service areas" ON service_agent_service_areas;
-    
+
     -- Create new policies
     CREATE POLICY "Service agents can manage own service areas"
       ON service_agent_service_areas FOR ALL
@@ -412,7 +412,7 @@ DO $$
 BEGIN
     -- Drop old policies if they exist
     DROP POLICY IF EXISTS "Contractors can manage own external reviews" ON external_reviews;
-    
+
     -- Create new policies
     CREATE POLICY "Service agents can manage own external reviews"
       ON external_reviews FOR ALL
@@ -442,7 +442,7 @@ BEGIN
     'message',
     false
   );
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -473,7 +473,7 @@ BEGIN
       'system',
       false
     );
-    
+
     -- Get service agent ID from booking
     DECLARE
       service_agent_id uuid;
@@ -482,7 +482,7 @@ BEGIN
       FROM bookings b
       JOIN service_packages sp ON b.service_package_id = sp.id
       WHERE b.id = NEW.booking_id;
-      
+
       -- Insert notification for service agent if found
       IF service_agent_id IS NOT NULL THEN
         INSERT INTO notifications (
@@ -501,7 +501,7 @@ BEGIN
       END IF;
     END;
   END IF;
-  
+
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

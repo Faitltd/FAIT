@@ -196,7 +196,8 @@ const ServiceAgentJobs = () => {
       ) : (
         <div className="space-y-6">
           {bookings.map((booking) => (
-            <div key={booking.id} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200">
+            <div key={booking.id} className="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-200 hover:shadow-md transition-shadow">
+              <Link to={`/dashboard/service-agent/jobs/${booking.id}/enhanced`} className="block">
               <div className="p-6">
                 <div className="flex flex-col md:flex-row md:justify-between md:items-start">
                   <div className="flex-1">
@@ -249,45 +250,56 @@ const ServiceAgentJobs = () => {
                   </div>
                 </div>
               </div>
+              </Link>
 
               <div className="bg-gray-50 px-6 py-4 border-t border-gray-200">
                 <div className="flex flex-wrap gap-2">
                   {activeTab === 'upcoming' && booking.status === 'pending' && (
-                    <>
-                      <button
-                        onClick={() => updateBookingStatus(booking.id, 'confirmed')}
-                        className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        <CheckCircle className="mr-1.5 h-4 w-4" />
-                        Confirm Job
-                      </button>
-                      <button
-                        onClick={() => updateBookingStatus(booking.id, 'cancelled')}
-                        className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                      >
-                        <XCircle className="mr-1.5 h-4 w-4" />
-                        Decline
-                      </button>
-                    </>
+                    <div className="flex flex-col sm:flex-row gap-2 w-full">
+                        <div className="flex-1 border border-gray-200 rounded-md p-3 bg-gray-50">
+                          <p className="text-sm font-medium text-gray-700 mb-2">Appointment Status:</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => updateBookingStatus(booking.id, 'confirmed')}
+                              className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              <CheckCircle className="mr-1.5 h-4 w-4" />
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => updateBookingStatus(booking.id, 'cancelled')}
+                              className="flex-1 inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                            >
+                              <XCircle className="mr-1.5 h-4 w-4" />
+                              Decline
+                            </button>
+                          </div>
+                        </div>
+                    </div>
                   )}
 
                   {activeTab === 'upcoming' && booking.status === 'confirmed' && (
-                    <button
-                      onClick={() => updateBookingStatus(booking.id, 'completed')}
-                      className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-                    >
-                      <CheckCircle className="mr-1.5 h-4 w-4" />
-                      Mark as Completed
-                    </button>
+                    <div className="flex-1 border border-gray-200 rounded-md p-3 bg-gray-50">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Appointment Status:</p>
+                      <button
+                        onClick={() => updateBookingStatus(booking.id, 'completed')}
+                        className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                      >
+                        <CheckCircle className="mr-1.5 h-4 w-4" />
+                        Mark as Completed
+                      </button>
+                    </div>
                   )}
 
-                  <Link
-                    to={`/dashboard/service-agent/messages?booking=${booking.id}`}
-                    className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-                  >
-                    <MessageSquare className="mr-1.5 h-4 w-4" />
-                    Messages
-                  </Link>
+                  <div className="mt-2 sm:mt-0">
+                    <Link
+                      to={`/dashboard/service-agent/messages?booking=${booking.id}`}
+                      className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                    >
+                      <MessageSquare className="mr-1.5 h-4 w-4" />
+                      Messages
+                    </Link>
+                  </div>
                 </div>
               </div>
             </div>

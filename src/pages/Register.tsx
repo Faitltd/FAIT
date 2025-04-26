@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import type { Database } from '../lib/database.types';
+import { referralService } from '../services/ReferralService';
 
 type UserType = Database['public']['Tables']['profiles']['Row']['user_type'];
 
@@ -14,7 +15,30 @@ const Register = () => {
   const [phone, setPhone] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+  const [referrerInfo, setReferrerInfo] = useState<{ referrerId: string } | null>(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Check for referral code in URL
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode) {
+      setReferralCode(refCode);
+      // Look up the referrer
+      const fetchReferrer = async () => {
+        try {
+          const referrer = await referralService.getReferralByCode(refCode);
+          if (referrer) {
+            setReferrerInfo(referrer);
+          }
+        } catch (err) {
+          console.error('Error fetching referrer:', err);
+        }
+      };
+      fetchReferrer();
+    }
+  }, [searchParams]);
 
   const validateForm = () => {
     // Reset errors
@@ -118,6 +142,21 @@ const Register = () => {
         // Non-critical error, don't throw
       }
 
+      // 5. Track referral if there's a referral code
+      if (referralCode && referrerInfo?.referrerId) {
+        try {
+          await referralService.trackReferral(
+            referrerInfo.referrerId,
+            authData.user.id,
+            referralCode,
+            userType
+          );
+        } catch (referralError) {
+          console.error('Error tracking referral:', referralError);
+          // Non-critical error, don't throw
+        }
+      }
+
       // Navigate based on user type
       navigate(userType === 'service_agent' ? '/dashboard/service-agent' : '/dashboard/client');
     } catch (err) {
@@ -146,6 +185,12 @@ const Register = () => {
             {error && (
               <div className="bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-md text-sm">
                 {error}
+              </div>
+            )}
+
+            {referralCode && (
+              <div className="bg-blue-50 border border-blue-200 text-blue-600 px-4 py-3 rounded-md text-sm">
+                You're signing up with a referral code. You'll receive bonus points when you complete verification!
               </div>
             )}
             <div className="space-y-4">

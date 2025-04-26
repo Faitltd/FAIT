@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase } from '../lib/supabase';
+import { supabase, isUsingLocalAuth } from '../lib/supabase';
 import { FaArrowLeft } from 'react-icons/fa';
 
 const DirectLogin = () => {
@@ -9,7 +9,13 @@ const DirectLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [usingLocalAuth, setUsingLocalAuth] = useState(false);
   const navigate = useNavigate();
+
+  // Check if we're using local auth
+  useEffect(() => {
+    setUsingLocalAuth(isUsingLocalAuth());
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,6 +23,27 @@ const DirectLogin = () => {
     setLoading(true);
 
     try {
+      // For local development, use test accounts
+      if (usingLocalAuth) {
+        // Hardcoded test accounts for local development
+        if (email === 'admin@itsfait.com' && password === 'password') {
+          localStorage.setItem('userEmail', email);
+          setSuccess(true);
+          setTimeout(() => navigate('/dashboard/admin'), 1000);
+          return;
+        } else if (email === 'client@itsfait.com' && password === 'password') {
+          localStorage.setItem('userEmail', email);
+          setSuccess(true);
+          setTimeout(() => navigate('/dashboard/client'), 1000);
+          return;
+        } else if (email === 'service@itsfait.com' && password === 'password') {
+          localStorage.setItem('userEmail', email);
+          setSuccess(true);
+          setTimeout(() => navigate('/dashboard/service-agent'), 1000);
+          return;
+        }
+      }
+
       // Sign in with email and password
       const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,

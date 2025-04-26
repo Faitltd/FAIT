@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { XCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import Navbar from '../components/Navbar';
 import BookingForm from '../components/BookingForm';
 import type { Database } from '../lib/database.types';
 
@@ -49,37 +50,46 @@ const BookService = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <>
+        <Navbar />
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        </div>
+      </>
     );
   }
 
   if (error || !service) {
     return (
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-red-50 border-l-4 border-red-400 p-4">
-          <div className="flex">
-            <div className="flex-shrink-0">
-              <XCircle className="h-5 w-5 text-red-400" />
-            </div>
-            <div className="ml-3">
-              <p className="text-sm text-red-700">{error || 'Service not found'}</p>
+      <>
+        <Navbar />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-red-50 border-l-4 border-red-400 p-4">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <XCircle className="h-5 w-5 text-red-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-red-700">{error || 'Service not found'}</p>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <BookingForm
-        service={service}
-        onSuccess={handleBookingSuccess}
-        onCancel={() => navigate(-1)}
-      />
-    </div>
+    <>
+      <Navbar />
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <BookingForm
+          service={service}
+          onSuccess={handleBookingSuccess}
+          onCancel={() => navigate(-1)}
+        />
+      </div>
+    </>
   );
 };
 

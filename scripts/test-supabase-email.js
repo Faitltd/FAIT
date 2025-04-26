@@ -30,21 +30,21 @@ const supabase = createClient(supabaseUrl, supabaseAnonKey);
 // Function to test password reset
 async function testPasswordReset() {
   console.log('Testing password reset email...');
-  
+
   try {
-    const { data, error } = await supabase.auth.resetPasswordForEmail('admin@itsfait.com', {
+    const { data, error } = await supabase.auth.resetPasswordForEmail('admin@fait-coop.com', {
       redirectTo: 'http://localhost:5173/reset-password',
     });
-    
+
     if (error) {
       console.error('Error sending password reset email:', error);
       process.exit(1);
     }
-    
+
     console.log('Password reset email request successful!');
     console.log('Data:', data);
     console.log('Check your email (including spam folder) for the reset link.');
-    
+
     process.exit(0);
   } catch (err) {
     console.error('Unexpected error:', err);

@@ -16,6 +16,7 @@ export const localSupabase = {
     signInWithPassword: localAuth.signInWithPassword,
     signOut: localAuth.signOut,
     getSession: localAuth.getSession,
+    getUser: localAuth.getUser,
 
     // Auth listeners
     onAuthStateChange: (callback: (event: string, session: any) => void) => {
@@ -122,14 +123,4 @@ export const localSupabase = {
   }
 };
 
-// Helper function to check if we should use local auth
-export const shouldUseLocalAuth = (): boolean => {
-  // Check if Supabase is available by looking for a specific error
-  // You can customize this logic based on your needs
-  return localStorage.getItem('use_local_auth') === 'true';
-};
-
-// Helper to set local auth mode
-export const setLocalAuthMode = (enabled: boolean): void => {
-  localStorage.setItem('use_local_auth', enabled ? 'true' : 'false');
-};
+// No longer needed as we always use local auth in this simplified version

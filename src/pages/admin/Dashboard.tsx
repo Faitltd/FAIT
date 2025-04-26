@@ -9,7 +9,11 @@ import {
   XCircle,
   Clock,
   BarChart3,
-  MessageCircle
+  MessageCircle,
+  CreditCard,
+  DollarSign,
+  Settings,
+  Database
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -225,6 +229,58 @@ const AdminDashboard = () => {
             </div>
           </div>
         </Link>
+
+        <Link
+          to="/dashboard/admin/subscriptions"
+          className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center">
+            <CreditCard className="h-8 w-8 text-indigo-600" />
+            <div className="ml-4">
+              <h3 className="text-lg font-medium text-gray-900">Subscriptions & Billing</h3>
+              <p className="text-sm text-gray-500">Manage user subscriptions and billing</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          to="/dashboard/admin/commissions"
+          className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center">
+            <DollarSign className="h-8 w-8 text-yellow-600" />
+            <div className="ml-4">
+              <h3 className="text-lg font-medium text-gray-900">Supplier Commissions</h3>
+              <p className="text-sm text-gray-500">Track supplier orders and commissions</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          to="/dashboard/admin/pricing"
+          className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center">
+            <Settings className="h-8 w-8 text-red-600" />
+            <div className="ml-4">
+              <h3 className="text-lg font-medium text-gray-900">Pricing Controls</h3>
+              <p className="text-sm text-gray-500">Configure subscription tiers and pricing</p>
+            </div>
+          </div>
+        </Link>
+
+        <Link
+          to="/dashboard/admin/data-import-export"
+          className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
+        >
+          <div className="flex items-center">
+            <Database className="h-8 w-8 text-teal-600" />
+            <div className="ml-4">
+              <h3 className="text-lg font-medium text-gray-900">Data Import/Export</h3>
+              <p className="text-sm text-gray-500">Import and export service agent and service data</p>
+            </div>
+          </div>
+        </Link>
       </div>
 
       {/* Statistics Grid */}
@@ -282,10 +338,10 @@ const AdminDashboard = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="font-medium text-gray-900">
-                      {verification.contractor.full_name}
+                      {verification.service_agent.full_name}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {verification.contractor.email}
+                      {verification.service_agent.email}
                     </p>
                   </div>
                   <span

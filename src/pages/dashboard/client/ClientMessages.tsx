@@ -454,9 +454,9 @@ const ClientMessages = () => {
                 bookings.map((booking) => (
                   <button
                     key={booking.id}
-                    className={"w-full text-left p-4 hover:bg-gray-50 focus:outline-none " + (
+                    className={`w-full text-left p-4 hover:bg-gray-50 focus:outline-none ${
                       selectedBookingId === booking.id ? 'bg-blue-50' : ''
-                    }}
+                    }`}
                     onClick={() => setSelectedBookingId(booking.id)}
                   >
                     <div className="flex items-center">
@@ -507,21 +507,32 @@ const ClientMessages = () => {
                     <p className="text-sm font-medium text-gray-900">
                       {getSelectedBooking()?.service_package.service_agent?.full_name || 'Service Agent'}
                     </p>
-                    <p className="text-xs text-gray-500 flex items-center">
-                      <Calendar className="h-3 w-3 mr-1" />
-                      {new Date(getSelectedBooking()?.scheduled_date || '').toLocaleDateString()}
-                      {' - '}
+                    <p className="text-xs text-gray-500">
                       {getSelectedBooking()?.service_package.title}
                     </p>
+                  </div>
+                  <div className="ml-auto flex items-center">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      getSelectedBooking()?.status === 'completed'
+                        ? 'bg-green-100 text-green-800'
+                        : getSelectedBooking()?.status === 'cancelled'
+                        ? 'bg-red-100 text-red-800'
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {getSelectedBooking()?.status.charAt(0).toUpperCase() + getSelectedBooking()?.status.slice(1)}
+                    </span>
+                    <div className="ml-2 flex items-center text-xs text-gray-500">
+                      <Calendar className="h-3 w-3 mr-1" />
+                      {new Date(getSelectedBooking()?.scheduled_date).toLocaleDateString()}
+                    </div>
                   </div>
                 </div>
 
                 {/* Messages */}
-                <div className="flex-1 p-4 overflow-y-auto bg-gray-50">
+                <div className="flex-1 p-4 overflow-y-auto">
                   {messages.length === 0 ? (
-                    <div className="text-center text-gray-500 mt-8">
-                      <p>No messages yet</p>
-                      <p className="text-sm mt-1">Send a message to start the conversation</p>
+                    <div className="flex items-center justify-center h-full">
+                      <p className="text-gray-500">No messages yet</p>
                     </div>
                   ) : (
                     <div className="space-y-4">
@@ -589,15 +600,7 @@ const ClientMessages = () => {
             ) : (
               <div className="flex-1 flex items-center justify-center">
                 <div className="text-center text-gray-500">
-                  <p>Select a conversation</p>
-                  {bookings.length === 0 && (
-                    <Link
-                      to="/services"
-                      className="mt-2 inline-block text-blue-600 hover:text-blue-800"
-                    >
-                      Book a service to start messaging
-                    </Link>
-                  )}
+                  <p>Select a conversation to view messages</p>
                 </div>
               </div>
             )}

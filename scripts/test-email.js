@@ -25,7 +25,7 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // true for 465, false for other ports
   auth: {
-    user: 'admin@itsfait.com',
+    user: 'admin@fait-coop.com',
     pass: appPassword
   },
   debug: true, // Show debug output
@@ -43,8 +43,8 @@ transporter.verify(function(error, success) {
 
 // Email content
 const mailOptions = {
-  from: '"FAIT" <admin@itsfait.com>',
-  to: 'admin@itsfait.com', // Send to yourself for testing
+  from: '"FAIT Co-op" <admin@fait-coop.com>',
+  to: 'admin@fait-coop.com', // Send to yourself for testing
   subject: 'Test Email - Password Reset Configuration',
   text: 'This is a test email to verify that your SMTP configuration is working correctly.',
   html: `

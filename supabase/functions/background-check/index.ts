@@ -85,14 +85,14 @@ Deno.serve(async (req) => {
     const check = await checkResponse.json();
 
     const { error: updateError } = await supabase
-      .from('contractor_verifications')
+      .from('service_agent_verifications')
       .update({
         background_check_status: 'in_progress',
         background_check_date: new Date().toISOString(),
         checkr_candidate_id: candidate.id,
         checkr_report_id: check.id,
       })
-      .eq('contractor_id', user.id);
+      .eq('service_agent_id', user.id);
 
     if (updateError) {
       throw updateError;

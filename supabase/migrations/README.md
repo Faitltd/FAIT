@@ -1,6 +1,6 @@
 # Database Schema Updates
 
-This directory contains the database migration files for the FAIT Co-Op platform. The migrations are applied in order based on their timestamp prefixes.
+This directory contains the database migration files for the FAIT Co-op platform. The migrations are applied in order based on their timestamp prefixes.
 
 ## Recent Updates
 

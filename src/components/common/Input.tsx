@@ -2,7 +2,7 @@ import React from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 
 const inputVariants = cva(
-  'block w-full rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm',
+  'block w-full rounded-md shadow-sm focus:outline-none focus:ring-company-lightpink focus:border-company-lightpink sm:text-sm',
   {
     variants: {
       variant: {
@@ -35,25 +35,25 @@ export interface InputProps
 }
 
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
-  ({ 
-    className, 
-    variant, 
-    size, 
-    label, 
-    helperText, 
-    errorText, 
-    leftIcon, 
-    rightIcon, 
+  ({
+    className,
+    variant,
+    size,
+    label,
+    helperText,
+    errorText,
+    leftIcon,
+    rightIcon,
     fullWidth = true,
     id,
-    ...props 
+    ...props
   }, ref) => {
     // Generate a unique ID if one is not provided
     const inputId = id || `input-${Math.random().toString(36).substring(2, 9)}`;
-    
+
     // Determine if we should show the error variant
     const inputVariant = errorText ? 'error' : variant;
-    
+
     return (
       <div className={fullWidth ? 'w-full' : ''}>
         {label && (
@@ -69,10 +69,10 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           )}
           <input
             id={inputId}
-            className={inputVariants({ 
-              variant: inputVariant, 
-              size, 
-              className: `${leftIcon ? 'pl-10' : ''} ${rightIcon ? 'pr-10' : ''} ${className || ''}` 
+            className={inputVariants({
+              variant: inputVariant,
+              size,
+              className: `${leftIcon ? 'pl-10' : ''} ${rightIcon ? 'pr-10' : ''} ${className || ''}`
             })}
             ref={ref}
             aria-invalid={!!errorText}

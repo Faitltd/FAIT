@@ -1,11 +1,11 @@
 /*
   # Essential Platform Updates for FAIT Co-Op
   
-  This is a simplified version of the migrations that focuses on the most important changes
-  and avoids problematic triggers.
+  Consolidated migrations file containing all essential database changes
+  in the correct order of execution.
 */
 
--- Create messages table if it doesn't exist
+-- Base Tables and Initial Setup
 CREATE TABLE IF NOT EXISTS messages (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   booking_id uuid REFERENCES bookings(id) ON DELETE CASCADE,
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS messages (
 -- Enable RLS on messages table
 ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
 
--- Create simplified policies for messages
+-- Messages Policies
 CREATE POLICY "Users can view their own messages"
   ON messages FOR SELECT
   TO authenticated
@@ -37,7 +37,44 @@ CREATE POLICY "Users can update their own messages"
   USING (sender_id = auth.uid() OR recipient_id = auth.uid())
   WITH CHECK (sender_id = auth.uid() OR recipient_id = auth.uid());
 
--- Create service_agent_portfolio_items table
+-- Subscription System
+CREATE TABLE IF NOT EXISTS public.subscriptions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  user_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  stripe_subscription_id TEXT,
+  stripe_customer_id TEXT,
+  plan_id TEXT NOT NULL,
+  status TEXT NOT NULL,
+  current_period_start TIMESTAMP WITH TIME ZONE,
+  current_period_end TIMESTAMP WITH TIME ZONE,
+  cancel_at_period_end BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Profile Enhancements
+ALTER TABLE public.profiles 
+ADD COLUMN IF NOT EXISTS stripe_customer_id TEXT,
+ADD COLUMN IF NOT EXISTS subscription_plan TEXT DEFAULT 'basic',
+ADD COLUMN IF NOT EXISTS service_limit INTEGER DEFAULT 1,
+ADD COLUMN IF NOT EXISTS featured_listing BOOLEAN DEFAULT FALSE;
+
+-- Subscription RLS
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view their own subscriptions" 
+ON public.subscriptions FOR SELECT 
+USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert their own subscriptions" 
+ON public.subscriptions FOR INSERT 
+WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update their own subscriptions" 
+ON public.subscriptions FOR UPDATE 
+USING (auth.uid() = user_id);
+
+-- Service Agent Portfolio
 CREATE TABLE IF NOT EXISTS service_agent_portfolio_items (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   service_agent_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
@@ -50,10 +87,9 @@ CREATE TABLE IF NOT EXISTS service_agent_portfolio_items (
   updated_at timestamptz DEFAULT now()
 );
 
--- Enable RLS on service_agent_portfolio_items table
+-- Portfolio RLS
 ALTER TABLE service_agent_portfolio_items ENABLE ROW LEVEL SECURITY;
 
--- Create policies for service_agent_portfolio_items
 CREATE POLICY "Anyone can view portfolio items"
   ON service_agent_portfolio_items FOR SELECT
   TO authenticated
@@ -75,16 +111,15 @@ CREATE POLICY "Service agents can delete their own portfolio items"
   TO authenticated
   USING (service_agent_id = auth.uid());
 
--- Add photo_urls to warranty_claims table
+-- Warranty Claims Enhancement
 ALTER TABLE warranty_claims
 ADD COLUMN IF NOT EXISTS photo_urls text[] DEFAULT '{}';
 
--- Create storage bucket for warranty photos
+-- Storage Setup for Warranty Photos
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('warranty_photos', 'warranty_photos', true)
 ON CONFLICT (id) DO NOTHING;
 
--- Create storage policies for warranty photos
 CREATE POLICY "Users can upload warranty photos"
   ON storage.objects FOR INSERT
   TO authenticated
@@ -98,7 +133,7 @@ CREATE POLICY "Users can view warranty photos"
   TO authenticated
   USING (bucket_id = 'warranty_photos');
 
--- Create service_agent_work_history table
+-- Service Agent Work History
 CREATE TABLE IF NOT EXISTS service_agent_work_history (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   service_agent_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
@@ -111,10 +146,8 @@ CREATE TABLE IF NOT EXISTS service_agent_work_history (
   updated_at timestamptz DEFAULT now()
 );
 
--- Enable RLS on service_agent_work_history table
 ALTER TABLE service_agent_work_history ENABLE ROW LEVEL SECURITY;
 
--- Create policies for service_agent_work_history
 CREATE POLICY "Anyone can view work history"
   ON service_agent_work_history FOR SELECT
   TO authenticated
@@ -136,7 +169,7 @@ CREATE POLICY "Service agents can delete their own work history"
   TO authenticated
   USING (service_agent_id = auth.uid());
 
--- Create service_agent_references table
+-- Service Agent References
 CREATE TABLE IF NOT EXISTS service_agent_references (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   service_agent_id uuid REFERENCES profiles(id) ON DELETE CASCADE,
@@ -149,10 +182,8 @@ CREATE TABLE IF NOT EXISTS service_agent_references (
   updated_at timestamptz DEFAULT now()
 );
 
--- Enable RLS on service_agent_references table
 ALTER TABLE service_agent_references ENABLE ROW LEVEL SECURITY;
 
--- Create policies for service_agent_references
 CREATE POLICY "Service agents can view their own references"
   ON service_agent_references FOR SELECT
   TO authenticated
@@ -174,12 +205,71 @@ CREATE POLICY "Service agents can delete their own references"
   TO authenticated
   USING (service_agent_id = auth.uid());
 
--- Update user_type in profiles
+-- Subscription Management Functions
+CREATE OR REPLACE FUNCTION public.check_service_limit()
+RETURNS TRIGGER AS $$
+DECLARE
+  service_count INTEGER;
+  user_limit INTEGER;
+BEGIN
+  SELECT COUNT(*) INTO service_count
+  FROM public.services
+  WHERE service_agent_id = NEW.service_agent_id AND status = 'active';
+  
+  SELECT service_limit INTO user_limit
+  FROM public.profiles
+  WHERE id = NEW.service_agent_id;
+  
+  IF service_count >= user_limit THEN
+    RAISE EXCEPTION 'Service limit exceeded. Please upgrade your subscription.';
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER enforce_service_limit
+BEFORE INSERT ON public.services
+FOR EACH ROW
+EXECUTE FUNCTION public.check_service_limit();
+
+CREATE OR REPLACE FUNCTION public.update_user_permissions()
+RETURNS TRIGGER AS $$
+BEGIN
+  IF NEW.status = 'active' THEN
+    UPDATE public.profiles
+    SET 
+      subscription_plan = NEW.plan_id,
+      service_limit = CASE 
+        WHEN NEW.plan_id = 'basic' THEN 1
+        WHEN NEW.plan_id = 'plus' THEN 5
+        WHEN NEW.plan_id = 'family' THEN 10
+        WHEN NEW.plan_id = 'pro' THEN 20
+        WHEN NEW.plan_id = 'business' THEN 50
+        ELSE 1
+      END,
+      featured_listing = CASE
+        WHEN NEW.plan_id IN ('family', 'pro', 'business') THEN TRUE
+        ELSE FALSE
+      END
+    WHERE id = NEW.user_id;
+  END IF;
+  
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER update_permissions_on_subscription_change
+AFTER INSERT OR UPDATE ON public.subscriptions
+FOR EACH ROW
+EXECUTE FUNCTION public.update_user_permissions();
+
+-- Legacy Data Updates
 UPDATE profiles 
 SET user_type = 'service_agent' 
 WHERE user_type = 'contractor';
 
--- Rename columns in external_reviews if the table exists
+-- Legacy Table Updates
 DO $$
 BEGIN
   IF EXISTS (
