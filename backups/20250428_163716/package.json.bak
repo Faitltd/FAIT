@@ -14,10 +14,6 @@
     "test": "jest",
     "test:coverage": "jest --coverage",
     "test:oauth": "node scripts/test-oauth.js",
-    "test:auth-credentials": "node scripts/test-auth-credentials.cjs",
-    "test:auth-credentials:sh": "./test-auth-credentials.sh",
-    "test:local-auth-credentials": "node scripts/test-local-auth-credentials.cjs",
-    "test:auth-comprehensive": "./test-auth-comprehensive.sh",
     "db:backup": "node scripts/backup-database.js",
     "db:restore": "node scripts/restore-database.js",
     "db:migrate": "bash scripts/apply_migrations.sh",
@@ -32,11 +28,7 @@
     "cypress:open": "npm run cypress:fix && cypress open",
     "cypress:run": "npm run cypress:fix && cypress run",
     "test:e2e": "./run-tests-with-server.sh",
-    "test:auth": "./test-auth-only.sh",
-    "test:local-auth": "./test-local-auth.sh",
-    "test:direct-login": "./test-direct-login.sh",
-    "test:emergency-login": "./test-emergency-login.sh",
-    "test:super-emergency-login": "./test-super-emergency-login.sh"
+    "test:auth": "./test-auth-only.sh"
   },
   "dependencies": {
     "@googlemaps/js-api-loader": "^1.16.6",
@@ -80,7 +72,7 @@
     "cross-env": "^7.0.3",
     "css-loader": "^7.1.2",
     "css-minimizer-webpack-plugin": "^7.0.2",
-    "cypress": "^12.17.4",
+    "cypress": "^14.3.2",
     "cypress-file-upload": "^5.0.8",
     "dotenv": "^16.5.0",
     "eslint": "^9.9.1",
