@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 import MainLayout from '../../components/MainLayout';
 import { getBookings } from '../../api/bookingApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const BookingsListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,32 +18,32 @@ const BookingsListPage = () => {
   const [statusFilter, setStatusFilter] = useState(searchParams.get('status') || 'all');
   const [sortBy, setSortBy] = useState(searchParams.get('sort') || 'date');
   const [sortDirection, setSortDirection] = useState(searchParams.get('dir') || 'desc');
-  
+
   // Fetch bookings data
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         setLoading(true);
-        
+
         // Get authenticated user
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
-        
+
         if (!user) {
           setError('You must be logged in to view your bookings');
           setLoading(false);
           return;
         }
-        
+
         // Get user type
         const { data: profile } = await supabase
           .from('profiles')
           .select('user_type')
           .eq('id', user.id)
           .single();
-        
+
         setUserType(profile?.user_type);
-        
+
         // Get bookings
         const bookingsData = await getBookings({
           userId: user.id,
@@ -52,7 +52,7 @@ const BookingsListPage = () => {
           sortBy,
           sortDirection
         });
-        
+
         setBookings(bookingsData);
         setError(null);
       } catch (err) {
@@ -62,34 +62,34 @@ const BookingsListPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchBookings();
   }, [statusFilter, sortBy, sortDirection]);
-  
+
   // Update URL when filters change
   useEffect(() => {
     const params = new URLSearchParams();
-    
+
     if (statusFilter !== 'all') {
       params.set('status', statusFilter);
     }
-    
+
     if (sortBy !== 'date') {
       params.set('sort', sortBy);
     }
-    
+
     if (sortDirection !== 'desc') {
       params.set('dir', sortDirection);
     }
-    
+
     setSearchParams(params);
   }, [statusFilter, sortBy, sortDirection, setSearchParams]);
-  
+
   // Handle filter change
   const handleFilterChange = (e) => {
     setStatusFilter(e.target.value);
   };
-  
+
   // Handle sort change
   const handleSortChange = (field) => {
     if (field === sortBy) {
@@ -100,23 +100,23 @@ const BookingsListPage = () => {
       setSortDirection('desc'); // Default to descending for new sort field
     }
   };
-  
+
   // Format date for display
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString();
   };
-  
+
   // Format time for display
   const formatTime = (timeString) => {
     if (!timeString) return '';
-    
+
     const [hours, minutes] = timeString.split(':');
     const hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
   };
-  
+
   // Get status badge class
   const getStatusBadgeClass = (status) => {
     switch (status) {
@@ -132,11 +132,11 @@ const BookingsListPage = () => {
         return 'bg-gray-100 text-gray-800';
     }
   };
-  
+
   // Render sort indicator
   const renderSortIndicator = (field) => {
     if (sortBy !== field) return null;
-    
+
     return sortDirection === 'asc' ? (
       <svg className="ml-1 h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
         <path fillRule="evenodd" d="M5.293 9.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 7.414V15a1 1 0 11-2 0V7.414L6.707 9.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -147,7 +147,7 @@ const BookingsListPage = () => {
       </svg>
     );
   };
-  
+
   return (
     <MainLayout currentPage="bookings">
       <div className="py-10">
@@ -185,7 +185,7 @@ const BookingsListPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Bookings List */}
               <div className="bg-white shadow overflow-hidden sm:rounded-lg">
                 {loading ? (

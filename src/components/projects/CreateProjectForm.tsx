@@ -6,7 +6,7 @@ import { useAuth } from '../../contexts/AuthContext';
 const CreateProjectForm: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -18,11 +18,11 @@ const CreateProjectForm: React.FC = () => {
     state: '',
     zip: ''
   });
-  
+
   const [photos, setPhotos] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -30,22 +30,22 @@ const CreateProjectForm: React.FC = () => {
       [name]: value
     }));
   };
-  
+
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const fileArray = Array.from(e.target.files);
       setPhotos(fileArray);
     }
   };
-  
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!user) {
       setError('You must be logged in to create a project');
       return;
     }
-    
+
     // Validate form
     if (
       !formData.title ||
@@ -57,17 +57,33 @@ const CreateProjectForm: React.FC = () => {
       setError('Please fill in all required fields');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
+      console.log('Creating project with data:', {
+        client_id: user.id,
+        name: formData.title, // Using name instead of title to match the expected field
+        title: formData.title, // Keep title for backward compatibility
+        description: formData.description,
+        budget: parseFloat(formData.budget),
+        timeline: formData.timeline,
+        category: formData.category,
+        status: 'pending',
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zip: formData.zip
+      });
+
       // Create project record
       const { data: project, error: projectError } = await supabase
         .from('projects')
         .insert({
           client_id: user.id,
-          title: formData.title,
+          name: formData.title, // Using name instead of title to match the expected field
+          title: formData.title, // Keep title for backward compatibility
           description: formData.description,
           budget: parseFloat(formData.budget),
           timeline: formData.timeline,
@@ -80,25 +96,27 @@ const CreateProjectForm: React.FC = () => {
         })
         .select()
         .single();
-        
+
       if (projectError) throw projectError;
-      
+
+      console.log('Project created successfully:', project);
+
       // Upload photos if any
       if (photos.length > 0 && project) {
         for (const photo of photos) {
           const fileName = `${project.id}/${Date.now()}-${photo.name}`;
-          
+
           const { error: uploadError } = await supabase.storage
             .from('project_photos')
             .upload(fileName, photo);
-            
+
           if (uploadError) throw uploadError;
-          
+
           // Get public URL
           const { data: publicUrl } = supabase.storage
             .from('project_photos')
             .getPublicUrl(fileName);
-            
+
           // Add photo to project_photos table
           const { error: photoError } = await supabase
             .from('project_photos')
@@ -107,13 +125,17 @@ const CreateProjectForm: React.FC = () => {
               photo_url: publicUrl.publicUrl,
               file_name: photo.name
             });
-            
+
           if (photoError) throw photoError;
         }
       }
-      
-      // Redirect to project page
-      navigate(`/projects/${project.id}`);
+
+      // Log navigation
+      console.log('Navigating to projects list page');
+
+      // Redirect to projects list page instead of individual project page
+      // This ensures the user sees the list of projects including the newly created one
+      navigate('/projects');
     } catch (err) {
       console.error('Error creating project:', err);
       setError(err instanceof Error ? err.message : 'An error occurred while creating the project');
@@ -121,17 +143,17 @@ const CreateProjectForm: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="max-w-3xl mx-auto bg-white p-8 rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">Create New Project</h1>
-      
+
       {error && (
         <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
           <p className="text-red-700">{error}</p>
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         <div className="space-y-6">
           {/* Project Details */}
@@ -153,7 +175,7 @@ const CreateProjectForm: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div>
                 <label htmlFor="description" className="block text-sm font-medium text-gray-700">
                   Project Description *
@@ -169,7 +191,7 @@ const CreateProjectForm: React.FC = () => {
                   required
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="budget" className="block text-sm font-medium text-gray-700">
@@ -188,7 +210,7 @@ const CreateProjectForm: React.FC = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="timeline" className="block text-sm font-medium text-gray-700">
                     Timeline *
@@ -210,7 +232,7 @@ const CreateProjectForm: React.FC = () => {
                     <option value="6+ months">6+ months</option>
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="category" className="block text-sm font-medium text-gray-700">
                     Category *
@@ -238,7 +260,7 @@ const CreateProjectForm: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Project Location */}
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">Project Location</h2>
@@ -257,7 +279,7 @@ const CreateProjectForm: React.FC = () => {
                   onChange={handleInputChange}
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 <div>
                   <label htmlFor="city" className="block text-sm font-medium text-gray-700">
@@ -273,7 +295,7 @@ const CreateProjectForm: React.FC = () => {
                     onChange={handleInputChange}
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="state" className="block text-sm font-medium text-gray-700">
                     State
@@ -291,7 +313,7 @@ const CreateProjectForm: React.FC = () => {
                     {/* Add other states as needed */}
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="zip" className="block text-sm font-medium text-gray-700">
                     ZIP Code
@@ -309,7 +331,7 @@ const CreateProjectForm: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Project Photos */}
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-4">Project Photos</h2>
@@ -371,7 +393,7 @@ const CreateProjectForm: React.FC = () => {
               )}
             </div>
           </div>
-          
+
           {/* Submit Button */}
           <div className="flex justify-end">
             <button

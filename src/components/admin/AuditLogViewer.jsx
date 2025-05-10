@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 import { getAuditLogs } from '../../api/auditLogApi';
 import { format } from 'date-fns';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const ACTION_TYPES = ['CREATE', 'UPDATE', 'DELETE', 'VIEW', 'LOGIN', 'LOGOUT', 'OTHER'];
 const TABLE_NAMES = ['profiles', 'services', 'bookings', 'subscriptions', 'warranty_claims', 'other'];
@@ -53,9 +53,9 @@ const AuditLogViewer = () => {
         .from('profiles')
         .select('id, first_name, last_name, email')
         .eq('user_type', 'admin');
-      
+
       if (error) throw error;
-      
+
       setAdmins(data);
     } catch (err) {
       console.error('Error fetching admins:', err);
@@ -113,10 +113,10 @@ const AuditLogViewer = () => {
 
   const formatDataDiff = (previousData, newData) => {
     if (!previousData || !newData) return null;
-    
+
     const allKeys = new Set([...Object.keys(previousData), ...Object.keys(newData)]);
     const changes = [];
-    
+
     allKeys.forEach(key => {
       if (JSON.stringify(previousData[key]) !== JSON.stringify(newData[key])) {
         changes.push({
@@ -126,7 +126,7 @@ const AuditLogViewer = () => {
         });
       }
     });
-    
+
     return changes;
   };
 
@@ -144,7 +144,7 @@ const AuditLogViewer = () => {
           Refresh
         </button>
       </div>
-      
+
       {/* Filters */}
       <div className="bg-white shadow px-4 py-5 sm:rounded-lg sm:p-6">
         <div className="md:grid md:grid-cols-4 md:gap-6">
@@ -173,7 +173,7 @@ const AuditLogViewer = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="sm:col-span-2">
                 <label htmlFor="tableName" className="block text-sm font-medium text-gray-700">
                   Table Name
@@ -191,7 +191,7 @@ const AuditLogViewer = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="sm:col-span-2">
                 <label htmlFor="adminId" className="block text-sm font-medium text-gray-700">
                   Admin
@@ -211,7 +211,7 @@ const AuditLogViewer = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="sm:col-span-3">
                 <label htmlFor="startDate" className="block text-sm font-medium text-gray-700">
                   Start Date
@@ -225,7 +225,7 @@ const AuditLogViewer = () => {
                   className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
-              
+
               <div className="sm:col-span-3">
                 <label htmlFor="endDate" className="block text-sm font-medium text-gray-700">
                   End Date
@@ -240,7 +240,7 @@ const AuditLogViewer = () => {
                 />
               </div>
             </div>
-            
+
             <div className="mt-6 flex justify-end">
               <button
                 type="button"
@@ -260,7 +260,7 @@ const AuditLogViewer = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Audit Logs Table */}
       {loading ? (
         <div className="flex justify-center items-center h-64">
@@ -353,7 +353,7 @@ const AuditLogViewer = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Pagination */}
           <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6">
             <div className="flex-1 flex justify-between sm:hidden">
@@ -418,7 +418,7 @@ const AuditLogViewer = () => {
           </div>
         </div>
       )}
-      
+
       {/* Log Details Modal */}
       {showLogDetails && selectedLog && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
@@ -426,9 +426,9 @@ const AuditLogViewer = () => {
             <div className="fixed inset-0 transition-opacity" aria-hidden="true">
               <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
             </div>
-            
+
             <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-            
+
             <div className="inline-block align-bottom bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-4xl sm:w-full sm:p-6">
               <div className="absolute top-0 right-0 pt-4 pr-4">
                 <button
@@ -442,7 +442,7 @@ const AuditLogViewer = () => {
                   </svg>
                 </button>
               </div>
-              
+
               <div className="sm:flex sm:items-start">
                 <div className="mt-3 text-center sm:mt-0 sm:text-left sm:flex-grow">
                   <h3 className="text-lg leading-6 font-medium text-gray-900 flex items-center">
@@ -456,7 +456,7 @@ const AuditLogViewer = () => {
                       {selectedLog.action_type}
                     </span>
                   </h3>
-                  
+
                   <div className="mt-4 grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Timestamp</h4>
@@ -464,7 +464,7 @@ const AuditLogViewer = () => {
                         {format(new Date(selectedLog.created_at), 'PPpp')}
                       </p>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Admin</h4>
                       <p className="mt-1 text-sm text-gray-900">
@@ -472,29 +472,29 @@ const AuditLogViewer = () => {
                       </p>
                       <p className="text-xs text-gray-500">{selectedLog.admin?.email}</p>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Table</h4>
                       <p className="mt-1 text-sm text-gray-900">{selectedLog.table_name}</p>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">Record ID</h4>
                       <p className="mt-1 text-sm text-gray-900">{selectedLog.record_id || 'N/A'}</p>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">IP Address</h4>
                       <p className="mt-1 text-sm text-gray-900">{selectedLog.ip_address || 'N/A'}</p>
                     </div>
-                    
+
                     <div>
                       <h4 className="text-sm font-medium text-gray-500">User Agent</h4>
                       <p className="mt-1 text-sm text-gray-900 truncate">
                         {selectedLog.user_agent || 'N/A'}
                       </p>
                     </div>
-                    
+
                     {selectedLog.action_type === 'UPDATE' && (
                       <div className="sm:col-span-2">
                         <h4 className="text-sm font-medium text-gray-500">Changes</h4>
@@ -536,7 +536,7 @@ const AuditLogViewer = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     {selectedLog.action_type === 'CREATE' && selectedLog.new_data && (
                       <div className="sm:col-span-2">
                         <h4 className="text-sm font-medium text-gray-500">Created Data</h4>
@@ -547,7 +547,7 @@ const AuditLogViewer = () => {
                         </div>
                       </div>
                     )}
-                    
+
                     {selectedLog.action_type === 'DELETE' && selectedLog.previous_data && (
                       <div className="sm:col-span-2">
                         <h4 className="text-sm font-medium text-gray-500">Deleted Data</h4>
@@ -561,7 +561,7 @@ const AuditLogViewer = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div className="mt-5 sm:mt-4 sm:flex sm:flex-row-reverse">
                 <button
                   type="button"

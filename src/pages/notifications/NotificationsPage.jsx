@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 import {
   getNotifications,
   markNotificationAsRead,
@@ -52,7 +52,7 @@ import NotificationItem from '../../components/notifications/NotificationItem';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const NotificationsPage = () => {
   const [notifications, setNotifications] = useState([]);
@@ -65,29 +65,57 @@ const NotificationsPage = () => {
   const pageSize = 20;
 
   useEffect(() => {
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
+    // If using emergency login, don't try to fetch or subscribe to notifications
+    if (isEmergencyLogin) {
+      console.log('Using emergency login, skipping notifications setup in NotificationsPage');
+      setLoading(false);
+      return;
+    }
+
     const fetchUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        setUser(user);
 
-      if (user) {
-        fetchNotifications();
+        if (user) {
+          fetchNotifications();
 
-        // Subscribe to new notifications
-        const subscription = await subscribeToNotifications((notification) => {
-          // Add new notification to the list if on first page
-          if (currentPage === 1) {
-            setNotifications(prev => [notification, ...prev]);
+          // Subscribe to new notifications
+          let subscription;
+          try {
+            subscription = await subscribeToNotifications((notification) => {
+              // Add new notification to the list if on first page
+              if (currentPage === 1) {
+                setNotifications(prev => [notification, ...prev]);
+              }
+
+              // Update total count
+              setTotalCount(prev => prev + 1);
+            });
+          } catch (err) {
+            console.error('Error subscribing to notifications:', err);
           }
 
-          // Update total count
-          setTotalCount(prev => prev + 1);
-        });
-
-        return () => {
-          if (subscription) {
-            supabase.removeChannel(subscription);
-          }
-        };
+          return () => {
+            if (subscription) {
+              try {
+                supabase.removeChannel(subscription);
+              } catch (err) {
+                console.error('Error removing notification channel:', err);
+              }
+            }
+          };
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+        setLoading(false);
+        setError('Error authenticating user');
       }
     };
 
@@ -95,6 +123,25 @@ const NotificationsPage = () => {
   }, [currentPage, filter]);
 
   const fetchNotifications = async () => {
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
+    if (isEmergencyLogin) {
+      console.log('Using emergency login, returning empty notifications');
+      setNotifications([]);
+      setTotalCount(0);
+      setLoading(false);
+      return;
+    }
+
+    // Only proceed if we have a valid user
+    if (!user || !user.id) {
+      console.log('No authenticated user, skipping notifications fetch');
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -105,6 +152,7 @@ const NotificationsPage = () => {
       let query = supabase
         .from('notifications')
         .select('*', { count: 'exact' })
+        .eq('user_id', user.id) // Make sure to filter by user_id
         .order('created_at', { ascending: false })
         .range(offset, offset + pageSize - 1);
 
@@ -119,7 +167,7 @@ const NotificationsPage = () => {
 
       if (error) throw error;
 
-      setNotifications(data);
+      setNotifications(data || []);
       setTotalCount(count || 0);
       setError(null);
     } catch (err) {
@@ -131,10 +179,20 @@ const NotificationsPage = () => {
   };
 
   const handleNotificationClick = async (notification) => {
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
     try {
       // Mark notification as read
       if (!notification.is_read) {
-        await markNotificationAsRead(notification.id);
+        if (!isEmergencyLogin) {
+          try {
+            await markNotificationAsRead(notification.id);
+          } catch (err) {
+            console.error('Error marking notification as read:', err);
+          }
+        }
 
         // Update notification in state
         setNotifications(prev =>
@@ -158,8 +216,18 @@ const NotificationsPage = () => {
   };
 
   const handleMarkAllAsRead = async () => {
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
     try {
-      await markAllNotificationsAsRead();
+      if (!isEmergencyLogin) {
+        try {
+          await markAllNotificationsAsRead();
+        } catch (err) {
+          console.error('Error marking all notifications as read:', err);
+        }
+      }
 
       // Update notifications in state
       setNotifications(prev =>

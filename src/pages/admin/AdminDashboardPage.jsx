@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import Navbar from '../../components/Navbar';
 import DashboardStats from '../../components/admin/DashboardStats';
 import UserStatsCard from '../../components/admin/UserStatsCard';
@@ -14,7 +14,7 @@ import { getAdminDashboardStats, getRecentActivity } from '../../api/dashboardSt
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const AdminDashboardPage = () => {
   const [stats, setStats] = useState(null);

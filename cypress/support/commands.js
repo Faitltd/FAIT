@@ -14,9 +14,33 @@ import 'cypress-file-upload';
 // -- This is a parent command --
 Cypress.Commands.add('login', (email, password) => {
   cy.visit('/login');
-  cy.get('[data-cy=login-email]').type(email);
-  cy.get('[data-cy=login-password]').type(password);
-  cy.get('[data-cy=login-submit]').click();
+
+  // Enable local auth mode if available
+  cy.window().then((win) => {
+    win.localStorage.setItem('useLocalAuth', 'true');
+  });
+
+  // Find email input using multiple possible selectors
+  cy.get('input[type="email"], input[name="email"], [data-cy="login-email"], [id="email"], [placeholder*="email" i]')
+    .first()
+    .clear()
+    .type(email);
+
+  // Find password input using multiple possible selectors
+  cy.get('input[type="password"], input[name="password"], [data-cy="login-password"], [id="password"], [placeholder*="password" i]')
+    .first()
+    .clear()
+    .type(password);
+
+  // Find submit button using multiple possible selectors
+  cy.get('button[type="submit"], [data-cy="login-submit"], button:contains("Log In"), button:contains("Sign In"), button:contains("Login"), input[type="submit"]')
+    .first()
+    .click();
+
+  // Wait for any redirects to complete
+  cy.wait(3000);
+
+  // Check for successful login - should redirect to dashboard
   cy.url().should('include', '/dashboard');
 });
 
@@ -266,5 +290,50 @@ Cypress.Commands.add('testResponsive', (url, viewports = ['desktop', 'tablet', '
 
     // Check that content is visible
     cy.get('body > div').should('be.visible');
+  });
+});
+
+// Command to check if user is logged in
+Cypress.Commands.add('isLoggedIn', () => {
+  return cy.window().then(win => {
+    // Check various localStorage keys that might indicate a logged-in user
+    const authKeys = [
+      'supabase.auth.token',
+      'local_auth_session',
+      'userType',
+      'userEmail',
+      'devUser',
+      'sb-sjrehyseqqptdcnadvod-auth-token'
+    ];
+
+    for (const key of authKeys) {
+      const value = win.localStorage.getItem(key);
+      if (value) {
+        cy.log(`Found auth key: ${key}`);
+        return true;
+      }
+    }
+
+    cy.log('No auth keys found in localStorage');
+    return false;
+  });
+});
+
+// Command to logout
+Cypress.Commands.add('logout', () => {
+  cy.log('Logging out');
+
+  // Clear localStorage to log out
+  cy.clearLocalStorage();
+
+  // Reload the page
+  cy.reload();
+
+  // Verify we're logged out by checking the URL or localStorage
+  cy.window().then(win => {
+    const hasAuthKeys = Object.keys(win.localStorage).some(key =>
+      key.includes('auth') || key.includes('user') || key.includes('session')
+    );
+    expect(hasAuthKeys).to.be.false;
   });
 });

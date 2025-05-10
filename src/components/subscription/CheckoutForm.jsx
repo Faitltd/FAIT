@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const CheckoutForm = ({ clientSecret, planName, onSuccess, onCancel }) => {
   const stripe = useStripe();
@@ -39,14 +39,14 @@ const CheckoutForm = ({ clientSecret, planName, onSuccess, onCancel }) => {
     } else if (paymentIntent.status === 'succeeded') {
       setError(null);
       setSucceeded(true);
-      
+
       // Update user's subscription status in local state
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         // Update local storage for immediate UI feedback
         localStorage.setItem('subscriptionPlan', planName);
       }
-      
+
       // Notify parent component
       onSuccess();
     }
@@ -75,13 +75,13 @@ const CheckoutForm = ({ clientSecret, planName, onSuccess, onCancel }) => {
           />
         </div>
       </div>
-      
+
       {error && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
           {error}
         </div>
       )}
-      
+
       <div className="flex justify-end space-x-3">
         <button
           type="button"

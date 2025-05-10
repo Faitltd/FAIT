@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIT Co-op - Offline</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    
+    header {
+      background-color: #4CAF50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    
+    main {
+      flex: 1;
+      padding: 2rem;
+      max-width: 800px;
+      margin: 0 auto;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    
+    .offline-container {
+      background-color: white;
+      border-radius: 8px;
+      padding: 2rem;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    
+    h1 {
+      margin-top: 0;
+      color: #333;
+    }
+    
+    .icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      color: #4CAF50;
+    }
+    
+    .message {
+      margin-bottom: 2rem;
+      line-height: 1.6;
+    }
+    
+    .button {
+      display: inline-block;
+      background-color: #4CAF50;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: background-color 0.3s;
+    }
+    
+    .button:hover {
+      background-color: #388E3C;
+    }
+    
+    .cached-content {
+      margin-top: 2rem;
+      text-align: left;
+      border-top: 1px solid #eee;
+      padding-top: 1rem;
+    }
+    
+    .cached-content h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    
+    .cached-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .cached-list li {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .cached-list a {
+      color: #4CAF50;
+      text-decoration: none;
+    }
+    
+    .cached-list a:hover {
+      text-decoration: underline;
+    }
+    
+    footer {
+      background-color: #f1f1f1;
+      padding: 1rem;
+      text-align: center;
+      font-size: 0.875rem;
+      color: #666;
+    }
+    
+    @media (max-width: 600px) {
+      main {
+        padding: 1rem;
+      }
+      
+      .offline-container {
+        padding: 1.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FAIT Co-op</h1>
+  </header>
+  
+  <main>
+    <div class="offline-container">
+      <div class="icon">📶</div>
+      <h1>You're Offline</h1>
+      <div class="message">
+        <p>It looks like you're not connected to the internet right now. Some features may not be available until you're back online.</p>
+        <p>Don't worry though! You can still access previously visited pages and any data you've saved.</p>
+      </div>
+      
+      <a href="/" class="button">Try Again</a>
+      
+      <div class="cached-content">
+        <h2>Available Offline</h2>
+        <ul class="cached-list" id="cached-pages">
+          <!-- This list will be populated by JavaScript -->
+          <li><a href="/">Home</a></li>
+        </ul>
+      </div>
+    </div>
+  </main>
+  
+  <footer>
+    <p>&copy; 2023 FAIT Co-op. All rights reserved.</p>
+  </footer>
+  
+  <script>
+    // This script will run when the page loads
+    document.addEventListener('DOMContentLoaded', async () => {
+      // Check if we're online and update UI accordingly
+      updateOnlineStatus();
+      window.addEventListener('online', updateOnlineStatus);
+      window.addEventListener('offline', updateOnlineStatus);
+      
+      // Try to load cached pages list
+      try {
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          const cachedList = document.getElementById('cached-pages');
+          
+          // Clear the default item
+          cachedList.innerHTML = '';
+          
+          let hasItems = false;
+          
+          for (const cacheName of cacheNames) {
+            const cache = await caches.open(cacheName);
+            const requests = await cache.keys();
+            
+            for (const request of requests) {
+              // Only show HTML pages (not assets)
+              if (request.url.endsWith('.html') || 
+                  request.url.endsWith('/') || 
+                  !request.url.includes('.')) {
+                
+                const url = new URL(request.url);
+                
+                // Skip the offline page itself
+                if (url.pathname === '/offline.html') continue;
+                
+                // Create list item
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = url.pathname;
+                a.textContent = url.pathname === '/' ? 'Home' : url.pathname.replace(/\//g, ' › ').trim();
+                li.appendChild(a);
+                cachedList.appendChild(li);
+                
+                hasItems = true;
+              }
+            }
+          }
+          
+          if (!hasItems) {
+            cachedList.innerHTML = '<li>No cached pages available</li>';
+          }
+        }
+      } catch (error) {
+        console.error('Error loading cached pages:', error);
+      }
+    });
+    
+    function updateOnlineStatus() {
+      const button = document.querySelector('.button');
+      
+      if (navigator.onLine) {
+        button.textContent = 'Reload Page';
+        button.addEventListener('click', () => {
+          window.location.reload();
+        });
+      } else {
+        button.textContent = 'Try Again';
+      }
+    }
+  </script>
+</body>
+</html>

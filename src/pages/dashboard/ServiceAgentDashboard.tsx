@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { useAuth } from '../../lib/hooks/useAuth';
+import { useAuth } from '../../contexts/AuthContext';
 import { useApi } from '../../lib/hooks/useApi';
 import {
   servicePackagesApi,
@@ -196,7 +196,7 @@ const ServiceAgentDashboard: React.FC = () => {
       )}
 
       {/* Quick Actions */}
-      <div className="mb-8 grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="mb-8 grid grid-cols-1 md:grid-cols-5 gap-4">
         <Link to="/dashboard/service-agent/messages" className="block">
           <Card variant="default" className="h-full hover:shadow-md transition-shadow">
             <CardContent className="p-6">
@@ -233,6 +233,20 @@ const ServiceAgentDashboard: React.FC = () => {
                 <div className="ml-4">
                   <h3 className="text-lg font-medium text-gray-900">Services</h3>
                   <p className="text-sm text-gray-500">Manage your service listings</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
+
+        <Link to="/dashboard/service-agent/referrals" className="block">
+          <Card variant="default" className="h-full hover:shadow-md transition-shadow">
+            <CardContent className="p-6">
+              <div className="flex items-center">
+                <Users className="h-8 w-8 text-orange-600" />
+                <div className="ml-4">
+                  <h3 className="text-lg font-medium text-gray-900">Referrals</h3>
+                  <p className="text-sm text-gray-500">Invite others and earn rewards</p>
                 </div>
               </div>
             </CardContent>

@@ -95,8 +95,8 @@ const MainLayout = ({ children, currentPage }) => {
   const navItems = getNavItems();
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-white shadow">
+    <div className="min-h-screen" style={{ backgroundColor: '#c0e2ff' }}>
+      <nav style={{ backgroundColor: '#c0e2ff' }} className="shadow">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex">
@@ -370,7 +370,7 @@ const MainLayout = ({ children, currentPage }) => {
 
       <main>{children}</main>
 
-      <footer className="bg-white">
+      <footer style={{ backgroundColor: '#c0e2ff' }}>
         <div className="max-w-7xl mx-auto py-12 px-4 overflow-hidden sm:px-6 lg:px-8">
           <nav className="-mx-5 -my-2 flex flex-wrap justify-center" aria-label="Footer">
             <div className="px-5 py-2">

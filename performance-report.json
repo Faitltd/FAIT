@@ -1,0 +1,728 @@
+{
+  "timestamp": "2025-05-06T12:47:41.838Z",
+  "bundleSizes": {
+    "total": 1193195,
+    "byType": {
+      "js": 1099696,
+      "css": 77574,
+      "svg": 439,
+      "md": 501,
+      "html": 12013,
+      "json": 2972
+    },
+    "entrypoints": {
+      "main": 292990
+    },
+    "chunks": [
+      {
+        "name": "workers/chunk-processor.js",
+        "size": 4819
+      }
+    ],
+    "assets": [
+      {
+        "name": "assets/AdminDashboard-DbekhU-f.js",
+        "size": 7597
+      },
+      {
+        "name": "assets/AuditLogPage-DzlgFfZz.js",
+        "size": 19520
+      },
+      {
+        "name": "assets/AvailabilityPage-DXUMHqS3.js",
+        "size": 11316
+      },
+      {
+        "name": "assets/BookingConfirmationPage-L7VvQNUC.js",
+        "size": 8156
+      },
+      {
+        "name": "assets/BookingDetailsPage-DupZ0CJ4.js",
+        "size": 13921
+      },
+      {
+        "name": "assets/BookingPage-ZC4sMm4d.js",
+        "size": 13786
+      },
+      {
+        "name": "assets/BookingsListPage-DGSxUzmj.js",
+        "size": 8211
+      },
+      {
+        "name": "assets/ClientDashboard-DrzAU0uL.js",
+        "size": 25554
+      },
+      {
+        "name": "assets/DashboardRouter-9794GB-a.js",
+        "size": 1753
+      },
+      {
+        "name": "assets/EnhancedSubscriptionDashboard-BDBNkE7z.js",
+        "size": 20005
+      },
+      {
+        "name": "assets/EstimateCalculators-BFpZUmDF.js",
+        "size": 1936
+      },
+      {
+        "name": "assets/EstimatesPage-CXqMq27J.js",
+        "size": 1193
+      },
+      {
+        "name": "assets/ForumPage-D__tAEw1.js",
+        "size": 6474
+      },
+      {
+        "name": "assets/GamificationPage-C_ghwnO1.js",
+        "size": 1196
+      },
+      {
+        "name": "assets/HandymanTaskEstimator-C7hyNTi9.js",
+        "size": 463
+      },
+      {
+        "name": "assets/LoginPage-JWkx8EZq.js",
+        "size": 6100
+      },
+      {
+        "name": "assets/MainLayout-BT_9griJ.js",
+        "size": 22382
+      },
+      {
+        "name": "assets/MessagingPage-Mqi7c9XY.js",
+        "size": 18397
+      },
+      {
+        "name": "assets/NotificationsPage-B0irqVfa.js",
+        "size": 8727
+      },
+      {
+        "name": "assets/ProfilePage-g1VqlIRd.js",
+        "size": 2022
+      },
+      {
+        "name": "assets/ProjectList-D0yIHiwk.js",
+        "size": 9199
+      },
+      {
+        "name": "assets/ProjectsPage-6FI1ffLk.js",
+        "size": 48567
+      },
+      {
+        "name": "assets/RemodelingCalculator-NCL6iA7z.js",
+        "size": 14240
+      },
+      {
+        "name": "assets/ServiceAgentDashboard-C3SOhAzV.js",
+        "size": 31529
+      },
+      {
+        "name": "assets/ServiceAgentListings-UsV9Cf7D.js",
+        "size": 4738
+      },
+      {
+        "name": "assets/ServiceAgentMessages-BbMPPB7f.js",
+        "size": 3702
+      },
+      {
+        "name": "assets/ServiceAgentReferrals-DPGPVtmp.js",
+        "size": 5289
+      },
+      {
+        "name": "assets/ServiceSearchPage-D69WM_9K.js",
+        "size": 28681
+      },
+      {
+        "name": "assets/ServicesPage-DydlvjuM.js",
+        "size": 1198
+      },
+      {
+        "name": "assets/SignupPage-Cz8_g4VK.js",
+        "size": 7586
+      },
+      {
+        "name": "assets/SimpleAdminMessages-2fcR4O6b.js",
+        "size": 996
+      },
+      {
+        "name": "assets/SimpleClientMessages-2rPmkTwL.js",
+        "size": 1000
+      },
+      {
+        "name": "assets/SimpleHandymanCalculator-CeOCOgU0.js",
+        "size": 10914
+      },
+      {
+        "name": "assets/SimpleRemodelingCalculator-kMjz_BkV.js",
+        "size": 7900
+      },
+      {
+        "name": "assets/SimpleSMSMessagingPage-BnMbhYHf.js",
+        "size": 8098
+      },
+      {
+        "name": "assets/SimpleServiceAgentMessages-C-5lpWxp.js",
+        "size": 1014
+      },
+      {
+        "name": "assets/SimpleServiceSearchPage-Dr25IpnU.js",
+        "size": 3834
+      },
+      {
+        "name": "assets/SubscriptionDashboard-CnWX9SD3.js",
+        "size": 1211
+      },
+      {
+        "name": "assets/SubscriptionPlansStripe-CUMLN5HL.js",
+        "size": 30274
+      },
+      {
+        "name": "assets/VerySimpleWarrantyClaimsPage-COblbW-v.js",
+        "size": 602
+      },
+      {
+        "name": "assets/WarrantyClaimDetailPage-DdSrLJ8I.js",
+        "size": 11420
+      },
+      {
+        "name": "assets/WarrantyClaimNewPage-BnKD8pK5.js",
+        "size": 8796
+      },
+      {
+        "name": "assets/WarrantyPage-CCnQqgY6.js",
+        "size": 9836
+      },
+      {
+        "name": "assets/api-vendor-CKeWRTjQ.js",
+        "size": 109358
+      },
+      {
+        "name": "assets/availabilityApi-t8LEcMYg.js",
+        "size": 2481
+      },
+      {
+        "name": "assets/bookingApi-h7AeQvJp.js",
+        "size": 3563
+      },
+      {
+        "name": "assets/browser-CPLWMrWQ.js",
+        "size": 347
+      },
+      {
+        "name": "assets/calendar-vendor-BGI_58BJ.js",
+        "size": 36
+      },
+      {
+        "name": "assets/chart-vendor-l0sNRNKZ.js",
+        "size": 1
+      },
+      {
+        "name": "assets/dashboardStatsApi-EIMmDrDh.js",
+        "size": 4707
+      },
+      {
+        "name": "assets/icons-vendor-CPGebksp.js",
+        "size": 22891
+      },
+      {
+        "name": "assets/index-CxwLlw7A.css",
+        "size": 77574
+      },
+      {
+        "name": "assets/index-DUZ6fzxD.js",
+        "size": 214452
+      },
+      {
+        "name": "assets/maps-vendor-l0sNRNKZ.js",
+        "size": 1
+      },
+      {
+        "name": "assets/react-vendor-TK1kbwdn.js",
+        "size": 164500
+      },
+      {
+        "name": "assets/servicesApi-7Y4i5x3e.js",
+        "size": 4290
+      },
+      {
+        "name": "assets/ui-vendor-BeM78qM_.js",
+        "size": 14771
+      },
+      {
+        "name": "assets/utils-vendor-5ojtMi-o.js",
+        "size": 25511
+      },
+      {
+        "name": "assets/warrantyApi-CeOKYyg1.js",
+        "size": 7689
+      },
+      {
+        "name": "fait-logo.svg",
+        "size": 439
+      },
+      {
+        "name": "images/renovation/README.md",
+        "size": 501
+      },
+      {
+        "name": "index.html",
+        "size": 964
+      },
+      {
+        "name": "manifest.json",
+        "size": 2972
+      },
+      {
+        "name": "offline.html",
+        "size": 5718
+      },
+      {
+        "name": "service-worker.js",
+        "size": 7907
+      },
+      {
+        "name": "simple-app.html",
+        "size": 2945
+      },
+      {
+        "name": "test-app.html",
+        "size": 539
+      },
+      {
+        "name": "test.html",
+        "size": 1847
+      },
+      {
+        "name": "workers/chunk-processor.js",
+        "size": 4819
+      },
+      {
+        "name": "workers/computation-worker.js",
+        "size": 18033
+      },
+      {
+        "name": "workers/data-processing-worker.js",
+        "size": 7135
+      },
+      {
+        "name": "workers/data-worker.js",
+        "size": 20907
+      },
+      {
+        "name": "workers/image-worker.js",
+        "size": 5733
+      },
+      {
+        "name": "workers/maps-worker.js",
+        "size": 11231
+      }
+    ]
+  },
+  "budgetViolations": [
+    {
+      "type": "entrypoint",
+      "name": "main",
+      "size": 292990,
+      "budget": 250000,
+      "overage": 42990
+    }
+  ],
+  "dependencies": {
+    "@fullcalendar/core": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.1.17"
+    },
+    "@fullcalendar/daygrid": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.1.17"
+    },
+    "@fullcalendar/interaction": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.1.17"
+    },
+    "@fullcalendar/react": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.1.17"
+    },
+    "@fullcalendar/timegrid": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.1.17"
+    },
+    "@googlemaps/js-api-loader": {
+      "size": 10000,
+      "count": 1,
+      "version": "^1.16.6"
+    },
+    "@googlemaps/markerclusterer": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.5.3"
+    },
+    "@radix-ui/react-tabs": {
+      "size": 10000,
+      "count": 1,
+      "version": "^1.0.4"
+    },
+    "@stripe/react-stripe-js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^3.7.0"
+    },
+    "@stripe/stripe-js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.4.0"
+    },
+    "@supabase/supabase-js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.49.4"
+    },
+    "@types/crypto-js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.2.2"
+    },
+    "@types/react-router-dom": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.3.3"
+    },
+    "chart.js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.4.9"
+    },
+    "class-variance-authority": {
+      "size": 10000,
+      "count": 1,
+      "version": "^0.7.1"
+    },
+    "classnames": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.5.1"
+    },
+    "clsx": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.1.0"
+    },
+    "crypto-js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.2.0"
+    },
+    "date-fns": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.1.0"
+    },
+    "framer-motion": {
+      "size": 10000,
+      "count": 1,
+      "version": "^12.9.4"
+    },
+    "libphonenumber-js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^1.12.7"
+    },
+    "lucide-react": {
+      "size": 10000,
+      "count": 1,
+      "version": "^0.507.0"
+    },
+    "react": {
+      "size": 164500,
+      "count": 1,
+      "version": "^18.3.1"
+    },
+    "react-dom": {
+      "size": 10000,
+      "count": 1,
+      "version": "^18.3.1"
+    },
+    "react-icons": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.5.0"
+    },
+    "react-router-dom": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.30.0"
+    },
+    "stripe": {
+      "size": 10000,
+      "count": 1,
+      "version": "^18.0.0"
+    },
+    "tailwind-merge": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.2.1"
+    },
+    "zod": {
+      "size": 10000,
+      "count": 1,
+      "version": "^3.24.3"
+    },
+    "@eslint/js": {
+      "size": 10000,
+      "count": 1,
+      "version": "^9.9.1"
+    },
+    "@faker-js/faker": {
+      "size": 10000,
+      "count": 1,
+      "version": "^8.4.1"
+    },
+    "@pmmmwh/react-refresh-webpack-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^0.5.16"
+    },
+    "@testing-library/jest-dom": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.6.3"
+    },
+    "@testing-library/react": {
+      "size": 10000,
+      "count": 1,
+      "version": "^16.3.0"
+    },
+    "@testing-library/user-event": {
+      "size": 10000,
+      "count": 1,
+      "version": "^14.6.1"
+    },
+    "@types/google.maps": {
+      "size": 10000,
+      "count": 1,
+      "version": "^3.55.4"
+    },
+    "@types/jest": {
+      "size": 10000,
+      "count": 1,
+      "version": "^29.5.14"
+    },
+    "@types/react": {
+      "size": 10000,
+      "count": 1,
+      "version": "^18.3.20"
+    },
+    "@types/react-dom": {
+      "size": 10000,
+      "count": 1,
+      "version": "^18.3.5"
+    },
+    "@typescript-eslint/eslint-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^8.29.0"
+    },
+    "@typescript-eslint/parser": {
+      "size": 10000,
+      "count": 1,
+      "version": "^8.29.0"
+    },
+    "@vitejs/plugin-react": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.3.1"
+    },
+    "autoprefixer": {
+      "size": 10000,
+      "count": 1,
+      "version": "^10.4.18"
+    },
+    "clean-webpack-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.0.0"
+    },
+    "compression-webpack-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^11.1.0"
+    },
+    "cross-env": {
+      "size": 10000,
+      "count": 1,
+      "version": "^7.0.3"
+    },
+    "css-loader": {
+      "size": 10000,
+      "count": 1,
+      "version": "^7.1.2"
+    },
+    "css-minimizer-webpack-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^7.0.2"
+    },
+    "cypress": {
+      "size": 10000,
+      "count": 1,
+      "version": "^12.17.4"
+    },
+    "cypress-file-upload": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.0.8"
+    },
+    "dotenv": {
+      "size": 10000,
+      "count": 1,
+      "version": "^16.5.0"
+    },
+    "eslint": {
+      "size": 10000,
+      "count": 1,
+      "version": "^9.9.1"
+    },
+    "eslint-plugin-react-hooks": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.1.0-rc.0"
+    },
+    "eslint-plugin-react-refresh": {
+      "size": 10000,
+      "count": 1,
+      "version": "^0.4.11"
+    },
+    "html-webpack-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.6.3"
+    },
+    "jest": {
+      "size": 10000,
+      "count": 1,
+      "version": "^29.7.0"
+    },
+    "jest-environment-jsdom": {
+      "size": 10000,
+      "count": 1,
+      "version": "^29.7.0"
+    },
+    "mini-css-extract-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.9.2"
+    },
+    "postcss": {
+      "size": 10000,
+      "count": 1,
+      "version": "^8.4.35"
+    },
+    "postcss-loader": {
+      "size": 10000,
+      "count": 1,
+      "version": "^8.1.1"
+    },
+    "react-refresh": {
+      "size": 10000,
+      "count": 1,
+      "version": "^0.17.0"
+    },
+    "style-loader": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.0.0"
+    },
+    "supabase": {
+      "size": 10000,
+      "count": 1,
+      "version": "^2.20.12"
+    },
+    "tailwindcss": {
+      "size": 10000,
+      "count": 1,
+      "version": "^3.4.1"
+    },
+    "ts-jest": {
+      "size": 10000,
+      "count": 1,
+      "version": "^29.3.2"
+    },
+    "ts-loader": {
+      "size": 10000,
+      "count": 1,
+      "version": "^9.5.2"
+    },
+    "typescript": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.8.2"
+    },
+    "vite": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.2.4"
+    },
+    "webpack": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.99.7"
+    },
+    "webpack-bundle-analyzer": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.10.2"
+    },
+    "webpack-dashboard": {
+      "size": 10000,
+      "count": 1,
+      "version": "^3.3.8"
+    },
+    "webpack-dev-server": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.2.1"
+    },
+    "webpack-manifest-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^5.0.0"
+    },
+    "webpack-merge": {
+      "size": 10000,
+      "count": 1,
+      "version": "^6.0.1"
+    },
+    "webpack-subresource-integrity": {
+      "size": 10000,
+      "count": 1,
+      "version": "^1.5.2"
+    },
+    "workbox-webpack-plugin": {
+      "size": 10000,
+      "count": 1,
+      "version": "^7.0.0"
+    },
+    "puppeteer": {
+      "size": 10000,
+      "count": 1,
+      "version": "^21.10.0"
+    },
+    "chalk": {
+      "size": 10000,
+      "count": 1,
+      "version": "^4.1.2"
+    }
+  },
+  "summary": {
+    "totalSize": 1193195,
+    "entryPointSize": 292990,
+    "violationCount": 1,
+    "dependencyCount": 78
+  }
+}

@@ -198,11 +198,13 @@ max_frequency = "5s"
 # 4152127777 = "123456"
 
 # Configure logged in session timeouts.
-# [auth.sessions]
+[auth.sessions]
 # Force log out after the specified duration.
-# timebox = "24h"
+timebox = "24h"
 # Force log out if the user has been inactive longer than the specified duration.
-# inactivity_timeout = "8h"
+inactivity_timeout = "2h"
+# Allow users to have multiple active sessions.
+multiple_sessions = true
 
 # This hook runs before a token is issued and allows you to add additional claims based on the authentication method used.
 # [auth.hook.custom_access_token]
@@ -224,25 +226,59 @@ max_enrolled_factors = 10
 
 # Control MFA via App Authenticator (TOTP)
 [auth.mfa.totp]
-enroll_enabled = false
-verify_enabled = false
+enroll_enabled = true
+verify_enabled = true
 
 # Configure MFA via Phone Messaging
 [auth.mfa.phone]
-enroll_enabled = false
-verify_enabled = false
+enroll_enabled = true
+verify_enabled = true
 otp_length = 6
-template = "Your code is {{ .Code }}"
+template = "Your FAIT Co-op verification code is {{ .Code }}"
 max_frequency = "5s"
 
+# Configure Twilio for SMS-based MFA
+[auth.sms.twilio]
+enabled = true
+account_sid = "env(TWILIO_ACCOUNT_SID)"
+message_service_sid = "env(TWILIO_MESSAGE_SERVICE_SID)"
+# DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:
+auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
+
 # Configure MFA via WebAuthn
-# [auth.mfa.web_authn]
-# enroll_enabled = true
-# verify_enabled = true
+[auth.mfa.web_authn]
+enroll_enabled = true
+verify_enabled = true
 
 # Use an external OAuth provider. The full list of providers are: `apple`, `azure`, `bitbucket`,
 # `discord`, `facebook`, `github`, `gitlab`, `google`, `keycloak`, `linkedin_oidc`, `notion`, `twitch`,
 # `twitter`, `slack`, `spotify`, `workos`, `zoom`.
+
+# Google OAuth configuration
+[auth.external.google]
+enabled = true
+client_id = "env(SUPABASE_AUTH_GOOGLE_CLIENT_ID)"
+# DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
+secret = "env(SUPABASE_AUTH_GOOGLE_SECRET)"
+# Overrides the default auth redirectUrl.
+redirect_uri = "http://localhost:5173/oauth-callback"
+# If enabled, the nonce check will be skipped. Required for local sign in with Google auth.
+skip_nonce_check = true
+# Additional scopes to request
+scopes = "email,profile"
+
+# Facebook OAuth configuration
+[auth.external.facebook]
+enabled = true
+client_id = "env(SUPABASE_AUTH_FACEBOOK_CLIENT_ID)"
+# DO NOT commit your OAuth provider secret to git. Use environment variable substitution instead:
+secret = "env(SUPABASE_AUTH_FACEBOOK_SECRET)"
+# Overrides the default auth redirectUrl.
+redirect_uri = "http://localhost:5173/oauth-callback"
+# Additional scopes to request
+scopes = "email,public_profile"
+
+# Apple OAuth configuration
 [auth.external.apple]
 enabled = false
 client_id = ""

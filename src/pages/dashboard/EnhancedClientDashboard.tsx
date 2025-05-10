@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ServiceSearch from '../../components/ServiceSearch';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
+import { Calculator, Wrench } from 'lucide-react';
 
 const EnhancedClientDashboard: React.FC = () => {
   const { user } = useAuth();
@@ -189,6 +190,30 @@ const EnhancedClientDashboard: React.FC = () => {
               </div>
             </div>
 
+            {/* Free Instant Estimate Button */}
+            <div className="px-4 py-6 sm:px-0">
+              <div className="bg-gradient-to-r from-blue-600 to-teal-500 rounded-lg shadow-lg overflow-hidden">
+                <div className="px-6 py-8 md:flex md:items-center md:justify-between">
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-2xl font-bold leading-7 text-white sm:text-3xl">
+                      Need a cost estimate for your project?
+                    </h2>
+                    <p className="mt-3 max-w-3xl text-lg text-blue-100">
+                      Get an instant ballpark estimate for your home improvement projects with our free calculators.
+                    </p>
+                  </div>
+                  <div className="mt-5 md:mt-0 md:ml-6">
+                    <Link
+                      to="/calculator/estimate"
+                      className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-blue-700 bg-white hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-blue-600 focus:ring-white"
+                    >
+                      Free Instant Estimate
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Service Search Section */}
             <div className="px-4 py-6 sm:px-0">
               <ServiceSearch userZipCode={userZipCode} />
@@ -264,6 +289,38 @@ const EnhancedClientDashboard: React.FC = () => {
                         <div className="ml-4">
                           <h3 className="text-lg font-medium text-gray-900">Warranties</h3>
                           <p className="text-sm text-gray-500">Manage your warranties</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link to="/calculator/remodeling" className="block">
+                  <div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
+                    <div className="px-4 py-5 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 bg-teal-100 rounded-md p-3">
+                          <Calculator className="h-6 w-6 text-teal-600" />
+                        </div>
+                        <div className="ml-4">
+                          <h3 className="text-lg font-medium text-gray-900">Remodeling Calculator</h3>
+                          <p className="text-sm text-gray-500">Estimate your project costs</p>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+
+                <Link to="/calculator/handyman" className="block">
+                  <div className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow">
+                    <div className="px-4 py-5 sm:p-6">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 bg-blue-100 rounded-md p-3">
+                          <Wrench className="h-6 w-6 text-blue-600" />
+                        </div>
+                        <div className="ml-4">
+                          <h3 className="text-lg font-medium text-gray-900">Handyman Task Estimator</h3>
+                          <p className="text-sm text-gray-500">Get pricing for common tasks</p>
                         </div>
                       </div>
                     </div>

@@ -25,7 +25,7 @@ type PortfolioItem = Database['public']['Tables']['service_agent_portfolio_items
 type ServiceArea = Database['public']['Tables']['service_agent_service_areas']['Row'];
 
 const ProfileSettings = () => {
-  const { user } = useAuth();
+  const { user, isDevelopmentMode, userPermissions, hasPermission } = useAuth();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -280,6 +280,26 @@ const ProfileSettings = () => {
             </nav>
           </div>
 
+          {/* Development Mode Indicator */}
+          {isDevelopmentMode && (
+            <div className="mb-6 bg-amber-50 border-l-4 border-amber-500 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-amber-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M8.485 2.495c.673-1.167 2.357-1.167 3.03 0l6.28 10.875c.673 1.167-.17 2.625-1.516 2.625H3.72c-1.347 0-2.189-1.458-1.515-2.625L8.485 2.495zM10 5a.75.75 0 01.75.75v4.5a.75.75 0 01-1.5 0v-4.5A.75.75 0 0110 5zm0 10a1 1 0 100-2 1 1 0 000 2z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-amber-700">
+                    <span className="font-medium text-amber-800">Development Mode Active</span>
+                    <br />
+                    You have {userPermissions.length} permissions enabled.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Tab Content */}
           {activeTab === 'profile' && (
             <EnhancedProfileForm onProfileUpdate={handleProfileUpdate} />
@@ -346,6 +366,28 @@ const ProfileSettings = () => {
                   <h2 className="text-lg font-medium text-gray-900">Advanced Settings</h2>
                 </div>
                 <div className="p-6 space-y-6">
+                  {/* User Permissions Section - Only visible in development mode */}
+                  {isDevelopmentMode && (
+                    <div className="mb-6">
+                      <h3 className="text-md font-medium text-gray-900 mb-3">User Permissions</h3>
+                      <p className="text-sm text-gray-600 mb-4">
+                        Your account has the following permissions:
+                      </p>
+                      <div className="bg-gray-50 p-4 rounded-md">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {userPermissions.map(permission => (
+                            <div key={permission} className="flex items-center">
+                              <svg className="h-4 w-4 text-green-500 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                              <span className="text-sm text-gray-700">{permission}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div>
                     <h3 className="text-md font-medium text-gray-900 mb-3">Data Export</h3>
                     <p className="text-sm text-gray-600 mb-4">

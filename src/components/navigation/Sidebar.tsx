@@ -1,24 +1,24 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { 
-  Home, 
-  Briefcase, 
-  Users, 
-  MessageSquare, 
-  Calendar, 
-  FileText, 
-  CreditCard, 
-  Settings, 
-  HelpCircle 
-} from 'lucide-react';
+
+// Import icons individually for better tree-shaking
+import Home from 'lucide-react/dist/esm/icons/home';
+import Briefcase from 'lucide-react/dist/esm/icons/briefcase';
+import Users from 'lucide-react/dist/esm/icons/users';
+import MessageSquare from 'lucide-react/dist/esm/icons/message-square';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
+import CreditCard from 'lucide-react/dist/esm/icons/credit-card';
+import Settings from 'lucide-react/dist/esm/icons/settings';
+import HelpCircle from 'lucide-react/dist/esm/icons/help-circle';
 
 const Sidebar: React.FC = () => {
   const location = useLocation();
-  
+
   const isActive = (path: string) => {
     return location.pathname.startsWith(path);
   };
-  
+
   const navItems = [
     {
       name: 'Dashboard',
@@ -63,7 +63,7 @@ const Sidebar: React.FC = () => {
       dataCy: 'sidebar-billing'
     }
   ];
-  
+
   return (
     <div className="hidden md:flex md:flex-shrink-0">
       <div className="flex flex-col w-64">

@@ -1,19 +1,89 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { SMSConversationList, SMSConversation, SMSTemplateManager } from '../../components/sms';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs';
 import { MessageSquare, Settings } from 'lucide-react';
+import { supabase } from '../../lib/supabaseClient';
 
 const SMSMessagingPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, userType } = useAuth();
   const [selectedPhoneNumber, setSelectedPhoneNumber] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('messages');
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [hasAccess, setHasAccess] = useState(false);
+
+  useEffect(() => {
+    const checkAccess = async () => {
+      if (!user) {
+        setHasAccess(false);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        // Check if user has access to SMS messaging
+        // First, verify user type from profile
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('user_type')
+          .eq('id', user.id)
+          .single();
+
+        if (profileError) {
+          console.error('Error fetching user profile:', profileError);
+          setError('Failed to verify user permissions');
+          setHasAccess(false);
+          setLoading(false);
+          return;
+        }
+
+        // Check if user type is admin or service_agent
+        const userHasAccess = profile.user_type === 'admin' ||
+                             profile.user_type === 'service_agent';
+
+        setHasAccess(userHasAccess);
+        if (!userHasAccess) {
+          setError('You do not have permission to access SMS messaging');
+        }
+      } catch (err) {
+        console.error('Error checking SMS access:', err);
+        setError('Failed to verify access permissions');
+        setHasAccess(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAccess();
+  }, [user]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
       <div className="flex items-center justify-center h-screen bg-gray-50">
         <div className="text-center">
           <p className="text-gray-500">Please sign in to access messaging</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !hasAccess) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-gray-50">
+        <div className="text-center max-w-md p-6 bg-white rounded-lg shadow-md">
+          <p className="text-red-500 mb-4">{error || 'You do not have permission to access SMS messaging'}</p>
+          <p className="text-gray-600">
+            SMS messaging is only available for service agents and administrators.
+          </p>
         </div>
       </div>
     );
@@ -27,25 +97,25 @@ const SMSMessagingPage: React.FC = () => {
           Manage your SMS conversations and templates
         </p>
       </div>
-      
+
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="flex space-x-4 border-b border-gray-200 mb-6">
-          <TabsTrigger 
-            value="messages" 
+          <TabsTrigger
+            value="messages"
             className={`pb-4 px-1 font-medium text-sm flex items-center ${
-              activeTab === 'messages' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
+              activeTab === 'messages'
+                ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             <MessageSquare className="h-5 w-5 mr-2" />
             Messages
           </TabsTrigger>
-          <TabsTrigger 
-            value="templates" 
+          <TabsTrigger
+            value="templates"
             className={`pb-4 px-1 font-medium text-sm flex items-center ${
-              activeTab === 'templates' 
-                ? 'text-blue-600 border-b-2 border-blue-600' 
+              activeTab === 'templates'
+                ? 'text-blue-600 border-b-2 border-blue-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
@@ -53,12 +123,12 @@ const SMSMessagingPage: React.FC = () => {
             Templates
           </TabsTrigger>
         </TabsList>
-        
+
         <TabsContent value="messages" className="focus:outline-none">
           <div className="bg-white rounded-lg shadow overflow-hidden">
             <div className="grid grid-cols-1 md:grid-cols-3 h-[calc(100vh-250px)]">
               <div className="md:col-span-1 border-r border-gray-200">
-                <SMSConversationList 
+                <SMSConversationList
                   onSelectConversation={(phoneNumber) => setSelectedPhoneNumber(phoneNumber)}
                   selectedPhoneNumber={selectedPhoneNumber || undefined}
                 />
@@ -76,7 +146,7 @@ const SMSMessagingPage: React.FC = () => {
             </div>
           </div>
         </TabsContent>
-        
+
         <TabsContent value="templates" className="focus:outline-none">
           <SMSTemplateManager />
         </TabsContent>

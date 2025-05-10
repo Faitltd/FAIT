@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import VerySimpleWarrantyClaimsPage from './pages/warranty/VerySimpleWarrantyClaimsPage';
+
+// Lazy load the warranty claims page
+const VerySimpleWarrantyClaimsPage = lazy(() => import('./pages/warranty/VerySimpleWarrantyClaimsPage'));
 
 // Simple Home component
 const Home = () => (
@@ -11,8 +13,8 @@ const Home = () => (
       <p className="text-gray-600 mb-4">
         This is a simplified version of the FAIT Co-op platform.
       </p>
-      <Link 
-        to="/warranty/claims" 
+      <Link
+        to="/warranty/claims"
         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
       >
         View Warranty Claims
@@ -29,8 +31,8 @@ const NotFound = () => (
       <p className="text-gray-600 mb-4">
         The page you are looking for does not exist.
       </p>
-      <Link 
-        to="/" 
+      <Link
+        to="/"
         className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
       >
         Go Home
@@ -71,11 +73,13 @@ function SimpleApp() {
           </div>
         </nav>
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/warranty/claims" element={<VerySimpleWarrantyClaimsPage />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <Suspense fallback={<div className="p-8 text-center">Loading...</div>}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/warranty/claims" element={<VerySimpleWarrantyClaimsPage />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </Suspense>
       </div>
     </Router>
   );

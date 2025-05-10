@@ -6,16 +6,9 @@ import { useAuth } from '../contexts/AuthContext';
 const Home: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading, signOut } = useAuth();
-  const [showFeatures, setShowFeatures] = useState(false);
+  const [showFeatures, setShowFeatures] = useState(true);
 
-  useEffect(() => {
-    // Show features section after a delay
-    const timer = setTimeout(() => {
-      setShowFeatures(true);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, []);
+  // No need for useEffect since we're starting with showFeatures = true
 
   const handleLogout = async () => {
     await signOut();
@@ -34,6 +27,17 @@ const Home: React.FC = () => {
             <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-500">
               Connecting homeowners with trusted service agents for all your home improvement needs.
             </p>
+
+            <div className="mt-8">
+              <Link
+                to="/register"
+                className="inline-flex items-center px-8 py-4 border border-transparent text-lg font-bold rounded-md shadow-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                data-testid="get-started-button"
+                id="get-started-button"
+              >
+                Get Started
+              </Link>
+            </div>
             <div className="mt-10 flex justify-center space-x-4">
               {loading ? (
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500"></div>
@@ -69,6 +73,16 @@ const Home: React.FC = () => {
                 </>
               )}
             </div>
+
+            <div className="mt-6">
+              <Link
+                to="/calculator/estimate"
+                className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700"
+                data-testid="free-instant-estimate-link"
+              >
+                Free Instant Estimate
+              </Link>
+            </div>
           </div>
         </div>
       </div>
@@ -87,7 +101,7 @@ const Home: React.FC = () => {
             </div>
 
             <div className="mt-10">
-              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
                 {/* Feature 1 */}
                 <div className="bg-white overflow-hidden shadow rounded-lg">
                   <div className="px-4 py-5 sm:p-6">
@@ -138,6 +152,45 @@ const Home: React.FC = () => {
                       >
                         Learn more &rarr;
                       </Link>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Feature 4 - Calculators */}
+                <div className="bg-white overflow-hidden shadow rounded-lg">
+                  <div className="px-4 py-5 sm:p-6">
+                    <h3 className="text-lg font-medium text-gray-900">Free Estimators</h3>
+                    <p className="mt-2 text-base text-gray-500">
+                      Get instant estimates for remodeling projects and handyman tasks.
+                    </p>
+                    <div className="mt-4 space-y-2">
+                      <div>
+                        <Link
+                          to="/calculator/remodeling"
+                          className="text-blue-600 hover:text-blue-500"
+                          data-testid="remodeling-calculator-link"
+                        >
+                          Remodeling Calculator &rarr;
+                        </Link>
+                      </div>
+                      <div>
+                        <Link
+                          to="/calculator/handyman"
+                          className="text-blue-600 hover:text-blue-500"
+                          data-testid="handyman-calculator-link"
+                        >
+                          Handyman Task Estimator &rarr;
+                        </Link>
+                      </div>
+                      <div className="mt-4">
+                        <Link
+                          to="/calculator/estimate"
+                          className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                          data-testid="view-all-calculators-link"
+                        >
+                          View All Calculators
+                        </Link>
+                      </div>
                     </div>
                   </div>
                 </div>

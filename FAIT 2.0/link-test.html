@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIT Link Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .status {
+      padding: 15px;
+      background-color: #e7f7e7;
+      border-left: 5px solid #28a745;
+      margin-bottom: 20px;
+    }
+    .error {
+      padding: 15px;
+      background-color: #f8d7da;
+      border-left: 5px solid #dc3545;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .link-test {
+      margin-bottom: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FAIT Link Test</h1>
+    
+    <div id="status" class="status">
+      <p>This tool will help test the links in the FAIT platform.</p>
+    </div>
+    
+    <div class="link-test">
+      <h2>Get Started Link</h2>
+      <p>This link should take you to the registration page.</p>
+      <button id="test-get-started">Test Get Started Link</button>
+      <div id="get-started-result"></div>
+    </div>
+    
+    <div class="link-test">
+      <h2>Browse Services Link</h2>
+      <p>This link should take you to the services page.</p>
+      <button id="test-browse-services">Test Browse Services Link</button>
+      <div id="browse-services-result"></div>
+    </div>
+    
+    <div class="link-test">
+      <h2>Direct Navigation</h2>
+      <p>Use these buttons to navigate directly to the pages.</p>
+      <button id="go-to-register">Go to Register Page</button>
+      <button id="go-to-services">Go to Services Page</button>
+    </div>
+  </div>
+
+  <script>
+    // Test Get Started link
+    document.getElementById('test-get-started').addEventListener('click', function() {
+      fetch('/register')
+        .then(response => {
+          if (response.ok) {
+            document.getElementById('get-started-result').innerHTML = 
+              '<p style="color: green;">The register page exists and is accessible.</p>';
+          } else {
+            document.getElementById('get-started-result').innerHTML = 
+              '<p style="color: red;">Error: The register page returned status ' + response.status + '.</p>';
+          }
+        })
+        .catch(error => {
+          document.getElementById('get-started-result').innerHTML = 
+            '<p style="color: red;">Error: ' + error.message + '</p>';
+        });
+    });
+    
+    // Test Browse Services link
+    document.getElementById('test-browse-services').addEventListener('click', function() {
+      fetch('/services')
+        .then(response => {
+          if (response.ok) {
+            document.getElementById('browse-services-result').innerHTML = 
+              '<p style="color: green;">The services page exists and is accessible.</p>';
+          } else {
+            document.getElementById('browse-services-result').innerHTML = 
+              '<p style="color: red;">Error: The services page returned status ' + response.status + '.</p>';
+          }
+        })
+        .catch(error => {
+          document.getElementById('browse-services-result').innerHTML = 
+            '<p style="color: red;">Error: ' + error.message + '</p>';
+        });
+    });
+    
+    // Direct navigation
+    document.getElementById('go-to-register').addEventListener('click', function() {
+      window.location.href = '/register';
+    });
+    
+    document.getElementById('go-to-services').addEventListener('click', function() {
+      window.location.href = '/services';
+    });
+  </script>
+</body>
+</html>

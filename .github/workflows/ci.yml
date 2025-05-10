@@ -5,6 +5,8 @@ on:
     branches: [ main ]
   pull_request:
     branches: [ main ]
+  # Allow manual triggering
+  workflow_dispatch:
 
 jobs:
   build:
@@ -28,3 +30,46 @@ jobs:
       with:
         name: dist
         path: dist
+
+  test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - run: npm ci
+    - run: npm test
+
+  e2e-test:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Use Node.js 20.x
+      uses: actions/setup-node@v3
+      with:
+        node-version: 20.x
+        cache: 'npm'
+    - run: npm ci
+    - name: Install Cypress
+      run: npx cypress install
+    - name: Run Cypress tests
+      uses: cypress-io/github-action@v5
+      with:
+        browser: chrome
+        start: npm run dev
+        wait-on: 'http://localhost:5173'
+        wait-on-timeout: 120
+        spec: cypress/e2e/basic-test.cy.js
+    - name: Upload screenshots on failure
+      if: failure()
+      uses: actions/upload-artifact@v3
+      with:
+        name: cypress-screenshots
+        path: cypress/screenshots

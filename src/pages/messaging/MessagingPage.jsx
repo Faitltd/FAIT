@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import MainLayout from '../../components/MainLayout';
 import ConversationList from '../../components/messaging/ConversationList';
 import ConversationView from '../../components/messaging/ConversationView';
@@ -8,7 +8,7 @@ import { getUnreadMessageCount } from '../../api/messagingApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const MessagingPage = () => {
   const { conversationId } = useParams();
@@ -22,10 +22,10 @@ const MessagingPage = () => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-      
+
       if (user) {
         fetchUnreadCount(user.id);
-        
+
         // Subscribe to new messages
         const messagesSubscription = supabase
           .channel('public:messages')
@@ -38,13 +38,13 @@ const MessagingPage = () => {
             fetchUnreadCount(user.id);
           })
           .subscribe();
-        
+
         return () => {
           supabase.removeChannel(messagesSubscription);
         };
       }
     };
-    
+
     fetchUser();
   }, []);
 
@@ -61,10 +61,10 @@ const MessagingPage = () => {
     const handleResize = () => {
       setMobileView(window.innerWidth < 768);
     };
-    
+
     handleResize();
     window.addEventListener('resize', handleResize);
-    
+
     return () => {
       window.removeEventListener('resize', handleResize);
     };
@@ -116,7 +116,7 @@ const MessagingPage = () => {
                       />
                     </div>
                   )}
-                  
+
                   {/* Conversation View */}
                   {(!mobileView || selectedConversationId) && (
                     <div className={`${mobileView ? 'w-full' : 'w-2/3'}`}>

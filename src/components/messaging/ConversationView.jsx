@@ -1,11 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import { getConversation, sendMessage, getAttachmentUrl } from '../../api/messagingApi';
 import { formatDistanceToNow, format } from 'date-fns';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const ConversationView = ({ conversationId, onBack }) => {
   const [conversation, setConversation] = useState(null);
@@ -17,7 +17,7 @@ const ConversationView = ({ conversationId, onBack }) => {
   const [user, setUser] = useState(null);
   const [attachments, setAttachments] = useState([]);
   const [showAttachmentPreview, setShowAttachmentPreview] = useState(false);
-  
+
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -25,10 +25,10 @@ const ConversationView = ({ conversationId, onBack }) => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-      
+
       if (user && conversationId) {
         fetchConversation(conversationId, user.id);
-        
+
         // Subscribe to new messages for this conversation
         const messagesSubscription = supabase
           .channel(`conversation:${conversationId}`)
@@ -42,13 +42,13 @@ const ConversationView = ({ conversationId, onBack }) => {
             fetchConversation(conversationId, user.id);
           })
           .subscribe();
-        
+
         return () => {
           supabase.removeChannel(messagesSubscription);
         };
       }
     };
-    
+
     fetchUser();
   }, [conversationId]);
 
@@ -76,9 +76,9 @@ const ConversationView = ({ conversationId, onBack }) => {
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    
+
     if (!newMessage.trim() && attachments.length === 0) return;
-    
+
     try {
       setSending(true);
       await sendMessage(
@@ -87,7 +87,7 @@ const ConversationView = ({ conversationId, onBack }) => {
         newMessage.trim(),
         attachments
       );
-      
+
       setNewMessage('');
       setAttachments([]);
       setShowAttachmentPreview(false);
@@ -111,7 +111,7 @@ const ConversationView = ({ conversationId, onBack }) => {
     const newAttachments = [...attachments];
     newAttachments.splice(index, 1);
     setAttachments(newAttachments);
-    
+
     if (newAttachments.length === 0) {
       setShowAttachmentPreview(false);
     }
@@ -215,7 +215,7 @@ const ConversationView = ({ conversationId, onBack }) => {
           )}
         </div>
       </div>
-      
+
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 ? (
@@ -227,9 +227,9 @@ const ConversationView = ({ conversationId, onBack }) => {
             const isCurrentUser = message.sender_id === user?.id;
             const sender = isCurrentUser ? 'You' : `${otherUser.first_name} ${otherUser.last_name}`;
             const hasAttachments = message.attachments && message.attachments.length > 0;
-            
+
             return (
-              <div 
+              <div
                 key={message.id}
                 className={`flex ${isCurrentUser ? 'justify-end' : 'justify-start'}`}
               >
@@ -241,11 +241,11 @@ const ConversationView = ({ conversationId, onBack }) => {
                     </span>
                   </div>
                   <p className="text-sm text-gray-800 whitespace-pre-wrap">{message.content}</p>
-                  
+
                   {hasAttachments && (
                     <div className="mt-2 space-y-2">
                       {message.attachments.map((attachment) => (
-                        <div 
+                        <div
                           key={attachment.id}
                           className="flex items-center p-2 bg-white rounded border border-gray-200 cursor-pointer hover:bg-gray-50"
                           onClick={() => handleAttachmentClick(attachment)}
@@ -270,7 +270,7 @@ const ConversationView = ({ conversationId, onBack }) => {
         )}
         <div ref={messagesEndRef} />
       </div>
-      
+
       {/* Attachment Preview */}
       {showAttachmentPreview && attachments.length > 0 && (
         <div className="px-4 py-2 border-t border-gray-200 bg-gray-50">
@@ -300,7 +300,7 @@ const ConversationView = ({ conversationId, onBack }) => {
           </div>
         </div>
       )}
-      
+
       {/* Message Input */}
       <div className="border-t border-gray-200 px-4 py-4 sm:px-6">
         <form onSubmit={handleSendMessage} className="flex space-x-3">

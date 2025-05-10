@@ -16,6 +16,10 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 
+// Import additional utilities
+import './visual-testing';
+import './test-data';
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
 
@@ -24,6 +28,8 @@ import './commands';
 
 // Handle uncaught exceptions
 Cypress.on('uncaught:exception', (err, runnable) => {
+  // Log the error for debugging
+  console.log('Uncaught exception:', err.message);
   // returning false here prevents Cypress from failing the test
   return false;
 });

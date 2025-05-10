@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabaseClient';
 import {
-  getWarrantyClaimById,
-  updateWarrantyClaimStatus,
+  getWarrantyClaim,
+  updateWarrantyClaim,
   addWarrantyClaimResolution,
   getWarrantyAttachmentUrl
 } from '../../api/warrantyApi';
@@ -81,7 +81,7 @@ const WarrantyClaimDetail = ({ claimId, onUpdate }) => {
         setUserType(profile?.user_type);
 
         // Get warranty claim
-        const claimData = await getWarrantyClaimById(claimId);
+        const claimData = await getWarrantyClaim(claimId);
 
         // Check if user has permission to view this claim
         if (profile?.user_type === 'client' && claimData.client_id !== user.id) {
@@ -130,10 +130,10 @@ const WarrantyClaimDetail = ({ claimId, onUpdate }) => {
     try {
       setSubmitting(true);
 
-      await updateWarrantyClaimStatus(claimId, newStatus);
+      await updateWarrantyClaim(claimId, { status: newStatus }, user.id);
 
       // Refresh claim data
-      const updatedClaim = await getWarrantyClaimById(claimId);
+      const updatedClaim = await getWarrantyClaim(claimId);
       setClaim(updatedClaim);
 
       // Reset form
@@ -166,7 +166,7 @@ const WarrantyClaimDetail = ({ claimId, onUpdate }) => {
       await addWarrantyClaimResolution(claimId, resolution);
 
       // Refresh claim data
-      const updatedClaim = await getWarrantyClaimById(claimId);
+      const updatedClaim = await getWarrantyClaim(claimId);
       setClaim(updatedClaim);
 
       // Reset form

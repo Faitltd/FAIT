@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import { useAuth } from '../../contexts/UnifiedAuthContext';
+import supabase from '../../utils/supabaseClient';
 import MainLayout from '../../components/MainLayout';
-import { getWarranties, getWarrantyClaims } from '../../api/warrantyApi';
+import { getUserWarranties, getServiceAgentWarranties, getUserWarrantyClaims, getServiceAgentWarrantyClaims } from '../../api/warrantyApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const WarrantyPage = () => {
   const [user, setUser] = useState(null);
@@ -16,50 +17,59 @@ const WarrantyPage = () => {
   const [error, setError] = useState(null);
   const [activeTab, setActiveTab] = useState('warranties');
 
+  // Use the UnifiedAuthContext
+  const { user: authUser, userType: authUserType, loading: authLoading } = useAuth();
+
   useEffect(() => {
-    const fetchUser = async () => {
+    const fetchUserData = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-        
-        if (user) {
-          // Get user type
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('user_type')
-            .eq('id', user.id)
-            .single();
-          
-          setUserType(profile?.user_type);
-          
+        if (authLoading) {
+          return; // Wait for auth to finish loading
+        }
+
+        if (authUser) {
+          setUser(authUser);
+          setUserType(authUserType);
+
           // Fetch warranties and claims
-          fetchWarrantyData(user.id, profile?.user_type);
+          fetchWarrantyData(authUser.id, authUserType);
         } else {
           setError('You must be logged in to access this page');
           setLoading(false);
         }
       } catch (err) {
-        console.error('Error fetching user:', err);
+        console.error('Error fetching user data:', err);
         setError('An error occurred while loading your profile');
         setLoading(false);
       }
     };
-    
-    fetchUser();
-  }, []);
+
+    fetchUserData();
+  }, [authUser, authUserType, authLoading]);
 
   const fetchWarrantyData = async (userId, type) => {
     try {
       setLoading(true);
-      
-      // Fetch warranties
-      const warrantiesData = await getWarranties(userId, type);
+
+      // Fetch warranties based on user type
+      let warrantiesData;
+      let claimsData;
+
+      if (type === 'client') {
+        warrantiesData = await getUserWarranties(userId);
+        claimsData = await getUserWarrantyClaims(userId);
+      } else if (type === 'service_agent') {
+        warrantiesData = await getServiceAgentWarranties(userId);
+        claimsData = await getServiceAgentWarrantyClaims(userId);
+      } else {
+        // Admin or other user types
+        warrantiesData = [];
+        claimsData = [];
+      }
+
       setWarranties(warrantiesData);
-      
-      // Fetch claims
-      const claimsData = await getWarrantyClaims(userId, type);
       setClaims(claimsData);
-      
+
       setError(null);
     } catch (err) {
       console.error('Error fetching warranty data:', err);
@@ -132,7 +142,7 @@ const WarrantyPage = () => {
                       </button>
                     </nav>
                   </div>
-                  
+
                   {/* Warranties Tab */}
                   {activeTab === 'warranties' && (
                     <div className="mt-6">
@@ -147,7 +157,7 @@ const WarrantyPage = () => {
                           </button>
                         )}
                       </div>
-                      
+
                       {warranties.length === 0 ? (
                         <div className="text-center py-12 px-4 bg-white shadow rounded-lg">
                           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -220,14 +230,14 @@ const WarrantyPage = () => {
                       )}
                     </div>
                   )}
-                  
+
                   {/* Claims Tab */}
                   {activeTab === 'claims' && (
                     <div className="mt-6">
                       <div className="flex justify-between items-center mb-4">
                         <h2 className="text-lg font-medium text-gray-900">Warranty Claims</h2>
                       </div>
-                      
+
                       {claims.length === 0 ? (
                         <div className="text-center py-12 px-4 bg-white shadow rounded-lg">
                           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">

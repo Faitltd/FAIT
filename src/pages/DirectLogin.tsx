@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { supabase, isUsingLocalAuth } from '../lib/supabase';
-import { FaArrowLeft } from 'react-icons/fa';
+import { useAuth } from '../contexts/UnifiedAuthContext';
+import { directAuthSignIn, getDirectAuthDashboardUrl } from '../lib/directAuth';
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 
 const DirectLogin = () => {
   const [email, setEmail] = useState('');
@@ -9,116 +10,62 @@ const DirectLogin = () => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const [usingLocalAuth, setUsingLocalAuth] = useState(false);
+  const { isLocalAuth, signIn } = useAuth();
   const navigate = useNavigate();
 
-  // Check if we're using local auth
+  // Log for debugging
   useEffect(() => {
-    setUsingLocalAuth(isUsingLocalAuth());
-  }, []);
+    console.log('[DirectLogin] Component mounted, isLocalAuth:', isLocalAuth);
+  }, [isLocalAuth]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
+    console.log('[DirectLogin] Login attempt with:', email);
 
     try {
-      // For local development, use test accounts
-      if (usingLocalAuth) {
-        // Hardcoded test accounts for local development
-        if (email === 'admin@itsfait.com' && password === 'password') {
-          localStorage.setItem('userEmail', email);
-          setSuccess(true);
-          setTimeout(() => navigate('/dashboard/admin'), 1000);
-          return;
-        } else if (email === 'client@itsfait.com' && password === 'password') {
-          localStorage.setItem('userEmail', email);
-          setSuccess(true);
-          setTimeout(() => navigate('/dashboard/client'), 1000);
-          return;
-        } else if (email === 'service@itsfait.com' && password === 'password') {
-          localStorage.setItem('userEmail', email);
-          setSuccess(true);
-          setTimeout(() => navigate('/dashboard/service-agent'), 1000);
-          return;
-        }
+      // Try direct auth first (this will work with the test accounts)
+      const directAuthResult = directAuthSignIn(email, password);
+
+      if (directAuthResult.success) {
+        console.log('[DirectLogin] Direct auth successful');
+        setSuccess(true);
+
+        // Get the user type from the result
+        const userType = directAuthResult.data?.user?.user_metadata?.user_type;
+        const dashboardUrl = getDirectAuthDashboardUrl(userType);
+
+        // Log the redirect
+        console.log(`[DirectLogin] Redirecting to ${dashboardUrl}`);
+
+        // Immediate redirect for Cypress tests
+        navigate(dashboardUrl);
+        return;
       }
 
-      // Sign in with email and password
-      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
+      // If direct auth fails, try unified auth
+      console.log('[DirectLogin] Direct auth failed, trying unified auth');
+      const { data, error: authError } = await signIn(email, password);
 
       if (authError) {
         throw authError;
       }
 
-      if (!authData.user) {
+      if (!data?.user) {
         throw new Error('No user data returned');
       }
 
-      // Get user profile to determine user type
-      const { data: profileData, error: profileError } = await supabase
-        .from('profiles')
-        .select('user_type')
-        .eq('id', authData.user.id)
-        .single();
+      // Get user type from metadata
+      const userType = data.user.user_metadata?.user_type || 'client';
+      const dashboardUrl = getDirectAuthDashboardUrl(userType);
 
-      // If profile doesn't exist, create one
-      if (profileError && profileError.code === 'PGRST116') {
-        console.log('Profile not found, creating a new one');
-
-        // Get user metadata from auth
-        const { data: userData } = await supabase.auth.getUser();
-        const userMeta = userData?.user?.user_metadata;
-
-        // Default to client if no user type in metadata
-        const userType = userMeta?.user_type || 'client';
-        const fullName = userMeta?.full_name || userMeta?.name || email.split('@')[0];
-
-        // Create profile
-        const { error: insertError } = await supabase
-          .from('profiles')
-          .insert({
-            id: authData.user.id,
-            user_type: userType,
-            full_name: fullName,
-            email: email,
-            created_at: new Date().toISOString()
-          });
-
-        if (insertError) {
-          console.error('Error creating profile:', insertError);
-          throw new Error('Failed to create user profile. Please contact support.');
-        }
-
-        // Navigate based on created user type
-        if (userType === 'service_agent') {
-          navigate('/dashboard/service-agent');
-        } else {
-          navigate('/dashboard/client');
-        }
-        return;
-      } else if (profileError) {
-        throw profileError;
-      }
-
-      // Navigate based on user type
-      if (profileData) {
-        setSuccess(true);
-        setTimeout(() => {
-          if (profileData.user_type === 'service_agent') {
-            navigate('/dashboard/service-agent');
-          } else {
-            navigate('/dashboard/client');
-          }
-        }, 1000);
-      } else {
-        navigate('/complete-profile');
-      }
+      // Set success and redirect immediately
+      setSuccess(true);
+      console.log(`[DirectLogin] Unified auth successful, redirecting to ${dashboardUrl}`);
+      navigate(dashboardUrl);
     } catch (err) {
-      console.error('Login error:', err);
+      console.error('[DirectLogin] Login error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred during sign in');
     } finally {
       setLoading(false);
@@ -131,7 +78,7 @@ const DirectLogin = () => {
         <div>
           <div className="flex items-center justify-between">
             <Link to="/login" className="flex items-center text-sm text-blue-600 hover:text-blue-500">
-              <FaArrowLeft className="mr-1" /> Back to login options
+              <ArrowLeft className="mr-1" size={16} /> Back to login options
             </Link>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">

@@ -2,23 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { isAdmin } from '../../lib/admin';
-import {
-  Menu,
-  X,
-  Home,
-  User,
-  Package,
-  MessageSquare,
-  Calendar,
-  Settings,
-  Shield,
-  LogOut,
-  LogIn,
-  BarChart,
-  FileText
-} from 'lucide-react';
+
+// Import icons individually for better tree-shaking
+import Menu from 'lucide-react/dist/esm/icons/menu';
+import X from 'lucide-react/dist/esm/icons/x';
+import Home from 'lucide-react/dist/esm/icons/home';
+import User from 'lucide-react/dist/esm/icons/user';
+import Package from 'lucide-react/dist/esm/icons/package';
+import MessageSquare from 'lucide-react/dist/esm/icons/message-square';
+import Calendar from 'lucide-react/dist/esm/icons/calendar';
+import Settings from 'lucide-react/dist/esm/icons/settings';
+import Shield from 'lucide-react/dist/esm/icons/shield';
+import LogOut from 'lucide-react/dist/esm/icons/log-out';
+import LogIn from 'lucide-react/dist/esm/icons/log-in';
+import BarChart from 'lucide-react/dist/esm/icons/bar-chart';
+import FileText from 'lucide-react/dist/esm/icons/file-text';
 import NotificationCenter from '../notifications/NotificationCenter';
 import LoadingSpinner from '../LoadingSpinner';
+import MobileBottomNav from '../navigation/MobileBottomNav';
+import { useMobile } from '../../hooks/useMediaQuery';
 
 interface ResponsiveLayoutProps {
   children: React.ReactNode;
@@ -27,12 +29,14 @@ interface ResponsiveLayoutProps {
 
 const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) => {
   const { user, logout } = useAuth();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isNavMenuOpen, setIsNavMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [userType, setUserType] = useState<string | null>(null);
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [loading, setLoading] = useState(true);
   const location = useLocation();
+  const isMobile = useMobile();
 
   useEffect(() => {
     const checkUserType = async () => {
@@ -51,9 +55,11 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
     checkUserType();
   }, [user]);
 
-  // Close mobile menu when route changes
+  // Close menus when route changes
   useEffect(() => {
-    setIsMenuOpen(false);
+    setIsMobileMenuOpen(false);
+    setIsNavMenuOpen(false);
+    setIsUserMenuOpen(false);
   }, [location.pathname]);
 
   const handleLogout = async () => {
@@ -66,11 +72,19 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
   };
 
   const getNavItems = () => {
-    if (!user || loading) return [];
-
+    // Always return at least the common items, even if user is not logged in
     const commonItems = [
-      { name: 'Home', href: '/', icon: <Home className="h-5 w-5" /> }
+      { name: 'Home', href: '/', icon: <Home className="h-5 w-5" /> },
+      { name: 'Projects', href: '/projects', icon: <FileText className="h-5 w-5" /> },
+      { name: 'Services', href: '/services', icon: <Package className="h-5 w-5" /> },
+      { name: 'Estimates', href: '/estimates', icon: <FileText className="h-5 w-5" /> },
+      { name: 'Warranties', href: '/warranty', icon: <Shield className="h-5 w-5" /> },
+      { name: 'Gamification', href: '/gamification', icon: <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+      </svg> }
     ];
+
+    if (!user || loading) return commonItems;
 
     const clientItems = [
       { name: 'Services', href: '/services', icon: <Package className="h-5 w-5" /> },
@@ -133,28 +147,37 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
                 </Link>
               </div>
 
-              {/* Desktop navigation */}
+              {/* Desktop navigation - Main links */}
               <nav className="hidden md:ml-6 md:flex md:space-x-8">
-                {navItems.map((item) => (
-                  <Link
-                    key={item.name}
-                    to={item.href}
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      location.pathname === item.href
-                        ? 'border-blue-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                ))}
+                <Link
+                  to="/"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                    location.pathname === '/'
+                      ? 'border-blue-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  }`}
+                >
+                  <Home className="h-5 w-5 mr-1" />
+                  Home
+                </Link>
+                <Link
+                  to="/projects"
+                  className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                    location.pathname.startsWith('/projects')
+                      ? 'border-blue-500 text-gray-900'
+                      : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                  }`}
+                >
+                  <FileText className="h-5 w-5 mr-1" />
+                  Projects
+                </Link>
               </nav>
             </div>
 
             {/* Mobile menu button */}
             <div className="flex items-center md:hidden">
               <button
-                onClick={() => setIsMenuOpen(true)}
+                onClick={() => setIsMobileMenuOpen(true)}
                 className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
               >
                 <span className="sr-only">Open main menu</span>
@@ -162,8 +185,40 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
               </button>
             </div>
 
-            {/* User menu and notifications */}
+            {/* Navigation dropdown and user menu */}
             <div className="hidden md:ml-6 md:flex md:items-center">
+              {/* Navigation dropdown - always visible */}
+              <div className="relative mr-4">
+                <button
+                  onClick={() => setIsNavMenuOpen(!isNavMenuOpen)}
+                  className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-50 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <span>More Options</span>
+                  <svg className="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
+                  </svg>
+                </button>
+
+                {isNavMenuOpen && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1" role="menu" aria-orientation="vertical">
+                      {navItems.filter(item => item.name !== 'Home' && item.name !== 'Projects').map((item) => (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          onClick={() => setIsNavMenuOpen(false)}
+                          data-testid={`dropdown-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                        >
+                          <span className="mr-3">{item.icon}</span>
+                          {item.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {user ? (
                 <>
                   <NotificationCenter />
@@ -234,20 +289,20 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
         </div>
 
         {/* Mobile menu */}
-        {isMenuOpen && (
+        {isMobileMenuOpen && (
           <div className="md:hidden">
             <div className="fixed inset-0 z-40 flex">
               {/* Overlay */}
               <div
                 className="fixed inset-0 bg-gray-600 bg-opacity-75"
-                onClick={() => setIsMenuOpen(false)}
+                onClick={() => setIsMobileMenuOpen(false)}
               ></div>
 
               {/* Menu panel */}
               <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white">
                 <div className="absolute top-0 right-0 -mr-12 pt-2">
                   <button
-                    onClick={() => setIsMenuOpen(false)}
+                    onClick={() => setIsMobileMenuOpen(false)}
                     className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
                   >
                     <span className="sr-only">Close sidebar</span>
@@ -257,7 +312,9 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
 
                 <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto">
                   <div className="flex-shrink-0 flex items-center px-4">
-                    <span className="text-blue-600 font-bold text-xl">FAIT Co-Op</span>
+                    <Link to="/" className="text-blue-600 font-bold text-xl" onClick={() => setIsMobileMenuOpen(false)}>
+                      FAIT Co-Op
+                    </Link>
                   </div>
 
                   {user ? (
@@ -299,6 +356,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
                             ? 'bg-gray-100 text-gray-900'
                             : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                         }`}
+                        onClick={() => setIsMobileMenuOpen(false)}
                       >
                         <span className="mr-4 h-6 w-6">{item.icon}</span>
                         {item.name}
@@ -310,6 +368,7 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
                         <Link
                           to="/profile"
                           className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          onClick={() => setIsMobileMenuOpen(false)}
                         >
                           <Settings className="mr-4 h-6 w-6" />
                           Profile Settings
@@ -317,12 +376,16 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
                         <Link
                           to="/subscription/dashboard"
                           className="group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                          onClick={() => setIsMobileMenuOpen(false)}
                         >
                           <Package className="mr-4 h-6 w-6" />
                           Subscription
                         </Link>
                         <button
-                          onClick={handleLogout}
+                          onClick={() => {
+                            setIsMobileMenuOpen(false);
+                            handleLogout();
+                          }}
                           className="w-full group flex items-center px-2 py-2 text-base font-medium rounded-md text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                         >
                           <LogOut className="mr-4 h-6 w-6" />
@@ -356,10 +419,15 @@ const ResponsiveLayout: React.FC<ResponsiveLayoutProps> = ({ children, title }) 
               <LoadingSpinner />
             </div>
           ) : (
-            children
+            <div className={isMobile ? "pb-16" : ""}>
+              {children}
+            </div>
           )}
         </div>
       </main>
+
+      {/* Mobile Bottom Navigation */}
+      {user && <MobileBottomNav />}
 
       {/* Footer */}
       <footer className="bg-white border-t border-gray-200">

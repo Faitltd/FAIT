@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import Loading from '../../components/Loading';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const DashboardRouter = () => {
   const [loading, setLoading] = useState(true);
@@ -16,22 +16,22 @@ const DashboardRouter = () => {
     const fetchUserType = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           // User is not logged in, redirect to home
           setLoading(false);
           return;
         }
-        
+
         // Get user type from profiles table
         const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('user_type')
           .eq('id', user.id)
           .single();
-        
+
         if (profileError) throw profileError;
-        
+
         setUserType(profile?.user_type);
       } catch (err) {
         console.error('Error fetching user type:', err);
@@ -40,7 +40,7 @@ const DashboardRouter = () => {
         setLoading(false);
       }
     };
-    
+
     fetchUserType();
   }, []);
 

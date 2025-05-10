@@ -25,7 +25,47 @@ const NotificationCenter: React.FC = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (!user) return;
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
+    // If using emergency login, don't try to fetch or subscribe to notifications
+    if (isEmergencyLogin) {
+      console.log('Using emergency login, skipping notifications setup in NotificationCenter');
+
+      // Still set up the click outside handler
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+      setLoading(false);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+
+    // Regular flow for authenticated users
+    if (!user || !user.id) {
+      console.log('No authenticated user, skipping notifications setup in NotificationCenter');
+      setLoading(false);
+
+      // Just set up click handler if no user
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setIsOpen(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
 
     const fetchNotifications = async () => {
       try {
@@ -54,19 +94,24 @@ const NotificationCenter: React.FC = () => {
     fetchNotifications();
 
     // Subscribe to new notifications
-    const subscription = supabase
-      .channel('notifications_changes')
-      .on('postgres_changes', {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'notifications',
-        filter: `user_id=eq.${user.id}`
-      }, (payload) => {
-        // Add the new notification to the list
-        setNotifications(prev => [payload.new as Notification, ...prev]);
-        setUnreadCount(prev => prev + 1);
-      })
-      .subscribe();
+    let subscription;
+    try {
+      subscription = supabase
+        .channel('notifications_changes')
+        .on('postgres_changes', {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`
+        }, (payload) => {
+          // Add the new notification to the list
+          setNotifications(prev => [payload.new as Notification, ...prev]);
+          setUnreadCount(prev => prev + 1);
+        })
+        .subscribe();
+    } catch (err) {
+      console.error('Error setting up notifications subscription in NotificationCenter:', err);
+    }
 
     // Handle clicks outside the dropdown to close it
     const handleClickOutside = (event: MouseEvent) => {
@@ -78,13 +123,32 @@ const NotificationCenter: React.FC = () => {
     document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      supabase.removeChannel(subscription);
+      if (subscription) {
+        try {
+          supabase.removeChannel(subscription);
+        } catch (err) {
+          console.error('Error removing notification channel:', err);
+        }
+      }
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [user]);
 
   const markAsRead = async (notificationId: string) => {
-    if (!user) return;
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
+    if (isEmergencyLogin) {
+      // Just update the UI state without making a database call
+      setNotifications(prev =>
+        prev.map(n => (n.id === notificationId ? { ...n, is_read: true } : n))
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      return;
+    }
+
+    if (!user || !user.id) return;
 
     try {
       const { error } = await supabase
@@ -106,7 +170,18 @@ const NotificationCenter: React.FC = () => {
   };
 
   const markAllAsRead = async () => {
-    if (!user) return;
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
+    if (isEmergencyLogin) {
+      // Just update the UI state without making a database call
+      setNotifications(prev => prev.map(n => ({ ...n, is_read: true })));
+      setUnreadCount(0);
+      return;
+    }
+
+    if (!user || !user.id) return;
 
     try {
       const { error } = await supabase

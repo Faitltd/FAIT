@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import {
   Home,
@@ -10,7 +10,12 @@ import {
   Shield,
   DollarSign,
   Settings,
-  BarChart
+  BarChart,
+  Package,
+  FileText,
+  Calendar,
+  MessageSquare,
+  ChevronDown
 } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { supabase } from '../../lib/supabase';
@@ -20,9 +25,12 @@ const Navbar: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [userType, setUserType] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  React.useEffect(() => {
+  // Fetch user profile
+  useEffect(() => {
     if (user) {
       const fetchUserProfile = async () => {
         const { data, error } = await supabase
@@ -40,6 +48,24 @@ const Navbar: React.FC = () => {
     }
   }, [user]);
 
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node) &&
+        isDropdownOpen
+      ) {
+        setIsDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isDropdownOpen]);
+
   const handleLogout = async () => {
     await supabase.auth.signOut();
     navigate('/login');
@@ -47,6 +73,10 @@ const Navbar: React.FC = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const toggleDropdown = () => {
+    setIsDropdownOpen(!isDropdownOpen);
   };
 
   const isActive = (path: string) => {
@@ -70,16 +100,85 @@ const Navbar: React.FC = () => {
             </div>
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
               <Link
-                to="/dashboard"
+                to="/"
                 className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                  isActive('/dashboard')
+                  isActive('/')
                     ? 'border-company-lightpink text-gray-900'
                     : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
                 }`}
               >
                 <Home className="h-4 w-4 mr-1" />
-                Dashboard
+                Home
               </Link>
+
+              <Link
+                to="/projects"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  isActive('/projects') || location.pathname.startsWith('/projects')
+                    ? 'border-company-lightpink text-gray-900'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                }`}
+              >
+                <FileText className="h-4 w-4 mr-1" />
+                Projects
+              </Link>
+
+              {/* More Options Dropdown */}
+              <div className="relative" ref={dropdownRef}>
+                <button
+                  onClick={toggleDropdown}
+                  className="inline-flex items-center px-1 pt-1 border-b-2 border-transparent text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                  data-testid="more-options-button"
+                >
+                  More Options
+                  <ChevronDown className="h-4 w-4 ml-1" />
+                </button>
+
+                {isDropdownOpen && (
+                  <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
+                    <div className="py-1" role="menu" aria-orientation="vertical">
+                      <Link
+                        to="/services"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                        data-testid="dropdown-link-services"
+                      >
+                        <Package className="h-4 w-4 mr-3" />
+                        Services
+                      </Link>
+                      <Link
+                        to="/estimates"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                        data-testid="dropdown-link-estimates"
+                      >
+                        <FileText className="h-4 w-4 mr-3" />
+                        Estimates
+                      </Link>
+                      <Link
+                        to="/warranty"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                        data-testid="dropdown-link-warranties"
+                      >
+                        <Shield className="h-4 w-4 mr-3" />
+                        Warranties
+                      </Link>
+                      <Link
+                        to="/gamification"
+                        className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setIsDropdownOpen(false)}
+                        data-testid="dropdown-link-gamification"
+                      >
+                        <svg className="h-4 w-4 mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                        Gamification
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {user && (
                 <>
@@ -93,32 +192,6 @@ const Navbar: React.FC = () => {
                   >
                     <CreditCard className="h-4 w-4 mr-1" />
                     Subscription
-                  </Link>
-
-                  {isContractor && (
-                    <Link
-                      to="/commissions"
-                      className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                        isActive('/commissions')
-                          ? 'border-blue-500 text-gray-900'
-                          : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                      }`}
-                    >
-                      <DollarSign className="h-4 w-4 mr-1" />
-                      Commissions
-                    </Link>
-                  )}
-
-                  <Link
-                    to="/warranties"
-                    className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
-                      isActive('/warranties')
-                        ? 'border-blue-500 text-gray-900'
-                        : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-                    }`}
-                  >
-                    <Shield className="h-4 w-4 mr-1" />
-                    Warranties
                   </Link>
 
                   {isAdmin && (
@@ -174,6 +247,14 @@ const Navbar: React.FC = () => {
                 >
                   Sign up
                 </Link>
+                <Link
+                  to="/register"
+                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  id="get-started-button"
+                  data-testid="get-started-button"
+                >
+                  Get Started
+                </Link>
               </div>
             )}
           </div>
@@ -198,16 +279,92 @@ const Navbar: React.FC = () => {
         <div className="sm:hidden">
           <div className="pt-2 pb-3 space-y-1">
             <Link
-              to="/dashboard"
+              to="/"
               className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                isActive('/dashboard')
+                isActive('/')
                   ? 'border-blue-500 text-blue-700 bg-blue-50'
                   : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
               }`}
             >
               <div className="flex items-center">
                 <Home className="h-5 w-5 mr-2" />
-                Dashboard
+                Home
+              </div>
+            </Link>
+
+            <Link
+              to="/projects"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                isActive('/projects') || location.pathname.startsWith('/projects')
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+              }`}
+            >
+              <div className="flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Projects
+              </div>
+            </Link>
+
+            <Link
+              to="/services"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                isActive('/services')
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+              }`}
+              data-testid="mobile-dropdown-link-services"
+            >
+              <div className="flex items-center">
+                <Package className="h-5 w-5 mr-2" />
+                Services
+              </div>
+            </Link>
+
+            <Link
+              to="/estimates"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                isActive('/estimates')
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+              }`}
+              data-testid="mobile-dropdown-link-estimates"
+            >
+              <div className="flex items-center">
+                <FileText className="h-5 w-5 mr-2" />
+                Estimates
+              </div>
+            </Link>
+
+            <Link
+              to="/warranty"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                isActive('/warranty')
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+              }`}
+              data-testid="mobile-dropdown-link-warranties"
+            >
+              <div className="flex items-center">
+                <Shield className="h-5 w-5 mr-2" />
+                Warranties
+              </div>
+            </Link>
+
+            <Link
+              to="/gamification"
+              className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
+                isActive('/gamification')
+                  ? 'border-blue-500 text-blue-700 bg-blue-50'
+                  : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+              }`}
+              data-testid="mobile-dropdown-link-gamification"
+            >
+              <div className="flex items-center">
+                <svg className="h-5 w-5 mr-2" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                </svg>
+                Gamification
               </div>
             </Link>
 
@@ -224,36 +381,6 @@ const Navbar: React.FC = () => {
                   <div className="flex items-center">
                     <CreditCard className="h-5 w-5 mr-2" />
                     Subscription
-                  </div>
-                </Link>
-
-                {isContractor && (
-                  <Link
-                    to="/commissions"
-                    className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                      isActive('/commissions')
-                        ? 'border-blue-500 text-blue-700 bg-blue-50'
-                        : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-                    }`}
-                  >
-                    <div className="flex items-center">
-                      <DollarSign className="h-5 w-5 mr-2" />
-                      Commissions
-                    </div>
-                  </Link>
-                )}
-
-                <Link
-                  to="/warranties"
-                  className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium ${
-                    isActive('/warranties')
-                      ? 'border-blue-500 text-blue-700 bg-blue-50'
-                      : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
-                  }`}
-                >
-                  <div className="flex items-center">
-                    <Shield className="h-5 w-5 mr-2" />
-                    Warranties
                   </div>
                 </Link>
 
@@ -319,6 +446,14 @@ const Navbar: React.FC = () => {
                   className="block text-center mt-2 px-4 py-2 rounded-md text-base font-medium text-gray-700 bg-gray-50 hover:bg-gray-100"
                 >
                   Sign up
+                </Link>
+                <Link
+                  to="/register"
+                  className="block text-center mt-2 px-4 py-2 rounded-md text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700"
+                  id="get-started-button-mobile"
+                  data-testid="get-started-button"
+                >
+                  Get Started
                 </Link>
               </div>
             )}

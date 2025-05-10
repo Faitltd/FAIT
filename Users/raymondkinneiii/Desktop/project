@@ -1,0 +1,56 @@
+import { defineConfig } from 'cypress';
+import { Tools } from 'lucide-react'; // Lucide has a 'Tools' icon, not 'Tool'
+
+// Export both Tools (the actual component) and Tool (for backward compatibility)
+export const Tool = Tools; // This creates an alias for backward compatibility
+export { Tools }; // Re-export the original Tools component
+
+// Default export for the ServiceTools component
+const ServiceTools = () => {
+  return &lt;Tools className=&quot;icon&quot; /&gt;;
+};
+
+export default ServiceTools;
+
+export default defineConfig({
+  projectId: "ksq7ct",
+
+  e2e: {
+    baseUrl: 'http://localhost:5173',
+    viewportWidth: 1280,
+    viewportHeight: 800,
+    defaultCommandTimeout: 10000,
+    requestTimeout: 10000,
+    responseTimeout: 30000,
+    pageLoadTimeout: 60000,
+    video: false,
+    screenshotOnRunFailure: true,
+    trashAssetsBeforeRuns: true,
+    chromeWebSecurity: false,
+    setupNodeEvents(on, config) {
+      on(&quot;task&quot;, {
+        log(message) {
+          console.log(message);
+          return null;
+        },
+      });
+      
+      // Add this to see uncaught exceptions in the console
+      on('uncaught:exception', (err, runnable) => {
+        console.log('Uncaught Exception:', err.message);
+        return false; // returning false prevents Cypress from failing the test
+      });
+    },
+  },
+
+  env: {
+    apiUrl: "http://localhost:8000",
+  },
+
+  component: {
+    devServer: {
+      framework: 'react',
+      bundler: 'vite',
+    },
+  },
+});

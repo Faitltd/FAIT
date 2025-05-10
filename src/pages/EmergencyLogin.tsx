@@ -1,13 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-
-// Hardcoded credentials for emergency access
-// In a real application, these would be stored securely and not in the code
-const EMERGENCY_CREDENTIALS = [
-  { email: 'admin@itsfait.com', password: 'admin123', userType: 'admin' },
-  { email: 'client@itsfait.com', password: 'client123', userType: 'client' },
-  { email: 'service@itsfait.com', password: 'service123', userType: 'service_agent' }
-];
+import ArrowLeft from 'lucide-react/dist/esm/icons/arrow-left';
 
 const EmergencyLogin = () => {
   const [email, setEmail] = useState('');
@@ -23,40 +16,71 @@ const EmergencyLogin = () => {
     setLoading(true);
 
     try {
-      // Simple validation
-      if (!email || !password) {
-        throw new Error('Email and password are required');
+      // Hardcoded test accounts for emergency login
+      if (email === 'admin@itsfait.com' && password === 'admin123') {
+        // Store user info in localStorage
+        localStorage.setItem('emergencyAuth', JSON.stringify({
+          user: {
+            id: 'admin-uuid',
+            email: email,
+            user_metadata: {
+              full_name: 'Admin User',
+              user_type: 'admin'
+            }
+          },
+          session: {
+            access_token: `emergency-token-${Date.now()}`,
+            expires_at: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+          }
+        }));
+        
+        setSuccess(true);
+        setTimeout(() => navigate('/dashboard/admin'), 1000);
+        return;
+      } else if (email === 'client@itsfait.com' && password === 'client123') {
+        // Store user info in localStorage
+        localStorage.setItem('emergencyAuth', JSON.stringify({
+          user: {
+            id: 'client-uuid',
+            email: email,
+            user_metadata: {
+              full_name: 'Client User',
+              user_type: 'client'
+            }
+          },
+          session: {
+            access_token: `emergency-token-${Date.now()}`,
+            expires_at: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+          }
+        }));
+        
+        setSuccess(true);
+        setTimeout(() => navigate('/dashboard/client'), 1000);
+        return;
+      } else if (email === 'service@itsfait.com' && password === 'service123') {
+        // Store user info in localStorage
+        localStorage.setItem('emergencyAuth', JSON.stringify({
+          user: {
+            id: 'service-uuid',
+            email: email,
+            user_metadata: {
+              full_name: 'Service Agent User',
+              user_type: 'service_agent'
+            }
+          },
+          session: {
+            access_token: `emergency-token-${Date.now()}`,
+            expires_at: Date.now() + 24 * 60 * 60 * 1000 // 24 hours
+          }
+        }));
+        
+        setSuccess(true);
+        setTimeout(() => navigate('/dashboard/service-agent'), 1000);
+        return;
       }
 
-      // Check against hardcoded credentials
-      const user = EMERGENCY_CREDENTIALS.find(
-        (cred) => cred.email.toLowerCase() === email.toLowerCase() && cred.password === password
-      );
-
-      if (!user) {
-        throw new Error('Invalid credentials');
-      }
-
-      // Store user info in localStorage (this is not secure, but it's for emergency use only)
-      localStorage.setItem('emergency_auth', JSON.stringify({
-        email: user.email,
-        userType: user.userType,
-        isEmergencyLogin: true
-      }));
-
-      // Show success message
-      setSuccess(true);
-      
-      // Redirect based on user type
-      setTimeout(() => {
-        if (user.userType === 'admin') {
-          navigate('/dashboard/admin');
-        } else if (user.userType === 'service_agent') {
-          navigate('/dashboard/service-agent');
-        } else {
-          navigate('/dashboard/client');
-        }
-      }, 1000);
+      // If we get here, credentials were invalid
+      setError('Invalid email or password');
     } catch (err) {
       console.error('Login error:', err);
       setError(err instanceof Error ? err.message : 'An error occurred during sign in');
@@ -70,19 +94,20 @@ const EmergencyLogin = () => {
       <div className="max-w-md w-full space-y-8">
         <div>
           <div className="flex items-center justify-between">
-            <Link to="/login" className="flex items-center text-sm text-blue-600 hover:text-blue-500">
-              ← Back to login options
+            <Link to="/direct-login" className="flex items-center text-sm text-blue-600 hover:text-blue-500">
+              <ArrowLeft className="mr-1" size={16} /> Back to direct login
             </Link>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Emergency Login
           </h2>
-          <div className="mt-2 bg-yellow-50 border border-yellow-200 rounded-md p-3">
-            <p className="text-center text-sm text-yellow-800">
-              Use this method only when Supabase authentication is completely broken.
-              <br />
-              <span className="font-medium">This bypasses the database entirely.</span>
-            </p>
+          <p className="mt-2 text-center text-sm text-gray-600">
+            Use this method if standard login methods are not working
+          </p>
+          <div className="mt-2 text-center">
+            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+              No Database Required
+            </span>
           </div>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
@@ -140,14 +165,22 @@ const EmergencyLogin = () => {
               {loading ? 'Signing in...' : 'Emergency Sign In'}
             </button>
           </div>
-          
+
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600 mb-2">Still having issues?</p>
+            <Link
+              to="/super-login"
+              className="w-full flex justify-center py-2 px-4 border border-red-800 rounded-md shadow-sm text-sm font-medium text-red-800 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+            >
+              Super Emergency Login
+            </Link>
+          </div>
+
           <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Available test accounts:</p>
-            <ul className="mt-2 space-y-1 text-left bg-gray-50 p-3 rounded-md">
-              <li><span className="font-medium">Admin:</span> admin@itsfait.com / admin123</li>
-              <li><span className="font-medium">Client:</span> client@itsfait.com / client123</li>
-              <li><span className="font-medium">Service Agent:</span> service@itsfait.com / service123</li>
-            </ul>
+            <p>Need help?</p>
+            <a href="mailto:support@itsfait.com" className="font-medium text-blue-600 hover:text-blue-500">
+              Contact Support
+            </a>
           </div>
         </form>
       </div>

@@ -1,27 +1,47 @@
 import { supabase } from '../lib/supabaseClient';
 
 export async function getNotifications(limit = 20, offset = 0) {
+
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !user.id) {
+      console.log('User not authenticated, returning empty notifications');
+      return { data: [], count: 0 };
+    }
+
     const { data, error, count } = await supabase
       .from('notifications')
       .select('*', { count: 'exact' })
+      .eq('user_id', user.id) // Make sure to filter by user_id
       .order('created_at', { ascending: false })
       .range(offset, offset + limit - 1);
 
     if (error) throw error;
 
-    return { data, count };
+    return { data: data || [], count: count || 0 };
   } catch (error) {
     console.error('Error getting notifications:', error);
-    throw error;
+    return { data: [], count: 0 }; // Return empty data instead of throwing
   }
 }
 
 export async function getUnreadNotificationsCount() {
+
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !user.id) {
+      console.log('User not authenticated, returning 0 unread notifications');
+      return 0;
+    }
+
     const { count, error } = await supabase
       .from('notifications')
       .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id) // Make sure to filter by user_id
       .eq('is_read', false);
 
     if (error) throw error;
@@ -34,7 +54,16 @@ export async function getUnreadNotificationsCount() {
 }
 
 export async function markNotificationAsRead(notificationId) {
+
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !user.id) {
+      console.log('User not authenticated, skipping mark notification as read');
+      return { success: false, error: 'User not authenticated' };
+    }
+
     const { error } = await supabase.rpc('mark_notifications_as_read', {
       p_notification_ids: [notificationId]
     });
@@ -44,12 +73,21 @@ export async function markNotificationAsRead(notificationId) {
     return { success: true };
   } catch (error) {
     console.error('Error marking notification as read:', error);
-    throw error;
+    return { success: false, error: error.message }; // Return error info instead of throwing
   }
 }
 
 export async function markAllNotificationsAsRead() {
+
   try {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user || !user.id) {
+      console.log('User not authenticated, skipping mark all notifications as read');
+      return { success: false, error: 'User not authenticated' };
+    }
+
     const { error } = await supabase.rpc('mark_all_notifications_as_read');
 
     if (error) throw error;
@@ -57,16 +95,21 @@ export async function markAllNotificationsAsRead() {
     return { success: true };
   } catch (error) {
     console.error('Error marking all notifications as read:', error);
-    throw error;
+    return { success: false, error: error.message }; // Return error info instead of throwing
   }
 }
 
 export async function subscribeToNotifications(callback) {
   try {
+
     const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
-      throw new Error('User not authenticated');
+    if (!user || !user.id) {
+      console.log('User not authenticated, skipping notifications subscription');
+      // Return a dummy subscription object
+      return {
+        unsubscribe: () => console.log('Unsubscribing from dummy subscription')
+      };
     }
 
     // Subscribe to notifications table changes
@@ -85,7 +128,10 @@ export async function subscribeToNotifications(callback) {
     return subscription;
   } catch (error) {
     console.error('Error subscribing to notifications:', error);
-    throw error;
+    // Return a dummy subscription object instead of throwing
+    return {
+      unsubscribe: () => console.log('Unsubscribing from dummy subscription')
+    };
   }
 }
 

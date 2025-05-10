@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
   const [date, setDate] = useState('');
@@ -15,25 +15,25 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
   const [error, setError] = useState(null);
   const [availableTimes, setAvailableTimes] = useState([]);
   const [userProfile, setUserProfile] = useState(null);
-  
+
   // Get today's date in YYYY-MM-DD format for min date
   const today = new Date().toISOString().split('T')[0];
-  
+
   // Get user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (user) {
           const { data: profile } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
-          
+
           setUserProfile(profile);
-          
+
           // Pre-fill address and zip code if available
           if (profile) {
             if (profile.address) setAddress(profile.address);
@@ -44,35 +44,35 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
         console.error('Error fetching user profile:', error);
       }
     };
-    
+
     fetchUserProfile();
   }, []);
-  
+
   // Initialize with tomorrow's date and check availability
   useEffect(() => {
     // Set default date to tomorrow
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
-    
+
     setDate(tomorrowStr);
     checkAvailability(tomorrowStr);
   }, []);
-  
+
   // Check availability when date changes
   const checkAvailability = async (selectedDate) => {
     try {
       setLoading(true);
-      
+
       // Get available time slots for the selected date
       const times = await getAvailableTimeSlots(selectedDate);
       setAvailableTimes(times);
-      
+
       // Clear selected time if it's no longer available
       if (time && !times.includes(time)) {
         setTime('');
       }
-      
+
       setError(null);
     } catch (err) {
       console.error('Error checking availability:', err);
@@ -82,39 +82,39 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
       setLoading(false);
     }
   };
-  
+
   // Handle date change
   const handleDateChange = (e) => {
     const selectedDate = e.target.value;
     setDate(selectedDate);
     checkAvailability(selectedDate);
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!date || !time) {
       setError('Please select a date and time');
       return;
     }
-    
+
     if (!address || !zipCode) {
       setError('Please provide your address and ZIP code');
       return;
     }
-    
+
     // Validate ZIP code format
     const zipCodeRegex = /^\d{5}(-\d{4})?$/;
     if (!zipCodeRegex.test(zipCode)) {
       setError('Please enter a valid 5-digit ZIP code');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Submit booking
       const result = await onSubmit({
@@ -124,7 +124,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
         address,
         zipCode
       });
-      
+
       if (result && !result.success) {
         setError(result.error);
       }
@@ -135,7 +135,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
       setLoading(false);
     }
   };
-  
+
   // Format time for display
   const formatTime = (timeString) => {
     const [hours, minutes] = timeString.split(':');
@@ -144,17 +144,17 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
   };
-  
+
   return (
     <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
       <h3 className="text-lg font-medium text-gray-900 mb-4">Book This Service</h3>
-      
+
       {error && (
         <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
           {error}
         </div>
       )}
-      
+
       <form onSubmit={handleSubmit}>
         {/* Date Selection */}
         <div className="mb-4">
@@ -172,7 +172,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
             required
           />
         </div>
-        
+
         {/* Time Selection */}
         <div className="mb-4">
           <label htmlFor="time" className="block text-sm font-medium text-gray-700">
@@ -205,7 +205,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
             </select>
           )}
         </div>
-        
+
         {/* Address */}
         <div className="mb-4">
           <label htmlFor="address" className="block text-sm font-medium text-gray-700">
@@ -222,7 +222,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
             required
           />
         </div>
-        
+
         {/* ZIP Code */}
         <div className="mb-4">
           <label htmlFor="zipCode" className="block text-sm font-medium text-gray-700">
@@ -239,7 +239,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
             required
           />
         </div>
-        
+
         {/* Notes */}
         <div className="mb-4">
           <label htmlFor="notes" className="block text-sm font-medium text-gray-700">
@@ -255,7 +255,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
             placeholder="Add any special instructions or details"
           />
         </div>
-        
+
         {/* Price Summary */}
         <div className="mb-6 bg-white p-4 rounded-md border border-gray-200">
           <div className="flex justify-between items-center">
@@ -279,7 +279,7 @@ const BookingForm = ({ service, onSubmit, getAvailableTimeSlots }) => {
             </span>
           </div>
         </div>
-        
+
         {/* Submit Button */}
         <button
           type="submit"

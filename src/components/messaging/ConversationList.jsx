@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import { getConversations } from '../../api/messagingApi';
 import { formatDistanceToNow } from 'date-fns';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const ConversationList = ({ onSelectConversation, selectedConversationId }) => {
   const [conversations, setConversations] = useState([]);
@@ -17,10 +17,10 @@ const ConversationList = ({ onSelectConversation, selectedConversationId }) => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-      
+
       if (user) {
         fetchConversations(user.id);
-        
+
         // Subscribe to new messages
         const messagesSubscription = supabase
           .channel('public:messages')
@@ -33,13 +33,13 @@ const ConversationList = ({ onSelectConversation, selectedConversationId }) => {
             fetchConversations(user.id);
           })
           .subscribe();
-        
+
         return () => {
           supabase.removeChannel(messagesSubscription);
         };
       }
     };
-    
+
     fetchUser();
   }, []);
 
@@ -93,9 +93,9 @@ const ConversationList = ({ onSelectConversation, selectedConversationId }) => {
         {conversations.map((conversation) => {
           const otherUser = conversation.otherParticipant;
           const lastMessage = conversation.lastMessage;
-          
+
           return (
-            <li 
+            <li
               key={conversation.id}
               className={`px-4 py-4 hover:bg-gray-50 cursor-pointer ${
                 selectedConversationId === conversation.id ? 'bg-blue-50' : ''

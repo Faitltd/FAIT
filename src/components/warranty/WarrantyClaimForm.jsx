@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 import { getUserCompletedBookings, createWarrantyClaim } from '../../api/warrantyApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
   const [bookings, setBookings] = useState([]);
@@ -16,21 +16,21 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [loadingBookings, setLoadingBookings] = useState(true);
-  
+
   // Fetch user's completed bookings
   useEffect(() => {
     const fetchBookings = async () => {
       try {
         setLoadingBookings(true);
-        
+
         // Get authenticated user
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           setError('You must be logged in to submit a warranty claim');
           return;
         }
-        
+
         // Get user's completed bookings
         const bookingsData = await getUserCompletedBookings(user.id);
         setBookings(bookingsData);
@@ -41,91 +41,91 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
         setLoadingBookings(false);
       }
     };
-    
+
     fetchBookings();
   }, []);
-  
+
   // Handle photo upload
   const handlePhotoUpload = (e) => {
     const files = Array.from(e.target.files);
-    
+
     // Validate file types and sizes
     const validFiles = files.filter(file => {
       const isValidType = ['image/jpeg', 'image/png', 'image/jpg'].includes(file.type);
       const isValidSize = file.size <= 5 * 1024 * 1024; // 5MB max
-      
+
       if (!isValidType) {
         setError('Only JPEG and PNG images are allowed');
       } else if (!isValidSize) {
         setError('Images must be less than 5MB');
       }
-      
+
       return isValidType && isValidSize;
     });
-    
+
     if (validFiles.length === 0) {
       return;
     }
-    
+
     // Create preview URLs
     const newPhotos = validFiles.map(file => ({
       file,
       preview: URL.createObjectURL(file)
     }));
-    
+
     setPhotos([...photos, ...newPhotos]);
     setPhotoFiles([...photoFiles, ...validFiles]);
     setError(null);
   };
-  
+
   // Remove photo
   const handleRemovePhoto = (index) => {
     const newPhotos = [...photos];
     const newPhotoFiles = [...photoFiles];
-    
+
     // Revoke object URL to avoid memory leaks
     URL.revokeObjectURL(newPhotos[index].preview);
-    
+
     newPhotos.splice(index, 1);
     newPhotoFiles.splice(index, 1);
-    
+
     setPhotos(newPhotos);
     setPhotoFiles(newPhotoFiles);
   };
-  
+
   // Upload photos to storage
   const uploadPhotos = async (claimId) => {
     if (photoFiles.length === 0) {
       return [];
     }
-    
+
     setPhotoUploading(true);
-    
+
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      
+
       if (!user) {
         throw new Error('User not authenticated');
       }
-      
+
       const photoUrls = await Promise.all(
         photoFiles.map(async (file, index) => {
           const fileExt = file.name.split('.').pop();
           const fileName = `${user.id}/${claimId}/${Date.now()}-${index}.${fileExt}`;
           const filePath = `warranty_photos/${fileName}`;
-          
+
           const { error: uploadError } = await supabase.storage
             .from('warranty_photos')
             .upload(filePath, file);
-          
+
           if (uploadError) {
             throw uploadError;
           }
-          
+
           return filePath;
         })
       );
-      
+
       return photoUrls;
     } catch (err) {
       console.error('Error uploading photos:', err);
@@ -134,47 +134,47 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
       setPhotoUploading(false);
     }
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     // Validate form
     if (!selectedBookingId) {
       setError('Please select a service');
       return;
     }
-    
+
     if (!description.trim()) {
       setError('Please provide a description of the issue');
       return;
     }
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       // Create warranty claim
       const claim = await createWarrantyClaim(selectedBookingId, description);
-      
+
       // Upload photos if any
       if (photoFiles.length > 0) {
         const photoUrls = await uploadPhotos(claim.id);
-        
+
         // Update claim with photo URLs
         const { error: updateError } = await supabase
           .from('warranty_claims')
           .update({ photo_urls: photoUrls })
           .eq('id', claim.id);
-        
+
         if (updateError) {
           throw updateError;
         }
       }
-      
+
       // Clean up photo previews
       photos.forEach(photo => URL.revokeObjectURL(photo.preview));
-      
+
       // Call success callback
       if (onSuccess) {
         onSuccess(claim);
@@ -186,7 +186,7 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="bg-white shadow overflow-hidden sm:rounded-lg">
       <div className="px-4 py-5 sm:px-6 bg-gray-50">
@@ -195,14 +195,14 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
           Please provide details about the issue you're experiencing with a completed service.
         </p>
       </div>
-      
+
       <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
         {error && (
           <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
             {error}
           </div>
         )}
-        
+
         <form onSubmit={handleSubmit}>
           {/* Service Selection */}
           <div className="mb-6">
@@ -238,7 +238,7 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
               )}
             </div>
           </div>
-          
+
           {/* Description */}
           <div className="mb-6">
             <label htmlFor="description" className="block text-sm font-medium text-gray-700">
@@ -260,7 +260,7 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
               Be specific about what's wrong and when you first noticed the issue.
             </p>
           </div>
-          
+
           {/* Photo Upload */}
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700">
@@ -292,7 +292,7 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
                 </p>
               </div>
             </div>
-            
+
             {/* Photo Previews */}
             {photos.length > 0 && (
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
@@ -320,7 +320,7 @@ const WarrantyClaimForm = ({ onSuccess, onCancel }) => {
               </div>
             )}
           </div>
-          
+
           {/* Submit Button */}
           <div className="flex justify-end space-x-3">
             {onCancel && (

@@ -8,7 +8,7 @@
 # - Supabase project set up and running
 #
 # Usage:
-# export STRIPE_SECRET_KEY=sk_test_your_key
+# export STRIPE_SECRET_KEY=sk_test_51RFha1BXhGFYU3zX4h9LnmB3xt4GYN23OBapKfhgRzuD6jfdrThOS72POKjH2iIqxn8hq2GHpgaopNhS5OJBMdlf00ghjOwdV9
 # ./scripts/setup_stripe_webhook.sh
 
 # Check if Stripe CLI is installed
@@ -21,13 +21,12 @@ fi
 # Check if STRIPE_SECRET_KEY is set
 if [ -z "$STRIPE_SECRET_KEY" ]; then
   echo "Error: STRIPE_SECRET_KEY environment variable is not set."
-  echo "Please set it with: export STRIPE_SECRET_KEY=sk_test_your_key"
+  echo "Please set it with: export STRIPE_SECRET_KEY=sk_test_51RFha1BXhGFYU3zX4h9LnmB3xt4GYN23OBapKfhgRzuD6jfdrThOS72POKjH2iIqxn8hq2GHpgaopNhS5OJBMdlf00ghjOwdV9"
   exit 1
 fi
 
 # Get Supabase project URL
-echo "Enter your Supabase project URL (e.g., https://your-project.supabase.co):"
-read SUPABASE_URL
+SUPABASE_URL="https://ydisdyadjupyswcpbxzu.supabase.co"
 
 # Create the webhook endpoint
 echo "Creating Stripe webhook endpoint..."
@@ -52,3 +51,14 @@ echo "Please set the following environment variables in your Supabase project:"
 echo "STRIPE_WEBHOOK_SECRET=$WEBHOOK_SECRET"
 echo ""
 echo "You can set these variables in the Supabase dashboard under Settings > API > Environment Variables."
+
+# Update .env file with the webhook secret
+if grep -q "STRIPE_WEBHOOK_SECRET" .env; then
+  # Replace existing value
+  sed -i '' "s/STRIPE_WEBHOOK_SECRET=.*/STRIPE_WEBHOOK_SECRET=$WEBHOOK_SECRET/" .env
+else
+  # Add new value
+  echo "STRIPE_WEBHOOK_SECRET=$WEBHOOK_SECRET" >> .env
+fi
+
+echo "Added STRIPE_WEBHOOK_SECRET to .env file"

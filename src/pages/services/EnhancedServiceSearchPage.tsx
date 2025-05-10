@@ -1,13 +1,44 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, lazy, Suspense } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
 import LoadingSpinner from '../../components/LoadingSpinner';
-import ServiceSearchFilters from '../../components/services/ServiceSearchFilters';
+import ServiceSearchFilters from '../../components/services/ServiceSearchFilters.tsx';
 import ServiceSearchResults from '../../components/services/ServiceSearchResults';
 import ServiceSortControls from '../../components/services/ServiceSortControls';
-import ServiceSearchMap from '../../components/services/ServiceSearchMap';
-import { Grid, List, MapPin } from 'lucide-react';
+import { Grid, List, MapPin, Navigation } from 'lucide-react';
+import MapSkeleton from '../../components/skeletons/MapSkeleton';
+import ServiceCardSkeleton from '../../components/skeletons/ServiceCardSkeleton';
+import { getUserLocation } from '../../utils/locationStorage';
+
+// Lazy load the map component to improve initial page load performance
+const ServiceSearchMap = lazy(() => {
+  // Add a small artificial delay to ensure the loading indicator shows
+  // This prevents a flash of loading/content for very fast connections
+  return new Promise(resolve => {
+    // Start performance measurement
+    const startTime = performance.now();
+
+    // Import the component
+    import('../../components/services/ServiceSearchMap')
+      .then(module => {
+        // End performance measurement
+        const loadTime = performance.now() - startTime;
+
+        // Log performance in development mode
+        if (process.env.NODE_ENV === 'development') {
+          console.log(`ServiceSearchMap lazy loaded in ${loadTime.toFixed(2)}ms`);
+        }
+
+        // Add a small delay if the load was very fast to ensure loading indicator shows
+        if (loadTime < 100) {
+          setTimeout(() => resolve(module), 100 - loadTime);
+        } else {
+          resolve(module);
+        }
+      });
+  });
+});
 
 // Define service package type
 export interface ServicePackage {
@@ -18,7 +49,7 @@ export interface ServicePackage {
   category: string;
   subcategory?: string;
   image_url?: string;
-  status: string;
+  is_active: boolean;
   service_agent_id: string;
   created_at: string;
   service_agent: {
@@ -102,9 +133,19 @@ const EnhancedServiceSearchPage: React.FC = () => {
     navigate({ search: params.toString() }, { replace: true });
   }, [filters, navigate]);
 
-  // Fetch user profile for zip code
+  // Fetch user profile for zip code or use saved location
   useEffect(() => {
     const fetchUserProfile = async () => {
+      // First check if we have a saved location in localStorage
+      const savedLocation = getUserLocation();
+      if (savedLocation && !filters.zipCode) {
+        console.log('Using saved location from localStorage:', savedLocation.zipCode);
+        setFilters(prev => ({ ...prev, zipCode: savedLocation.zipCode }));
+        setUserZipCode(savedLocation.zipCode);
+        return;
+      }
+
+      // If no saved location, try to get from user profile
       if (user && !filters.zipCode) {
         try {
           const { data, error } = await supabase
@@ -135,7 +176,7 @@ const EnhancedServiceSearchPage: React.FC = () => {
         const { data, error } = await supabase
           .from('service_packages')
           .select('category, subcategory')
-          .eq('status', 'active');
+          .eq('is_active', true);
 
         if (error) throw error;
 
@@ -156,6 +197,7 @@ const EnhancedServiceSearchPage: React.FC = () => {
           });
         } else {
           console.warn('No category data returned or data is not an array');
+          setCategories([]);
         }
 
         // Convert to array of Category objects
@@ -167,6 +209,9 @@ const EnhancedServiceSearchPage: React.FC = () => {
         setCategories(categoryArray);
       } catch (err) {
         console.error('Error fetching categories:', err);
+        // Don't set error state here to avoid blocking the page
+        // Just set empty categories
+        setCategories([]);
       }
     };
 
@@ -192,7 +237,7 @@ const EnhancedServiceSearchPage: React.FC = () => {
               zip_code
             )
           `)
-          .eq('status', 'active');
+          .eq('is_active', true);
 
         // Add category filter if provided
         if (filters.category) {
@@ -217,41 +262,52 @@ const EnhancedServiceSearchPage: React.FC = () => {
 
         if (error) throw error;
 
-        if (!data || !Array.isArray(data)) {
-          throw new Error('No service data returned or data is not an array');
+        if (!data) {
+          console.warn('No service data returned');
+          setServices([]);
+          setFilteredServices([]);
+          return;
         }
 
-        // Fetch ratings for each service
-        const servicesWithRatings = await Promise.all(
-          data.map(async (service) => {
-            const { data: reviewData, error: reviewError } = await supabase
-              .from('reviews')
-              .select('rating')
-              .eq('service_package_id', service.id);
+        if (!Array.isArray(data)) {
+          console.warn('Service data is not an array:', data);
+          setServices([]);
+          setFilteredServices([]);
+          return;
+        }
 
-            if (reviewError) {
-              console.error('Error fetching reviews:', reviewError);
-              return {
-                ...service,
-                avg_rating: 0,
-                review_count: 0
-              };
-            }
+        // Fetch ratings in a single query instead of multiple queries
+        const { data: reviewsData, error: reviewsError } = await supabase
+          .from('reviews')
+          .select('service_package_id, rating')
+          .in('service_package_id', data.map(service => service.id));
 
-            const ratings = reviewData && Array.isArray(reviewData)
-              ? reviewData.map(review => review.rating)
-              : [];
-            const avgRating = ratings.length > 0
-              ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
-              : 0;
+        if (reviewsError) {
+          console.error('Error fetching reviews:', reviewsError);
+        }
 
-            return {
-              ...service,
-              avg_rating: avgRating,
-              review_count: ratings.length
-            };
-          })
-        );
+        // Group reviews by service_package_id
+        const reviewsByServiceId = (reviewsData || []).reduce((acc, review) => {
+          if (!acc[review.service_package_id]) {
+            acc[review.service_package_id] = [];
+          }
+          acc[review.service_package_id].push(review.rating);
+          return acc;
+        }, {});
+
+        // Add ratings to services
+        const servicesWithRatings = data.map(service => {
+          const ratings = reviewsByServiceId[service.id] || [];
+          const avgRating = ratings.length > 0
+            ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
+            : 0;
+
+          return {
+            ...service,
+            avg_rating: avgRating,
+            review_count: ratings.length
+          };
+        });
 
         setServices(servicesWithRatings);
 
@@ -259,7 +315,10 @@ const EnhancedServiceSearchPage: React.FC = () => {
         applyFilters(servicesWithRatings);
       } catch (err) {
         console.error('Error fetching services:', err);
-        setError('Failed to load services. Please try again.');
+        const errorMessage = err instanceof Error
+          ? `Failed to load services: ${err.message}`
+          : 'Failed to load services. Please try again.';
+        setError(errorMessage);
         setServices([]);
         setFilteredServices([]);
       } finally {
@@ -405,6 +464,15 @@ const EnhancedServiceSearchPage: React.FC = () => {
     setFilters(prev => ({ ...prev, viewMode: mode }));
   };
 
+  // Handle get directions
+  const handleGetDirections = (serviceId: string) => {
+    // Switch to map view and then get directions
+    setFilters(prev => ({ ...prev, viewMode: 'map' }));
+
+    // We need to wait for the map to load before we can get directions
+    // This is handled by the ServiceSearchMap component
+  };
+
   return (
     <>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -488,8 +556,12 @@ const EnhancedServiceSearchPage: React.FC = () => {
         {/* Results */}
         <div className="p-4">
           {loading ? (
-            <div className="py-12 flex justify-center">
-              <LoadingSpinner />
+            <div className="py-12">
+              {filters.viewMode === 'map' ? (
+                <MapSkeleton />
+              ) : (
+                <ServiceCardSkeleton count={6} />
+              )}
             </div>
           ) : error ? (
             <div className="py-8 text-center">
@@ -501,17 +573,39 @@ const EnhancedServiceSearchPage: React.FC = () => {
                 Try Again
               </button>
             </div>
+          ) : filters.viewMode === 'map' ? (
+            <div className="relative">
+              <Suspense fallback={<MapSkeleton />}>
+                <ServiceSearchMap
+                  services={filteredServices}
+                  userZipCode={filters.zipCode}
+                  onSelectService={(serviceId) => navigate(`/book/${serviceId}`)}
+                />
+              </Suspense>
+              {/* Fallback button in case map doesn't load properly */}
+              <div className="absolute top-2 right-2">
+                <button
+                  onClick={() => handleViewModeChange('grid')}
+                  className="px-3 py-1 bg-white border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  Switch to Grid View
+                </button>
+              </div>
+            </div>
           ) : filteredServices.length === 0 ? (
             <div className="py-8 text-center">
               <p className="text-gray-500 mb-2">No services found matching your criteria.</p>
               <p className="text-gray-500">Try adjusting your filters or search term.</p>
+              <div className="mt-4">
+                <button
+                  onClick={() => handleViewModeChange('map')}
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <MapPin className="h-5 w-5 mr-2" />
+                  View Map
+                </button>
+              </div>
             </div>
-          ) : filters.viewMode === 'map' ? (
-            <ServiceSearchMap
-              services={filteredServices}
-              userZipCode={filters.zipCode}
-              onSelectService={(serviceId) => navigate(`/book/${serviceId}`)}
-            />
           ) : (
             <ServiceSearchResults
               services={filteredServices}
@@ -519,6 +613,7 @@ const EnhancedServiceSearchPage: React.FC = () => {
               page={filters.page}
               totalPages={totalPages}
               onPageChange={(page) => handleFilterChange('page', page)}
+              onGetDirections={handleGetDirections}
             />
           )}
         </div>

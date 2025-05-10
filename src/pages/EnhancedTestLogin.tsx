@@ -26,19 +26,19 @@ const EnhancedTestLogin: React.FC = () => {
 
     try {
       // Check for hardcoded test accounts first
-      if (email === 'admin@itsfait.com' && (password === 'password' || password === 'admin123')) {
+      if (email === 'admin@itsfait.com' && password === 'admin123') {
         localStorage.setItem('userEmail', email);
         localStorage.setItem('userType', 'admin');
         setMessage('Login successful as admin!');
         setTimeout(() => navigate('/subscription/dashboard'), 1000);
         return;
-      } else if (email === 'client@itsfait.com' && (password === 'password' || password === 'admin123')) {
+      } else if (email === 'client@itsfait.com' && password === 'client123') {
         localStorage.setItem('userEmail', email);
         localStorage.setItem('userType', 'client');
         setMessage('Login successful as client!');
         setTimeout(() => navigate('/subscription/dashboard'), 1000);
         return;
-      } else if (email === 'service@itsfait.com' && (password === 'password' || password === 'admin123')) {
+      } else if (email === 'service@itsfait.com' && password === 'service123') {
         localStorage.setItem('userEmail', email);
         localStorage.setItem('userType', 'service_agent');
         setMessage('Login successful as service agent!');
@@ -128,8 +128,6 @@ const EnhancedTestLogin: React.FC = () => {
   };
 
   return (
-    <>
-      <Navbar />
     <div className="bg-gradient-to-b from-blue-50 to-white flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center">
@@ -265,9 +263,9 @@ const EnhancedTestLogin: React.FC = () => {
               <div className="mb-4 bg-blue-50 border border-blue-200 rounded-md p-3 text-sm text-blue-800">
                 <p className="font-medium">Test Account Credentials</p>
                 <ul className="mt-2 list-disc list-inside">
-                  <li><strong>Admin:</strong> admin@itsfait.com / password or admin123</li>
-                  <li><strong>Client:</strong> client@itsfait.com / password or admin123</li>
-                  <li><strong>Service Agent:</strong> service@itsfait.com / password or admin123</li>
+                  <li><strong>Admin:</strong> admin@itsfait.com / admin123</li>
+                  <li><strong>Client:</strong> client@itsfait.com / client123</li>
+                  <li><strong>Service Agent:</strong> service@itsfait.com / service123</li>
                 </ul>
                 <p className="mt-2">Or use any email with password "password" or "admin123"</p>
               </div>
@@ -345,7 +343,6 @@ const EnhancedTestLogin: React.FC = () => {
         </div>
       </div>
     </div>
-    </>
   );
 };
 

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Bell } from 'lucide-react';
+import Bell from 'lucide-react/dist/esm/icons/bell';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import type { Database } from '../lib/database.types';
@@ -14,95 +14,200 @@ const NotificationBell = () => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
+
+    // If using emergency login, don't try to fetch or subscribe to notifications
+    if (isEmergencyLogin) {
+      console.log('Using emergency login, skipping notifications setup');
+
+      // Still set up the click outside handler
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setShowDropdown(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
+
+    // Regular flow for authenticated users
     const fetchNotifications = async () => {
-      if (!user) return;
-
-      const { data, error } = await supabase
-        .from('notifications')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(10);
-
-      if (error) {
-        console.error('Error fetching notifications:', error);
+      if (!user || !user.id) {
+        console.log('No authenticated user, skipping notifications fetch');
         return;
       }
 
-      setNotifications(data);
-      setUnreadCount(data.filter(n => !n.read).length);
-    };
+      try {
+        const { data, error } = await supabase
+          .from('notifications')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(10);
 
-    fetchNotifications();
-
-    // Subscribe to new notifications
-    const subscription = supabase
-      .channel('notifications')
-      .on(
-        'postgres_changes',
-        {
-          event: 'INSERT',
-          schema: 'public',
-          table: 'notifications',
-          filter: `user_id=eq.${user?.id}`,
-        },
-        (payload) => {
-          setNotifications(prev => [payload.new as Notification, ...prev]);
-          setUnreadCount(prev => prev + 1);
+        if (error) {
+          console.error('Error fetching notifications:', error);
+          return;
         }
-      )
-      .subscribe();
 
-    // Handle clicks outside dropdown
-    const handleClickOutside = (event: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-        setShowDropdown(false);
+        setNotifications(data || []);
+        setUnreadCount(data?.filter(n => !n.read).length || 0);
+      } catch (err) {
+        console.error('Exception fetching notifications:', err);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    // Only proceed with subscription if we have a valid user
+    if (user && user.id) {
+      fetchNotifications();
 
-    return () => {
-      subscription.unsubscribe();
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
+      // Subscribe to new notifications
+      let subscription;
+      try {
+        subscription = supabase
+          .channel('notifications')
+          .on(
+            'postgres_changes',
+            {
+              event: 'INSERT',
+              schema: 'public',
+              table: 'notifications',
+              filter: `user_id=eq.${user.id}`,
+            },
+            (payload) => {
+              setNotifications(prev => [payload.new as Notification, ...prev]);
+              setUnreadCount(prev => prev + 1);
+            }
+          )
+          .subscribe();
+      } catch (err) {
+        console.error('Error setting up notifications subscription:', err);
+      }
+
+      // Handle clicks outside dropdown
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setShowDropdown(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+
+      return () => {
+        if (subscription) {
+          try {
+            subscription.unsubscribe();
+          } catch (err) {
+            console.error('Error unsubscribing from notifications:', err);
+          }
+        }
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    } else {
+      // Just set up click handler if no user
+      const handleClickOutside = (event: MouseEvent) => {
+        if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+          setShowDropdown(false);
+        }
+      };
+
+      document.addEventListener('mousedown', handleClickOutside);
+
+      return () => {
+        document.removeEventListener('mousedown', handleClickOutside);
+      };
+    }
   }, [user]);
 
   const markAsRead = async (notificationId: string) => {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('id', notificationId);
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
 
-    if (error) {
-      console.error('Error marking notification as read:', error);
+    if (isEmergencyLogin) {
+      // Just update the UI state without making a database call
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, read: true } : n
+        )
+      );
+      setUnreadCount(prev => prev - 1);
       return;
     }
 
-    setNotifications(prev =>
-      prev.map(n =>
-        n.id === notificationId ? { ...n, read: true } : n
-      )
-    );
-    setUnreadCount(prev => prev - 1);
+    // Only proceed if we have a valid user
+    if (!user || !user.id) {
+      console.log('No authenticated user, skipping mark as read');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('id', notificationId);
+
+      if (error) {
+        console.error('Error marking notification as read:', error);
+        return;
+      }
+
+      setNotifications(prev =>
+        prev.map(n =>
+          n.id === notificationId ? { ...n, read: true } : n
+        )
+      );
+      setUnreadCount(prev => prev - 1);
+    } catch (err) {
+      console.error('Exception marking notification as read:', err);
+    }
   };
 
   const markAllAsRead = async () => {
-    const { error } = await supabase
-      .from('notifications')
-      .update({ read: true })
-      .eq('user_id', user?.id)
-      .eq('read', false);
+    // Check if we're using emergency login
+    const isEmergencyLogin = localStorage.getItem('emergency_auth') ||
+                            localStorage.getItem('super_emergency_auth');
 
-    if (error) {
-      console.error('Error marking all notifications as read:', error);
+    if (isEmergencyLogin) {
+      // Just update the UI state without making a database call
+      setNotifications(prev =>
+        prev.map(n => ({ ...n, read: true }))
+      );
+      setUnreadCount(0);
       return;
     }
 
-    setNotifications(prev =>
-      prev.map(n => ({ ...n, read: true }))
-    );
-    setUnreadCount(0);
+    // Only proceed if we have a valid user
+    if (!user || !user.id) {
+      console.log('No authenticated user, skipping mark all as read');
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from('notifications')
+        .update({ read: true })
+        .eq('user_id', user.id)
+        .eq('read', false);
+
+      if (error) {
+        console.error('Error marking all notifications as read:', error);
+        return;
+      }
+
+      setNotifications(prev =>
+        prev.map(n => ({ ...n, read: true }))
+      );
+      setUnreadCount(0);
+    } catch (err) {
+      console.error('Exception marking all notifications as read:', err);
+    }
   };
 
   const getNotificationIcon = (type: string) => {
@@ -128,7 +233,7 @@ const NotificationBell = () => {
 
   const formatTimeAgo = (date: string) => {
     const seconds = Math.floor((new Date().getTime() - new Date(date).getTime()) / 1000);
-    
+
     if (seconds < 60) return 'just now';
     const minutes = Math.floor(seconds / 60);
     if (minutes < 60) return `${minutes}m ago`;

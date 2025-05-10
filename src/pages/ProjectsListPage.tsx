@@ -6,7 +6,9 @@ import ResponsiveLayout from '../components/layout/ResponsiveLayout';
 
 interface Project {
   id: string;
-  name: string;
+  name?: string;
+  title?: string; // Add title field as an alternative to name
+  displayName?: string; // Added for consistent display
   description?: string;
   status: string;
   created_at: string;
@@ -18,14 +20,20 @@ const ProjectsListPage: React.FC = () => {
   const [projects, setProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [refreshKey, setRefreshKey] = useState(0); // Add a refresh key to force re-fetching
+
+  // Function to manually refresh the projects list
+  const refreshProjects = () => {
+    setRefreshKey(prevKey => prevKey + 1);
+  };
 
   useEffect(() => {
     const fetchProjects = async () => {
       if (!user) return;
-      
+
       setIsLoading(true);
       setError(null);
-      
+
       try {
         // Get user type
         const { data: profileData, error: profileError } = await supabase
@@ -33,26 +41,35 @@ const ProjectsListPage: React.FC = () => {
           .select('user_type')
           .eq('id', user.id)
           .single();
-        
+
         if (profileError) throw profileError;
-        
+
         let query = supabase.from('projects').select('*');
-        
+
         // Filter projects based on user type
         if (profileData.user_type === 'client') {
           query = query.eq('client_id', user.id);
         } else if (profileData.user_type === 'service_agent') {
           query = query.eq('service_agent_id', user.id);
         }
-        
+
         // Order by created_at
         query = query.order('created_at', { ascending: false });
-        
+
         const { data, error } = await query;
-        
+
         if (error) throw error;
-        
-        setProjects(data as Project[]);
+
+        console.log('Fetched projects:', data);
+
+        // Process the data to ensure we have a consistent display name
+        const processedData = (data || []).map(project => ({
+          ...project,
+          // Use name if available, otherwise use title, or fallback to "Untitled Project"
+          displayName: project.name || project.title || "Untitled Project"
+        }));
+
+        setProjects(processedData as Project[]);
       } catch (err: any) {
         console.error('Error fetching projects:', err);
         setError(err.message || 'Failed to load projects');
@@ -60,9 +77,9 @@ const ProjectsListPage: React.FC = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchProjects();
-  }, [user]);
+  }, [user, refreshKey]); // Add refreshKey to dependencies to trigger refresh
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
@@ -83,8 +100,16 @@ const ProjectsListPage: React.FC = () => {
 
   return (
     <ResponsiveLayout title="Projects">
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Projects</h1>
+      <div className="mb-6 flex justify-between">
+        <button
+          onClick={refreshProjects}
+          className="inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md shadow-sm text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+        >
+          <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          Refresh Projects
+        </button>
         <Link
           to="/projects/create"
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -95,7 +120,7 @@ const ProjectsListPage: React.FC = () => {
           New Project
         </Link>
       </div>
-      
+
       {isLoading ? (
         <div className="flex justify-center items-center h-64">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
@@ -115,7 +140,7 @@ const ProjectsListPage: React.FC = () => {
             </div>
           </div>
         </div>
-      ) : projects.length === 0 ? (
+      ) : !projects || projects.length === 0 ? (
         <div className="bg-white shadow overflow-hidden sm:rounded-lg">
           <div className="px-4 py-5 sm:p-6 text-center">
             <svg className="mx-auto h-12 w-12 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,7 +150,16 @@ const ProjectsListPage: React.FC = () => {
             <p className="mt-1 text-sm text-gray-500">
               Get started by creating a new project.
             </p>
-            <div className="mt-6">
+            <div className="mt-6 flex space-x-4 justify-center">
+              <button
+                onClick={refreshProjects}
+                className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <svg className="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh List
+              </button>
               <Link
                 to="/projects/create"
                 className="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -153,7 +187,7 @@ const ProjectsListPage: React.FC = () => {
                           </svg>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-blue-600">{project.name}</div>
+                          <div className="text-sm font-medium text-blue-600">{project.displayName || project.name || project.title || "Untitled Project"}</div>
                           <div className="text-sm text-gray-500">{project.description || 'No description'}</div>
                         </div>
                       </div>

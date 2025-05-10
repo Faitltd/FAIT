@@ -1,45 +1,45 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import MainLayout from '../../components/MainLayout';
 import { getBookingById } from '../../api/bookingApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const BookingConfirmationPage = () => {
   const { bookingId } = useParams();
   const navigate = useNavigate();
-  
+
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   // Fetch booking data
   useEffect(() => {
     const fetchBooking = async () => {
       try {
         setLoading(true);
-        
+
         // Get authenticated user
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (!user) {
           navigate('/login');
           return;
         }
-        
+
         // Get booking details
         const bookingData = await getBookingById(bookingId);
-        
+
         // Check if user has permission to view this booking
         if (bookingData.client_id !== user.id) {
           setError('You do not have permission to view this booking');
           setLoading(false);
           return;
         }
-        
+
         setBooking(bookingData);
         setError(null);
       } catch (err) {
@@ -49,27 +49,27 @@ const BookingConfirmationPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchBooking();
   }, [bookingId, navigate]);
-  
+
   // Format date for display
   const formatDate = (dateString) => {
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
     return new Date(dateString).toLocaleDateString(undefined, options);
   };
-  
+
   // Format time for display
   const formatTime = (timeString) => {
     if (!timeString) return '';
-    
+
     const [hours, minutes] = timeString.split(':');
     const hour = parseInt(hours, 10);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const hour12 = hour % 12 || 12;
     return `${hour12}:${minutes} ${ampm}`;
   };
-  
+
   if (loading) {
     return (
       <MainLayout currentPage="booking">
@@ -83,7 +83,7 @@ const BookingConfirmationPage = () => {
       </MainLayout>
     );
   }
-  
+
   if (error || !booking) {
     return (
       <MainLayout currentPage="booking">
@@ -105,7 +105,7 @@ const BookingConfirmationPage = () => {
       </MainLayout>
     );
   }
-  
+
   return (
     <MainLayout currentPage="booking">
       <div className="py-10">
@@ -134,42 +134,42 @@ const BookingConfirmationPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Booking Details */}
                 <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Booking Details</h3>
-                  
+
                   <div className="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
                     {/* Service */}
                     <div className="sm:col-span-3">
                       <dt className="text-sm font-medium text-gray-500">Service</dt>
                       <dd className="mt-1 text-sm text-gray-900">{booking.service_name}</dd>
                     </div>
-                    
+
                     {/* Service Provider */}
                     <div className="sm:col-span-3">
                       <dt className="text-sm font-medium text-gray-500">Service Provider</dt>
                       <dd className="mt-1 text-sm text-gray-900">{booking.service_agent_name}</dd>
                     </div>
-                    
+
                     {/* Date */}
                     <div className="sm:col-span-3">
                       <dt className="text-sm font-medium text-gray-500">Date</dt>
                       <dd className="mt-1 text-sm text-gray-900">{formatDate(booking.service_date)}</dd>
                     </div>
-                    
+
                     {/* Time */}
                     <div className="sm:col-span-3">
                       <dt className="text-sm font-medium text-gray-500">Time</dt>
                       <dd className="mt-1 text-sm text-gray-900">{formatTime(booking.start_time)}</dd>
                     </div>
-                    
+
                     {/* Address */}
                     <div className="sm:col-span-6">
                       <dt className="text-sm font-medium text-gray-500">Service Address</dt>
                       <dd className="mt-1 text-sm text-gray-900">{booking.address}</dd>
                     </div>
-                    
+
                     {/* Notes */}
                     {booking.notes && (
                       <div className="sm:col-span-6">
@@ -177,13 +177,13 @@ const BookingConfirmationPage = () => {
                         <dd className="mt-1 text-sm text-gray-900">{booking.notes}</dd>
                       </div>
                     )}
-                    
+
                     {/* Price */}
                     <div className="sm:col-span-6">
                       <dt className="text-sm font-medium text-gray-500">Price</dt>
                       <dd className="mt-1 text-sm text-gray-900">${booking.price.toFixed(2)}</dd>
                     </div>
-                    
+
                     {/* Status */}
                     <div className="sm:col-span-6">
                       <dt className="text-sm font-medium text-gray-500">Status</dt>
@@ -195,11 +195,11 @@ const BookingConfirmationPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Next Steps */}
                 <div className="border-t border-gray-200 px-4 py-5 sm:p-6 bg-gray-50">
                   <h3 className="text-lg font-medium text-gray-900 mb-4">Next Steps</h3>
-                  
+
                   <div className="space-y-4">
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
@@ -213,7 +213,7 @@ const BookingConfirmationPage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
                         <svg className="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -226,7 +226,7 @@ const BookingConfirmationPage = () => {
                         </p>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-start">
                       <div className="flex-shrink-0">
                         <svg className="h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -241,7 +241,7 @@ const BookingConfirmationPage = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Actions */}
                 <div className="border-t border-gray-200 px-4 py-5 sm:px-6">
                   <div className="flex justify-between">
@@ -251,7 +251,7 @@ const BookingConfirmationPage = () => {
                     >
                       View Booking Details
                     </Link>
-                    
+
                     <Link
                       to="/bookings"
                       className="inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"

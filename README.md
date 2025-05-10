@@ -38,6 +38,36 @@ npm run dev:simple
 npm run webpack:dev
 ```
 
+### App Versions
+
+The application has been structured to support multiple versions with increasing complexity:
+
+1. **Simple Test App** (`?version=simple`): A minimal test app with basic login functionality.
+2. **Minimal App** (`?version=minimal`): A simplified version with core navigation and basic pages.
+3. **Enhanced Minimal App** (`?version=enhanced`): Includes more providers and components.
+4. **Full App** (`?version=full`): The complete application with all features.
+
+You can specify which version of the app to run by adding a query parameter:
+
+- Simple Test App: http://localhost:5173/?version=simple
+- Minimal App: http://localhost:5173/?version=minimal
+- Enhanced Minimal App: http://localhost:5173/?version=enhanced
+- Full App: http://localhost:5173/?version=full
+
+### Testing App Versions
+
+To test all app versions:
+
+```bash
+# Run the test script
+./run-tests.sh
+```
+
+This script will:
+1. Start the development server
+2. Run the Cypress tests for all app versions
+3. Shut down the server when tests are complete
+
 ### Build
 
 ```bash

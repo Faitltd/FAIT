@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import Navbar from '../../components/Navbar';
+import supabase from '../../utils/supabaseClient';;
 import ServiceAgentDashboardStats from '../../components/service-agent/ServiceAgentDashboardStats';
 import ServiceListCard from '../../components/service-agent/ServiceListCard';
 import UpcomingAppointmentsCard from '../../components/service-agent/UpcomingAppointmentsCard';
@@ -13,7 +12,7 @@ import { getServiceAgentDashboardStats } from '../../api/dashboardStatsApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const ServiceAgentDashboard = () => {
   const [stats, setStats] = useState(null);
@@ -77,7 +76,6 @@ const ServiceAgentDashboard = () => {
 
   return (
     <>
-      <Navbar />
       <div className="py-10">
         <header>
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

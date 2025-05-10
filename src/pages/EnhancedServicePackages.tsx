@@ -288,14 +288,25 @@ const EnhancedServicePackages: React.FC = () => {
                   <div className="px-4 py-5 sm:p-6">
                     <h2 className="text-lg leading-6 font-medium text-gray-900">Service Locations</h2>
                     <div className="mt-4 border-2 border-gray-300 border-dashed rounded-lg h-96 flex items-center justify-center bg-gray-100 relative overflow-hidden">
-                      {/* Map placeholder image */}
-                      <img
-                        src="https://developers.google.com/static/maps/images/landing/hero_maps_static_api.png"
-                        alt="Map view"
-                        className="absolute inset-0 w-full h-full object-cover opacity-50"
-                      />
-                      <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center">
-                        <div className="text-center p-6 bg-white bg-opacity-90 rounded-lg shadow-sm">
+                      {/* Interactive Map Component */}
+                      <div className="absolute inset-0 w-full h-full">
+                        <iframe
+                          src={`https://www.google.com/maps/embed/v1/search?key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}&q=service+providers+near+${zipCode || 'Denver'}&zoom=12`}
+                          className="w-full h-full"
+                          style={{ border: 0 }}
+                          allowFullScreen
+                          loading="lazy"
+                          referrerPolicy="no-referrer-when-downgrade"
+                          title="Service Providers Map"
+                          onError={(e) => {
+                            console.error('Map iframe failed to load', e);
+                            // If iframe fails, show fallback image
+                            e.currentTarget.style.display = 'none';
+                          }}
+                        ></iframe>
+                      </div>
+                      <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center pointer-events-none">
+                        <div className="text-center p-6 bg-white bg-opacity-90 rounded-lg shadow-sm pointer-events-auto">
                           <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />

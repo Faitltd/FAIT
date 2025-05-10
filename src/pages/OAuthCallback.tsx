@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
+import { handleAuthError, AuthErrorCategory } from '../utils/authErrorHandler';
 
 const OAuthCallback = () => {
   const [error, setError] = useState<string | null>(null);
@@ -105,7 +106,19 @@ const OAuthCallback = () => {
         }
       } catch (err) {
         console.error('OAuth callback error:', err);
-        setError(err instanceof Error ? err.message : 'Authentication failed');
+        const formattedError = handleAuthError(err instanceof Error ? err : new Error('Authentication failed'));
+
+        // Add more detailed error information for OAuth errors
+        if (formattedError.category === AuthErrorCategory.OAUTH) {
+          setDebugInfo({
+            ...debugInfo,
+            errorDetails: formattedError.details,
+            errorCategory: formattedError.category,
+            errorCode: formattedError.code
+          });
+        }
+
+        setError(formattedError.message);
       } finally {
         setLoading(false);
       }

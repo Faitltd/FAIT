@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
-import { Search, MapPin, Filter, Star, ArrowUpDown, ArrowUp, ArrowDown } from 'lucide-react';
+import { Search, MapPin, Filter, Star, ArrowUpDown, ArrowUp, ArrowDown, Calculator } from 'lucide-react';
 import type { Database } from '../lib/database.types';
 
 // List of available trades (same as in ServiceForm)
@@ -205,7 +205,18 @@ const ServiceSearch: React.FC<ServiceSearchProps> = ({ userZipCode }) => {
   return (
     <div className="bg-white rounded-lg shadow-sm overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="text-xl font-semibold text-gray-900">Find Services Near You</h2>
+        <div className="flex justify-between items-center mb-3">
+          <h2 className="text-xl font-semibold text-gray-900">Find Services Near You</h2>
+        </div>
+        <div className="flex flex-wrap gap-2 justify-end">
+          <Link
+            to="/calculator/estimate"
+            className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            <Calculator className="h-5 w-5 mr-2" />
+            Free Instant Estimate
+          </Link>
+        </div>
       </div>
 
       <div className="p-6">
@@ -395,11 +406,36 @@ const ServiceSearch: React.FC<ServiceSearchProps> = ({ userZipCode }) => {
             <div className="p-6 text-center">
               <p className="text-gray-500">No services found matching your criteria.</p>
               <p className="text-sm text-gray-400 mt-1">Try adjusting your search or ZIP code.</p>
+              <div className="mt-6 space-y-4">
+                <div>
+                  <p className="text-sm text-gray-600 mb-2">Need a cost estimate for your project?</p>
+                  <Link
+                    to="/calculator/estimate"
+                    className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                  >
+                    <Calculator className="h-5 w-5 mr-2" />
+                    Free Instant Estimate
+                  </Link>
+                </div>
+              </div>
             </div>
           )
         ) : (
           <div className="p-6 text-center">
             <p className="text-gray-500">Enter your search criteria above to find services.</p>
+            <div className="mt-6">
+              <div className="p-6 bg-gradient-to-r from-blue-50 to-teal-50 rounded-lg">
+                <p className="text-lg font-medium text-gray-800 mb-2">Need a cost estimate for your project?</p>
+                <p className="text-gray-600 mb-4">Get an instant ballpark estimate for your home improvement projects with our free calculators.</p>
+                <Link
+                  to="/calculator/estimate"
+                  className="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-gradient-to-r from-blue-600 to-teal-500 hover:from-blue-700 hover:to-teal-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <Calculator className="h-5 w-5 mr-2" />
+                  Free Instant Estimate
+                </Link>
+              </div>
+            </div>
           </div>
         )}
       </div>

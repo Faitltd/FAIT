@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import MainLayout from '../../components/MainLayout';
 import BookingForm from '../../components/booking/BookingForm';
 import { getServiceById } from '../../api/servicesApi';
@@ -8,36 +8,36 @@ import { getAvailableTimeSlots } from '../../api/availabilityApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const BookingPage = () => {
   const { serviceId } = useParams();
   const navigate = useNavigate();
-  
+
   const [service, setService] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [user, setUser] = useState(null);
-  
+
   // Fetch service and user data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        
+
         // Get authenticated user
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
-        
+
         if (!user) {
           navigate('/login', { state: { from: `/book/${serviceId}` } });
           return;
         }
-        
+
         // Get service details
         const serviceData = await getServiceById(serviceId);
         setService(serviceData);
-        
+
         setError(null);
       } catch (err) {
         console.error('Error fetching data:', err);
@@ -46,10 +46,10 @@ const BookingPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchData();
   }, [serviceId, navigate]);
-  
+
   // Handle booking submission
   const handleBookingSubmit = async (bookingData) => {
     try {
@@ -70,9 +70,9 @@ const BookingPage = () => {
         })
         .select()
         .single();
-      
+
       if (error) throw error;
-      
+
       // Navigate to booking confirmation page
       navigate(`/booking/confirmation/${data.id}`);
     } catch (err) {
@@ -80,7 +80,7 @@ const BookingPage = () => {
       return { success: false, error: 'Failed to create booking. Please try again.' };
     }
   };
-  
+
   if (loading) {
     return (
       <MainLayout currentPage="booking">
@@ -94,7 +94,7 @@ const BookingPage = () => {
       </MainLayout>
     );
   }
-  
+
   if (error || !service) {
     return (
       <MainLayout currentPage="booking">
@@ -116,7 +116,7 @@ const BookingPage = () => {
       </MainLayout>
     );
   }
-  
+
   return (
     <MainLayout currentPage="booking">
       <div className="py-10">
@@ -139,7 +139,7 @@ const BookingPage = () => {
                     <div className="text-2xl font-bold text-gray-900">${service.price.toFixed(2)}</div>
                   </div>
                 </div>
-                
+
                 <div className="border-t border-gray-200 px-4 py-5 sm:p-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="md:col-span-2">
@@ -148,7 +148,7 @@ const BookingPage = () => {
                         <h3 className="text-lg font-medium text-gray-900">Service Description</h3>
                         <p className="mt-2 text-sm text-gray-500">{service.description}</p>
                       </div>
-                      
+
                       {/* Service Provider */}
                       <div className="mb-6">
                         <h3 className="text-lg font-medium text-gray-900">Service Provider</h3>
@@ -194,7 +194,7 @@ const BookingPage = () => {
                           </div>
                         </div>
                       </div>
-                      
+
                       {/* Service Details */}
                       <div className="mb-6">
                         <h3 className="text-lg font-medium text-gray-900">Service Details</h3>
@@ -235,7 +235,7 @@ const BookingPage = () => {
                         </div>
                       </div>
                     </div>
-                    
+
                     <div className="md:col-span-1">
                       {/* Booking Form */}
                       <BookingForm

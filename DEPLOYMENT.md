@@ -86,6 +86,26 @@ Then:
 
 To test your build locally before pushing:
 
+### For M1/M2 Macs (Apple Silicon)
+
+When building on Apple Silicon (M1/M2) Macs, you must specify the target platform for Cloud Run compatibility:
+
+```bash
+# Build the Docker image for amd64 architecture (required for Cloud Run)
+docker build --platform=linux/amd64 -t gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME] .
+
+# Run the container locally
+docker run -p 8080:8080 --env-file .env gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME]
+```
+
+You can also use the provided build script:
+
+```bash
+./build-docker.sh --tag=your-tag
+```
+
+### For Intel Macs or Linux
+
 ```bash
 # Build the Docker image
 docker build -t gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME] .
@@ -107,6 +127,41 @@ If your build fails, check:
 3. That your `cloudbuild.yaml` file is correctly formatted
 4. That your Dockerfile builds successfully
 
+### Architecture Issues for M1/M2 Mac Users
+
+If you see an error like:
+
+```
+ERROR: (gcloud.run.deploy) Revision is not ready and cannot serve traffic. Cloud Run does not support image: Container manifest type 'application/vnd.oci.image.index.v1+json' must support amd64/linux.
+```
+
+This means your Docker image was built for ARM architecture (default on M1/M2 Macs) but Cloud Run requires x86/amd64 architecture. To fix this:
+
+1. Rebuild your image with the platform flag:
+   ```bash
+   docker build --platform=linux/amd64 -t gcr.io/fait-444705/fait-coop:v1 .
+   ```
+
+2. Or use the provided build script:
+   ```bash
+   ./build-docker.sh
+   ```
+
+3. Push the rebuilt image:
+   ```bash
+   docker push gcr.io/fait-444705/fait-coop:v1
+   ```
+
+4. Deploy again:
+   ```bash
+   gcloud run deploy fait-coop --image=gcr.io/fait-444705/fait-coop:v1 --platform=managed --region=us-central1
+   ```
+
+To verify the architecture of your image:
+```bash
+docker inspect gcr.io/fait-444705/fait-coop:v1 | grep -i architecture
+```
+
 ## Security Considerations
 
 **Important**: Don't expose Service Role Key or JWT_SECRET in front-end code.
@@ -118,12 +173,51 @@ The environment variables are stored as substitution variables in your Cloud Bui
 
 ### Secrets Management
 
-Consider migrating to Secret Manager for SUPABASE_SERVICE_KEY, JWT_SECRET, and STRIPE_SECRET_KEY long term.
+We now use Google Secret Manager for SUPABASE_SERVICE_KEY, JWT_SECRET, and STRIPE_SECRET_KEY.
 
-Cloud Build supports:
+To set up the secrets:
 
-```yaml
---set-secrets=SUPABASE_SERVICE_KEY=projects/.../secrets/supabase-service-key:latest
+```bash
+# Run the setup script
+./scripts/setup-gcp-secrets.sh
 ```
 
-That keeps secrets out of source control and scripts.
+Cloud Build now uses:
+
+```yaml
+--set-secrets=SUPABASE_SERVICE_KEY=projects/$PROJECT_ID/secrets/supabase-service-key:latest,JWT_SECRET=projects/$PROJECT_ID/secrets/jwt-secret:latest,STRIPE_SECRET_KEY=projects/$PROJECT_ID/secrets/stripe-secret-key:latest
+```
+
+This keeps secrets out of source control and scripts.
+
+## Supabase Connection Pooling
+
+The application now uses Supabase's connection pooler (port 6543) for efficient database connections. This is important for Cloud Run, which can scale up and down quickly, potentially creating many new connections.
+
+Key benefits:
+- Prevents exhausting Postgres connection limits
+- Efficiently shares connections among Cloud Run instances
+- Improves performance and reliability
+
+## Optimized Cloud Run Configuration
+
+The service is now configured with optimized scaling parameters:
+
+- `min-instances=0`: Scales to zero when not in use to minimize costs
+- `max-instances=10`: Limits the maximum number of instances to control costs
+- `concurrency=80`: Allows each instance to handle multiple requests
+- `cpu=1`: Allocates 1 CPU to each instance
+- `memory=1Gi`: Allocates 1GB of memory to each instance
+- `timeout=300s`: Sets a 5-minute timeout for requests
+
+To deploy with these optimized settings:
+
+```bash
+./scripts/deploy-to-cloudrun-optimized.sh
+```
+
+For continuous deployment, use the provided Cloud Build configuration:
+
+```bash
+gcloud builds submit --config=cloudbuild.optimized.yaml
+```

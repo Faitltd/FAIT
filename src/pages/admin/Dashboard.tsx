@@ -13,7 +13,7 @@ import {
   CreditCard,
   DollarSign,
   Settings,
-  Database
+  Database as DatabaseIcon
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../contexts/AuthContext';
@@ -274,7 +274,7 @@ const AdminDashboard = () => {
           className="bg-white p-6 rounded-lg shadow-sm hover:shadow-md transition-shadow"
         >
           <div className="flex items-center">
-            <Database className="h-8 w-8 text-teal-600" />
+            <DatabaseIcon className="h-8 w-8 text-teal-600" />
             <div className="ml-4">
               <h3 className="text-lg font-medium text-gray-900">Data Import/Export</h3>
               <p className="text-sm text-gray-500">Import and export service agent and service data</p>

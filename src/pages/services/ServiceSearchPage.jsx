@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';;
 import MainLayout from '../../components/MainLayout';
 import ServiceSearchFilters from '../../components/services/ServiceSearchFilters';
 import ServiceSearchResults from '../../components/services/ServiceSearchResults';
@@ -9,13 +9,13 @@ import { searchServices } from '../../api/servicesApi';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const ServiceSearchPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const queryParams = new URLSearchParams(location.search);
-  
+
   // State for search parameters
   const [zipCode, setZipCode] = useState(queryParams.get('zip') || '');
   const [category, setCategory] = useState(queryParams.get('category') || '');
@@ -24,12 +24,12 @@ const ServiceSearchPage = () => {
   const [priceMin, setPriceMin] = useState(parseInt(queryParams.get('price_min') || '0', 10));
   const [priceMax, setPriceMax] = useState(parseInt(queryParams.get('price_max') || '1000', 10));
   const [ratingMin, setRatingMin] = useState(parseInt(queryParams.get('rating_min') || '0', 10));
-  
+
   // State for view options
   const [viewMode, setViewMode] = useState(queryParams.get('view') || 'list');
   const [sortBy, setSortBy] = useState(queryParams.get('sort') || 'distance');
   const [sortDirection, setSortDirection] = useState(queryParams.get('dir') || 'asc');
-  
+
   // State for results
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -37,25 +37,25 @@ const ServiceSearchPage = () => {
   const [page, setPage] = useState(parseInt(queryParams.get('page') || '1', 10));
   const [totalPages, setTotalPages] = useState(1);
   const [totalResults, setTotalResults] = useState(0);
-  
+
   // State for user profile
   const [userProfile, setUserProfile] = useState(null);
-  
+
   // Fetch user profile
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
-        
+
         if (user) {
           const { data: profile } = await supabase
             .from('profiles')
             .select('*')
             .eq('id', user.id)
             .single();
-          
+
           setUserProfile(profile);
-          
+
           // If no zip code is provided in the URL but user has one in profile, use that
           if (!zipCode && profile?.zip_code) {
             setZipCode(profile.zip_code);
@@ -66,14 +66,14 @@ const ServiceSearchPage = () => {
         console.error('Error fetching user profile:', error);
       }
     };
-    
+
     fetchUserProfile();
   }, []);
-  
+
   // Update URL when search parameters change
   const updateQueryParams = (params) => {
     const newParams = new URLSearchParams(location.search);
-    
+
     // Update or remove parameters
     Object.entries(params).forEach(([key, value]) => {
       if (value === null || value === undefined || value === '') {
@@ -82,15 +82,15 @@ const ServiceSearchPage = () => {
         newParams.set(key, value);
       }
     });
-    
+
     // Update URL without reloading the page
     navigate(`${location.pathname}?${newParams.toString()}`, { replace: true });
   };
-  
+
   // Handle search form submission
   const handleSearch = (e) => {
     if (e) e.preventDefault();
-    
+
     // Update URL parameters
     updateQueryParams({
       zip: zipCode,
@@ -105,41 +105,41 @@ const ServiceSearchPage = () => {
       dir: sortDirection,
       page: 1 // Reset to first page on new search
     });
-    
+
     // Reset page to 1 for new searches
     setPage(1);
-    
+
     // Fetch results
     fetchServices();
   };
-  
+
   // Handle pagination
   const handlePageChange = (newPage) => {
     setPage(newPage);
     updateQueryParams({ page: newPage });
   };
-  
+
   // Handle sort change
   const handleSortChange = (field) => {
     // If clicking the same field, toggle direction
     const newDirection = field === sortBy && sortDirection === 'asc' ? 'desc' : 'asc';
-    
+
     setSortBy(field);
     setSortDirection(newDirection);
     updateQueryParams({ sort: field, dir: newDirection });
   };
-  
+
   // Handle view mode change
   const handleViewModeChange = (mode) => {
     setViewMode(mode);
     updateQueryParams({ view: mode });
   };
-  
+
   // Fetch services based on search parameters
   const fetchServices = async () => {
     try {
       setLoading(true);
-      
+
       const searchParams = {
         zipCode,
         category,
@@ -153,9 +153,9 @@ const ServiceSearchPage = () => {
         page,
         limit: 10 // Number of results per page
       };
-      
+
       const { services, totalCount, totalPages: pages } = await searchServices(searchParams);
-      
+
       setServices(services);
       setTotalResults(totalCount);
       setTotalPages(pages);
@@ -170,19 +170,19 @@ const ServiceSearchPage = () => {
       setLoading(false);
     }
   };
-  
+
   // Fetch services when search parameters change
   useEffect(() => {
     fetchServices();
   }, [page, sortBy, sortDirection]);
-  
+
   // Fetch services on initial load if URL has search parameters
   useEffect(() => {
     if (location.search) {
       fetchServices();
     }
   }, [location.search]);
-  
+
   return (
     <MainLayout currentPage="search">
       <div className="py-10">
@@ -212,7 +212,7 @@ const ServiceSearchPage = () => {
                 setRatingMin={setRatingMin}
                 onSearch={handleSearch}
               />
-              
+
               {/* View Toggle */}
               <div className="mt-6 flex justify-between items-center">
                 <div className="flex space-x-2">
@@ -259,7 +259,7 @@ const ServiceSearchPage = () => {
                     Map View
                   </button>
                 </div>
-                
+
                 <div className="text-sm text-gray-500">
                   {totalResults > 0 ? (
                     <span>
@@ -270,7 +270,7 @@ const ServiceSearchPage = () => {
                   )}
                 </div>
               </div>
-              
+
               {/* Results */}
               {loading ? (
                 <div className="mt-6 flex justify-center items-center h-64">

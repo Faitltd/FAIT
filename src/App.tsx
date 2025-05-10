@@ -1,16 +1,42 @@
 import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { RouterProvider, createBrowserRouter, Route, Navigate, createRoutesFromElements, Outlet } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider, useAuth } from './contexts/UnifiedAuthContext';
 import { isAdmin } from './lib/admin';
 import { ToastContainer, ErrorBoundary as CommonErrorBoundary } from './components/common';
 // Removed Navbar import
 import LandingPage from './pages/LandingPage';
 import StaticHome from './pages/StaticHome';
 import TestPage from './pages/TestPage';
+import TestServicesPage from './pages/TestServicesPage';
+import ImprovedServicePackages from './pages/ImprovedServicePackages';
+import DebugServicePackages from './pages/DebugServicePackages';
+import TestDebugPage from './pages/TestDebugPage';
 import EnhancedHome from './pages/EnhancedHome';
-import Login from './pages/Login';
+import EnhancedHomeWithAnimations from './pages/EnhancedHomeWithAnimations';
+import EnhancedAboutWithParallax from './pages/EnhancedAboutWithParallax';
+import EnhancedServicesWithParallax from './pages/EnhancedServicesWithParallax';
+import FAITLocal from './pages/FAITLocal';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
+import DirectBypass from './pages/DirectBypass';
+import StandaloneServiceAgent from './pages/StandaloneServiceAgent';
+import DirectLogin from './pages/DirectLogin';
+import DiagnosticLogin from './pages/DiagnosticLogin';
+import AdminBypassLogin from './pages/AdminBypassLogin';
+import UnifiedLoginPage from './pages/auth/UnifiedLoginPage';
+import ComponentsDemo from './pages/demo/ComponentsDemo';
+import AnimationsDemo from './pages/AnimationsDemo';
+import ScrollRevealDemo from './pages/ScrollRevealDemo';
+import MobileOptimizationDemo from './pages/MobileOptimizationDemo';
+import PerformanceOptimizationDemo from './pages/PerformanceOptimizationDemo';
+import AnimationDemo from './components/demo/AnimationDemo';
+import AnimationDemoRoute from './components/demo/AnimationDemoRoute';
+import { ProjectsPage, ProjectDetailsPage, CreateProjectPage } from './pages/projects';
+import BookingTest from './pages/BookingTest';
+import AnimationTest from './pages/AnimationTest';
+import SimpleAnimationDemo from './pages/SimpleAnimationDemo';
+import AuthExample from './pages/AuthExample';
+import PerformanceDemo from './pages/demo/PerformanceDemo';
 
 // Import verification and onboarding components
 const VerificationPage = lazy(() => import('./pages/verification/VerificationPage'));
@@ -18,7 +44,7 @@ const ServiceAgentOnboarding = lazy(() => import('./components/onboarding/Servic
 import ResetPassword from './pages/ResetPassword';
 import BypassLoginPage from './pages/auth/BypassLoginPage';
 import ProjectPermitsPage from './pages/ProjectPermitsPage';
-import ProjectDetailsPage from './pages/ProjectDetailsPage';
+// ProjectDetailsPage is already imported from './pages/projects'
 import ProjectsListPage from './pages/ProjectsListPage';
 import ProjectCreatePage from './pages/ProjectCreatePage';
 import ProjectIssuesPage from './pages/ProjectIssuesPage';
@@ -52,6 +78,7 @@ import PointsRewards from './pages/dashboard/PointsRewards';
 import VotingDashboard from './pages/governance/VotingDashboard';
 import UnauthorizedPage from './components/UnauthorizedPage';
 import AuthModeSelector from './components/AuthModeSelector';
+import DirectAuthToggle from './components/DirectAuthToggle';
 import OAuthCallback from './pages/OAuthCallback';
 import CompleteProfile from './pages/CompleteProfile';
 import CreateService from './pages/services/CreateService';
@@ -62,6 +89,7 @@ import NotFoundRedirect from './components/NotFoundRedirect';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import CookieConsent from './components/CookieConsent';
+import MainLayout from './components/MainLayout';
 
 // Lazy load client components
 const ClientBookings = lazy(() => import('./pages/dashboard/client/ClientBookings'));
@@ -69,6 +97,9 @@ const ClientBookingDetails = lazy(() => import('./pages/dashboard/client/ClientB
 const ClientMessages = lazy(() => import('./pages/dashboard/client/ClientMessages'));
 const ClientWarranty = lazy(() => import('./pages/dashboard/client/ClientWarranty'));
 const ClientWarrantyClaim = lazy(() => import('./pages/dashboard/client/ClientWarrantyClaim'));
+
+// Lazy load test components
+const DirectMapTest = lazy(() => import('./pages/DirectMapTest'));
 
 // Lazy load service agent components
 const ServiceAgentListings = lazy(() => import('./pages/dashboard/service-agent/ServiceAgentListings'));
@@ -80,6 +111,11 @@ const ServiceAgentInvite = lazy(() => import('./pages/dashboard/service-agent/Se
 const BuildEstimate = lazy(() => import('./pages/dashboard/service-agent/BuildEstimate'));
 const AvailabilityManagementPage = lazy(() => import('./pages/dashboard/service-agent/AvailabilityManagementPage'));
 const BookingManagementPage = lazy(() => import('./pages/dashboard/service-agent/BookingManagementPage'));
+const ActiveServices = lazy(() => import('./pages/dashboard/service-agent/ActiveServices'));
+
+// Lazy load services pages
+const AllServicesPage = lazy(() => import('./pages/services/AllServicesPage'));
+const ManageServicesPage = lazy(() => import('./pages/services/ManageServicesPage'));
 
 // Lazy load admin components
 const AdminDashboard = lazy(() => import('./pages/admin/Dashboard'));
@@ -99,7 +135,10 @@ const SubscriptionManagement = lazy(() => import('./pages/SubscriptionManagement
 const SubscriptionDashboard = lazy(() => import('./pages/EnhancedSubscriptionDashboard'));
 const SubscriptionPlans = lazy(() => import('./pages/SubscriptionPlans'));
 const TestLogin = lazy(() => import('./pages/EnhancedTestLogin'));
+const TestAuthCredentials = lazy(() => import('./pages/TestAuthCredentials'));
+const TestLocalAuth = lazy(() => import('./pages/TestLocalAuth'));
 const DebugPage = lazy(() => import('./pages/DebugPage'));
+const GoogleMapsTestPage = lazy(() => import('./pages/GoogleMapsTestPage'));
 
 // Lazy load estimate components
 const ServiceAgentEstimates = lazy(() => import('./pages/estimates/ServiceAgentEstimates'));
@@ -123,10 +162,20 @@ const UserGuide = lazy(() => import('./pages/docs/UserGuide'));
 
 // Lazy load messaging pages
 const SMSMessagingPage = lazy(() => import('./pages/messaging/SMSMessagingPage'));
+const MessagesPage = lazy(() => import('./pages/messages/MessagesPage'));
 
 // Lazy load enhanced booking details
 const EnhancedBookingDetailsPage = lazy(() => import('./pages/booking/EnhancedBookingDetailsPage'));
 const BookingConfirmationPage = lazy(() => import('./pages/booking/BookingConfirmationPage'));
+const BookingsPage = lazy(() => import('./pages/bookings/BookingsPage'));
+
+// Lazy load calculator
+const RemodelingCalculator = lazy(() => import('./pages/calculator/RemodelingCalculator'));
+const HandymanCalculator = lazy(() => import('./pages/calculator/HandymanCalculator'));
+const TestRemodelingCalculator = lazy(() => import('./pages/calculator/TestRemodelingCalculator'));
+const SimpleTestCalculator = lazy(() => import('./pages/calculator/SimpleTestCalculator'));
+// Import EstimateCalculators directly
+import EstimateCalculators from './pages/calculator/EstimateCalculators';
 
 // Lazy load profile pages
 const ProfileSetupPage = lazy(() => import('./pages/profile/ProfileSetupPage'));
@@ -136,9 +185,11 @@ const AccountDeactivatedPage = lazy(() => import('./pages/profile/AccountDeactiv
 // Lazy load estimates
 const CreateEstimatePage = lazy(() => import('./pages/estimates/CreateEstimatePage'));
 
+// We're now using the unified auth context
+
 // Protected route wrapper with loading state
 const ProtectedRoute = ({ children, adminOnly = false }: { children: React.ReactNode, adminOnly?: boolean }) => {
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading, userType } = useAuth();
   const [isAdminUser, setIsAdminUser] = useState(false);
   const [checkingAdmin, setCheckingAdmin] = useState(adminOnly);
   const [error, setError] = useState<string | null>(null);
@@ -146,6 +197,13 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: React.React
   useEffect(() => {
     // If not admin-only or no user, no need to check admin status
     if (!user || !adminOnly) {
+      setCheckingAdmin(false);
+      return;
+    }
+
+    // If user type is admin, no need to check further
+    if (userType === 'admin') {
+      setIsAdminUser(true);
       setCheckingAdmin(false);
       return;
     }
@@ -166,9 +224,9 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: React.React
     };
 
     checkAdminStatus();
-  }, [user, adminOnly]);
+  }, [user, adminOnly, userType]);
 
-  if (authLoading || checkingAdmin) {
+  if (loading || checkingAdmin) {
     return <LoadingSpinner fullScreen message="Verifying access..." />;
   }
 
@@ -182,23 +240,24 @@ const ProtectedRoute = ({ children, adminOnly = false }: { children: React.React
   }
 
   // Handle admin-only routes
-  if (adminOnly && !isAdminUser) {
-    console.log('Access denied: adminOnly =', adminOnly, 'isAdminUser =', isAdminUser);
+  if (adminOnly && userType !== 'admin' && !isAdminUser) {
+    console.log('Access denied: adminOnly =', adminOnly, 'userType =', userType);
     return <UnauthorizedPage />;
   }
 
   return <>{children}</>;
 };
 
-// Create a layout component with the Navbar and Footer
+// Import the AuthToggle component
+import AuthToggle from './components/AuthToggle';
+
+// Create a layout component with MainLayout
 const Layout = () => (
-  <div className="min-h-screen bg-gray-50 flex flex-col">
-    <Navbar />
+  <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#c0e2ff' }}>
     <div className="flex-grow">
       <Outlet />
     </div>
-    <Footer />
-    <AuthModeSelector />
+    <AuthToggle />
     <CookieConsent />
   </div>
 );
@@ -207,24 +266,45 @@ const Layout = () => (
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Layout />} errorElement={<CommonErrorBoundary />}>
-      <Route path="/" element={<EnhancedHome />} />
-      <Route path="/login" element={<Login />} />
+      <Route path="/" element={<MainLayout currentPage="home"><EnhancedHomeWithAnimations /></MainLayout>} />
+      <Route path="/home/original" element={<MainLayout currentPage="home"><EnhancedHome /></MainLayout>} />
+      <Route path="/enhanced-about" element={<MainLayout currentPage="about"><EnhancedAboutWithParallax /></MainLayout>} />
+      <Route path="/enhanced-services" element={<MainLayout currentPage="services"><EnhancedServicesWithParallax /></MainLayout>} />
+      <Route path="/local" element={<MainLayout currentPage="local"><FAITLocal /></MainLayout>} />
+      <Route path="/login" element={<MainLayout currentPage="login"><React.Suspense fallback={<LoadingSpinner />}><UnifiedLoginPage /></React.Suspense></MainLayout>} />
+      <Route path="/direct-bypass" element={<DirectBypass />} />
+      <Route path="/standalone-service-agent" element={<StandaloneServiceAgent />} />
       <Route path="/bypass-login" element={<BypassLoginPage />} />
-      <Route path="/register" element={<Register />} />
+      <Route path="/direct-login" element={<DirectLogin />} />
+      <Route path="/diagnostic-login" element={<DiagnosticLogin />} />
+      <Route path="/admin-bypass" element={<AdminBypassLogin />} />
+      <Route path="/register" element={<MainLayout currentPage="register"><Register /></MainLayout>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/services" element={<ServicePackages />} />
-      <Route path="/services/search" element={<Suspense fallback={<LoadingSpinner />}><EnhancedServiceSearchPage /></Suspense>} />
+      <Route path="/services" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><ImprovedServicePackages /></MainLayout></Suspense>} />
+      <Route path="/services/debug" element={<Suspense fallback={<LoadingSpinner />}><DebugServicePackages /></Suspense>} />
+      <Route path="/services/debug-test" element={<TestDebugPage />} />
+      <Route path="/services/search" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><EnhancedServiceSearchPage /></MainLayout></Suspense>} />
       <Route path="/services/:serviceId/reviews" element={<Suspense fallback={<LoadingSpinner />}><ServiceReviews /></Suspense>} />
       <Route path="/service-agent/:serviceAgentId/reviews" element={<Suspense fallback={<LoadingSpinner />}><ServiceAgentReviewsPage /></Suspense>} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
+      {/* Test routes */}
+      <Route path="/test/booking/:serviceId?" element={<BookingTest />} />
+      <Route path="/test/animations" element={<AnimationTest />} />
+      <Route path="/demo/animations" element={<React.Suspense fallback={<LoadingSpinner />}><AnimationDemo /></React.Suspense>} />
+      <Route path="/demo/animations-new/*" element={<React.Suspense fallback={<LoadingSpinner />}><AnimationDemoRoute /></React.Suspense>} />
+      <Route path="/demo/simple-animations" element={<SimpleAnimationDemo />} />
+      <Route path="/demo/auth" element={<MainLayout currentPage="demo"><AuthExample /></MainLayout>} />
+      <Route path="/demo/performance" element={<MainLayout currentPage="demo"><PerformanceDemo /></MainLayout>} />
       {/* Redirect from old contractor dashboard to new service agent dashboard */}
       <Route path="/dashboard/contractor" element={<Navigate to="/dashboard/service-agent" replace />} />
       <Route
         path="/book/:serviceId"
         element={
           <ProtectedRoute>
-            <BookService />
+            <MainLayout currentPage="bookings">
+              <BookService />
+            </MainLayout>
           </ProtectedRoute>
         }
       />
@@ -248,7 +328,9 @@ const router = createBrowserRouter(
         path="/dashboard/client"
         element={
           <ProtectedRoute>
-            <ClientDashboard />
+            <MainLayout currentPage="dashboard">
+              <ClientDashboard />
+            </MainLayout>
           </ProtectedRoute>
         }
       />
@@ -356,7 +438,9 @@ const router = createBrowserRouter(
         path="/dashboard/service-agent"
         element={
           <ProtectedRoute>
-            <ServiceAgentDashboard />
+            <MainLayout currentPage="dashboard">
+              <ServiceAgentDashboard />
+            </MainLayout>
           </ProtectedRoute>
         }
       />
@@ -416,6 +500,16 @@ const router = createBrowserRouter(
           <ProtectedRoute>
             <Suspense fallback={<LoadingSpinner />}>
               <ServiceAgentMessages />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/messages"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <MessagesPage />
             </Suspense>
           </ProtectedRoute>
         }
@@ -649,6 +743,89 @@ const router = createBrowserRouter(
         }
       />
       <Route
+        path="/dashboard/service-agent/active-services"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ActiveServices />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/all"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <AllServicesPage />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/services/manage"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <ManageServicesPage />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/bookings"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <BookingsPage />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calculator/remodeling"
+        element={
+          <ProtectedRoute>
+            <Suspense fallback={<LoadingSpinner />}>
+              <RemodelingCalculator />
+            </Suspense>
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/calculator/handyman"
+        element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <HandymanCalculator />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/calculator/test"
+        element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <TestRemodelingCalculator />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/calculator/simple-test"
+        element={
+          <Suspense fallback={<LoadingSpinner />}>
+            <SimpleTestCalculator />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/calculator/estimate"
+        element={
+          <div>
+            {console.log('Rendering EstimateCalculators route - direct')}
+            <EstimateCalculators />
+          </div>
+        }
+      />
+      <Route
         path="/projects"
         element={
           <ProtectedRoute>
@@ -864,8 +1041,20 @@ const router = createBrowserRouter(
       <Route path="/account/deactivate" element={<Suspense fallback={<LoadingSpinner />}><AccountDeactivationPage /></Suspense>} />
       <Route path="/account-deactivated" element={<Suspense fallback={<LoadingSpinner />}><AccountDeactivatedPage /></Suspense>} />
       <Route path="/test-login" element={<TestLogin />} />
+      <Route path="/test-auth-credentials" element={<Suspense fallback={<LoadingSpinner />}><TestAuthCredentials /></Suspense>} />
+      <Route path="/test-local-auth" element={<Suspense fallback={<LoadingSpinner />}><TestLocalAuth /></Suspense>} />
       <Route path="/debug" element={<DebugPage />} />
       <Route path="/test-page" element={<TestPage />} />
+      <Route path="/test-maps" element={<Suspense fallback={<LoadingSpinner />}><GoogleMapsTestPage /></Suspense>} />
+      <Route path="/direct-map-test" element={<Suspense fallback={<LoadingSpinner />}><DirectMapTest /></Suspense>} />
+      <Route path="/components-demo" element={<ComponentsDemo />} />
+      <Route path="/scroll-reveal" element={<ScrollRevealDemo />} />
+      <Route path="/animations-demo" element={<AnimationsDemo />} />
+      <Route path="/mobile-demo" element={<MobileOptimizationDemo />} />
+      <Route path="/performance-demo" element={<PerformanceOptimizationDemo />} />
+
+      {/* Project Routes */}
+      <Route path="/projects/:projectId/edit" element={<CreateProjectPage />} />
 
       {/* Verification Routes */}
       <Route
@@ -962,10 +1151,8 @@ const router = createBrowserRouter(
       />
 
       {/* Redirect routes for old paths */}
-      <Route path="/bookings" element={<NotFoundRedirect />} />
-      <Route path="/warranty" element={<NotFoundRedirect />} />
-      <Route path="/warranty/claims" element={<NotFoundRedirect />} />
-      <Route path="/messages" element={<NotFoundRedirect />} />
+      <Route path="/warranty" element={<Navigate to="/dashboard/client/warranty" replace />} />
+      <Route path="/warranty/claims" element={<Navigate to="/dashboard/client/warranty" replace />} />
       <Route path="/contractor" element={<NotFoundRedirect />} />
       <Route path="/contractor/jobs" element={<NotFoundRedirect />} />
       <Route path="/contractor/listings" element={<NotFoundRedirect />} />
@@ -1056,6 +1243,8 @@ const router = createBrowserRouter(
 // Import providers
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import SystemMessageProvider from './contexts/SystemMessageContext';
+import GoogleMapsLoader from './components/GoogleMapsLoader';
+import SessionManager from './components/auth/SessionManager';
 
 function App() {
   return (
@@ -1063,8 +1252,16 @@ function App() {
       <AuthProvider>
         <SubscriptionProvider>
           <SystemMessageProvider>
-            <RouterProvider router={router} />
-            <ToastContainer />
+            {/* Session management for auto-refresh and timeout warnings */}
+            <SessionManager
+              warningTime={5 * 60 * 1000}  // Show warning 5 minutes before expiry
+              autoRefreshTime={10 * 60 * 1000}  // Auto-refresh 10 minutes before expiry
+            >
+              {/* Preload Google Maps API */}
+              <GoogleMapsLoader />
+              <RouterProvider router={router} />
+              <ToastContainer />
+            </SessionManager>
           </SystemMessageProvider>
         </SubscriptionProvider>
       </AuthProvider>

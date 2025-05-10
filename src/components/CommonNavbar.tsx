@@ -49,6 +49,17 @@ const CommonNavbar: React.FC<NavbarProps> = ({ currentPage = 'home' }) => {
               >
                 Services
               </a>
+              <a
+                href="#"
+                onClick={(e) => { e.preventDefault(); navigate('/local'); }}
+                className={`${
+                  currentPage === 'local'
+                    ? 'border-company-lightpink text-gray-900'
+                    : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+                } inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium`}
+              >
+                FAIT Local
+              </a>
               {userType === 'client' && (
                 <a
                   href="#"
@@ -194,6 +205,17 @@ const CommonNavbar: React.FC<NavbarProps> = ({ currentPage = 'home' }) => {
             } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
           >
             Services
+          </a>
+          <a
+            href="#"
+            onClick={(e) => { e.preventDefault(); navigate('/local'); }}
+            className={`${
+              currentPage === 'local'
+                ? 'bg-company-lightblue border-company-lightpink text-gray-800'
+                : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
+            } block pl-3 pr-4 py-2 border-l-4 text-base font-medium`}
+          >
+            FAIT Local
           </a>
           {userType === 'client' && (
             <a

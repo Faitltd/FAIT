@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const EnhancedHome: React.FC = () => {
   return (
@@ -14,19 +15,37 @@ const EnhancedHome: React.FC = () => {
           <p className="mt-6 max-w-2xl mx-auto text-xl text-gray-500">
             Connecting homeowners with trusted service agents for all your home improvement needs.
           </p>
-          <div className="mt-10 flex justify-center gap-4">
+          <div className="mt-10 flex flex-col items-center">
+            {/* Free Instant Estimate Button - Prominent */}
             <a
-              href="/test-login"
-              className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10 transition-colors"
+              href="/calculator/estimate"
+              className="w-full sm:w-auto px-10 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center mb-6"
             >
-              Get Started
+              <svg className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              Free Instant Estimate
             </a>
-            <a
-              href="/services/search"
-              className="px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition-colors"
-            >
-              Find Services
-            </a>
+
+            {/* Other buttons */}
+            <div className="flex justify-center gap-4">
+              <Link
+                to="/register"
+                className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10 transition-colors"
+                id="get-started-button-enhanced"
+                data-testid="get-started-button"
+              >
+                Get Started
+              </Link>
+              <Link
+                to="/services/search"
+                className="px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition-colors"
+                id="find-services-button"
+                data-testid="find-services-button"
+              >
+                Find Services
+              </Link>
+            </div>
           </div>
         </div>
       </div>

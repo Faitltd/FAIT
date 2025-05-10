@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../utils/supabaseClient';
 import MainLayout from '../components/MainLayout';
 import CheckoutForm from '../components/subscription/CheckoutForm';
 
@@ -11,7 +11,7 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 // Initialize Supabase
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const SubscriptionPlansStripe: React.FC = () => {
   const [userType, setUserType] = useState<string>('client');
@@ -31,24 +31,24 @@ const SubscriptionPlansStripe: React.FC = () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         setUserId(user.id);
-        
+
         // Get user profile
         const { data: profile } = await supabase
           .from('profiles')
           .select('user_type, subscription_plan')
           .eq('id', user.id)
           .single();
-        
+
         if (profile) {
           setUserType(profile.user_type);
           setCurrentPlanId(profile.subscription_plan || 'basic');
-          
+
           // Get user data based on type
           setUserData(getUserData(profile.user_type, profile.subscription_plan));
         }
       }
     };
-    
+
     fetchUserData();
   }, []);
 
@@ -177,7 +177,7 @@ const SubscriptionPlansStripe: React.FC = () => {
       alert('Please log in to select a subscription plan');
       return;
     }
-    
+
     const plan = userData.plans.find((p: any) => p.id === planId);
     if (plan) {
       if (plan.id === currentPlanId) {
@@ -192,7 +192,7 @@ const SubscriptionPlansStripe: React.FC = () => {
         // Paid plan - prepare for checkout
         setSelectedPlan(plan);
         setIsProcessing(true);
-        
+
         try {
           // Call backend to create or update subscription
           const response = await fetch('/api/create-subscription', {
@@ -206,9 +206,9 @@ const SubscriptionPlansStripe: React.FC = () => {
               currentPlanId,
             }),
           });
-          
+
           const data = await response.json();
-          
+
           if (data.clientSecret) {
             setClientSecret(data.clientSecret);
             setCheckoutMode(true);
@@ -230,7 +230,7 @@ const SubscriptionPlansStripe: React.FC = () => {
     if (selectedPlan.id === 'basic') {
       // Handle downgrade to free plan
       setIsProcessing(true);
-      
+
       try {
         const response = await fetch('/api/cancel-subscription', {
           method: 'POST',
@@ -239,15 +239,15 @@ const SubscriptionPlansStripe: React.FC = () => {
           },
           body: JSON.stringify({ userId }),
         });
-        
+
         const data = await response.json();
-        
+
         if (data.success) {
           setIsSuccess(true);
-          
+
           // Update local state
           setCurrentPlanId('basic');
-          
+
           // After showing success message, close modal after a delay
           setTimeout(() => {
             setShowModal(false);
@@ -269,7 +269,7 @@ const SubscriptionPlansStripe: React.FC = () => {
   const handlePaymentSuccess = () => {
     setIsSuccess(true);
     setCurrentPlanId(selectedPlan.id);
-    
+
     // After showing success message, close modal after a delay
     setTimeout(() => {
       setShowModal(false);
@@ -502,9 +502,9 @@ const SubscriptionPlansStripe: React.FC = () => {
                               <p className="text-sm text-gray-500 mb-4">
                                 Please enter your payment details to subscribe to the {selectedPlan?.name} plan.
                               </p>
-                              
+
                               <Elements stripe={stripePromise} options={{ clientSecret }}>
-                                <CheckoutForm 
+                                <CheckoutForm
                                   clientSecret={clientSecret}
                                   planName={selectedPlan?.name}
                                   onSuccess={handlePaymentSuccess}
@@ -531,7 +531,7 @@ const SubscriptionPlansStripe: React.FC = () => {
                                     <>Are you sure you want to change to the <span className="font-medium">{selectedPlan?.name}</span> plan?</>
                                   )}
                                 </p>
-                                
+
                                 {/* Billing details section */}
                                 <div className="bg-gray-50 p-4 rounded-md">
                                   <h4 className="text-sm font-medium text-gray-900 mb-2">Billing Details</h4>

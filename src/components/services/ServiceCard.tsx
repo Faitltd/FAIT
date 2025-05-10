@@ -1,14 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Star, MapPin, DollarSign } from 'lucide-react';
+import { Star, MapPin, DollarSign, Navigation } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { ServicePackage } from '../../pages/services/EnhancedServiceSearchPage';
 
 interface ServiceCardProps {
   service: ServicePackage;
+  onGetDirections?: (serviceId: string) => void;
 }
 
-const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
+const ServiceCard: React.FC<ServiceCardProps> = ({ service, onGetDirections }) => {
   // Helper function to render star ratings
   const renderStars = (rating: number) => {
     return (
@@ -90,13 +91,24 @@ const ServiceCard: React.FC<ServiceCardProps> = ({ service }) => {
           {renderStars(service.avg_rating)}
         </div>
 
-        <div className="mt-4">
+        <div className="mt-4 grid grid-cols-2 gap-2">
           <Link
             to={`/book/${service.id}`}
-            className="w-full inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+            className="inline-flex justify-center items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
           >
             Book Now
           </Link>
+
+          {onGetDirections && (
+            <button
+              onClick={() => onGetDirections(service.id)}
+              className="inline-flex justify-center items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              type="button"
+            >
+              <Navigation className="h-4 w-4 mr-2" />
+              Directions
+            </button>
+          )}
         </div>
       </div>
     </div>

@@ -113,7 +113,7 @@ const ClientDashboardStats = ({ stats }) => {
                     </dt>
                     <dd className="flex items-baseline">
                       <div className="text-2xl font-semibold text-gray-900">
-                        ${booking_stats.total_spent.toFixed(2)}
+                        ${booking_stats.total_spent ? booking_stats.total_spent.toFixed(2) : '0.00'}
                       </div>
                     </dd>
                   </dl>

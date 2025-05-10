@@ -7,6 +7,7 @@ export const simulatedClientDashboardStats = {
     pending_bookings: 2,
     confirmed_bookings: 2,
     cancelled_bookings: 0,
+    total_spent: 800.00,
     upcoming_bookings: [
       {
         id: 'b1',
@@ -281,7 +282,7 @@ export const simulatedRecentActivity = [
     date: '2023-05-01T09:15:00Z',
     details: {
       from: 'John Smith',
-      preview: 'I'll be arriving at your location around 10 AM tomorrow...'
+      preview: 'I\'ll be arriving at your location around 10 AM tomorrow...'
     }
   },
   {
@@ -330,7 +331,7 @@ export const simulatedConversations = [
     service: {
       name: 'Plumbing Repair'
     },
-    last_message: 'I'll be arriving at your location around 10 AM tomorrow. Please make sure someone is available to let me in.',
+    last_message: 'I\'ll be arriving at your location around 10 AM tomorrow. Please make sure someone is available to let me in.',
     last_message_time: '2023-05-01T09:15:00Z'
   },
   {
@@ -343,7 +344,7 @@ export const simulatedConversations = [
     service: {
       name: 'Electrical Inspection'
     },
-    last_message: 'Thank you for your payment. I've attached the inspection report for your records.',
+    last_message: 'Thank you for your payment. I\'ve attached the inspection report for your records.',
     last_message_time: '2023-04-29T16:30:00Z'
   },
   {

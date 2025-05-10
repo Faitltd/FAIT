@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Loader } from '@googlemaps/js-api-loader';
 import type { Database } from '../lib/database.types';
+import { loadGoogleMapsApi, isGoogleMapsLoaded } from '../utils/googleMapsLoader';
 
 type ServiceArea = Database['public']['Tables']['service_agent_service_areas']['Row'];
 
@@ -24,13 +25,13 @@ const ServiceAreaMap: React.FC<ServiceAreaMapProps> = ({ areas, className = '' }
           throw new Error('Google Maps API key is missing. Please check your environment variables.');
         }
 
-        const loader = new Loader({
-          apiKey: GOOGLE_MAPS_API_KEY,
-          version: 'weekly',
-          libraries: ['geometry', 'places']
-        });
+        // Load Google Maps API using our utility
+        if (!isGoogleMapsLoaded()) {
+          await loadGoogleMapsApi(['geometry', 'places']);
+        }
 
-        const google = await loader.load();
+        // Access Google Maps API
+        const google = window.google;
         const geocoder = new google.maps.Geocoder();
 
         if (!mapRef.current) return;

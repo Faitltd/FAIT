@@ -1,9 +1,12 @@
-import React, { lazy, Suspense, useState, useEffect } from 'react';
+import React, { Suspense, useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, useRouteError } from 'react-router-dom';
 import { supabase } from './lib/supabaseClient';
 import { SubscriptionProvider } from './contexts/SubscriptionContext';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import AppVersionIndicator from './components/AppVersionIndicator';
+import { lazyLoad } from './utils/advancedLazyLoading';
+import { registerServiceWorker } from './utils/serviceWorkerRegistration';
 
 // Import your components
 import Home from './pages/Home';
@@ -11,35 +14,116 @@ import Loading from './components/Loading';
 import NotificationBell from './components/notifications/NotificationBell';
 import ErrorBoundary from './components/ErrorBoundary';
 import NotFound from './components/NotFound';
-import VerySimpleWarrantyClaimsPage from './pages/warranty/VerySimpleWarrantyClaimsPage';
+// VerySimpleWarrantyClaimsPage is already lazy loaded as WarrantyClaimsPage
 
-// Auth pages
-const LoginPage = lazy(() => import('./pages/auth/LoginPage'));
-const SignupPage = lazy(() => import('./pages/auth/SignupPage'));
+// Register service worker
+registerServiceWorker({
+  onSuccess: (registration) => {
+    console.log('Service worker registered successfully:', registration);
+  },
+  onError: (error) => {
+    console.error('Service worker registration failed:', error);
+  }
+});
 
-// Lazy load other components
-const DashboardRouter = lazy(() => import('./pages/dashboard/DashboardRouter'));
-const ServiceAgentDashboard = lazy(() => import('./pages/dashboard/ServiceAgentDashboard'));
-const SimpleServiceAgentMessages = lazy(() => import('./pages/dashboard/service-agent/SimpleServiceAgentMessages'));
-const SimpleClientMessages = lazy(() => import('./pages/dashboard/client/SimpleClientMessages'));
-const SimpleAdminMessages = lazy(() => import('./pages/dashboard/admin/SimpleAdminMessages'));
-const ClientDashboard = lazy(() => import('./pages/dashboard/ClientDashboard'));
-const AdminDashboard = lazy(() => import('./pages/dashboard/AdminDashboard'));
-const ServiceSearchPage = lazy(() => import('./pages/services/ServiceSearchPage'));
-const BookingPage = lazy(() => import('./pages/booking/BookingPage'));
-const BookingConfirmationPage = lazy(() => import('./pages/booking/BookingConfirmationPage'));
-const BookingDetailsPage = lazy(() => import('./pages/booking/BookingDetailsPage'));
-const BookingsListPage = lazy(() => import('./pages/booking/BookingsListPage'));
-const MessagingPage = lazy(() => import('./pages/messaging/MessagingPage'));
-const WarrantyClaimsPage = lazy(() => import('./pages/warranty/VerySimpleWarrantyClaimsPage'));
-const WarrantyClaimNewPage = lazy(() => import('./pages/warranty/WarrantyClaimNewPage'));
-const WarrantyClaimDetailPage = lazy(() => import('./pages/warranty/WarrantyClaimDetailPage'));
-const SubscriptionDashboard = lazy(() => import('./pages/EnhancedSubscriptionDashboard'));
-const SubscriptionPlans = lazy(() => import('./pages/SubscriptionPlansStripe'));
-const NotificationsPage = lazy(() => import('./pages/notifications/NotificationsPage'));
-const WarrantyPage = lazy(() => import('./pages/warranty/WarrantyPage'));
-const AvailabilityPage = lazy(() => import('./pages/availability/AvailabilityPage'));
-const AuditLogPage = lazy(() => import('./pages/admin/AuditLogPage'));
+// Auth pages - preload these for faster login/signup experience
+const LoginPage = lazyLoad(() => import('./pages/auth/LoginPage'), {
+  name: 'LoginPage',
+  preload: true
+});
+const SignupPage = lazyLoad(() => import('./pages/auth/SignupPage'), {
+  name: 'SignupPage',
+  preload: true
+});
+
+// Dashboard components - these are critical for logged-in users
+const DashboardRouter = lazyLoad(() => import('./pages/dashboard/DashboardRouter'), {
+  name: 'DashboardRouter'
+});
+const ServiceAgentDashboard = lazyLoad(() => import('./pages/dashboard/ServiceAgentDashboard'), {
+  name: 'ServiceAgentDashboard'
+});
+const ClientDashboard = lazyLoad(() => import('./pages/dashboard/ClientDashboard'), {
+  name: 'ClientDashboard'
+});
+const AdminDashboard = lazyLoad(() => import('./pages/dashboard/AdminDashboard'), {
+  name: 'AdminDashboard'
+});
+
+// Messaging components
+const ServiceAgentMessages = lazyLoad(() => import('./pages/dashboard/service-agent/ServiceAgentMessages'), {
+  name: 'ServiceAgentMessages'
+});
+const SimpleClientMessages = lazyLoad(() => import('./pages/dashboard/client/SimpleClientMessages'), {
+  name: 'SimpleClientMessages'
+});
+const SimpleAdminMessages = lazyLoad(() => import('./pages/dashboard/admin/SimpleAdminMessages'), {
+  name: 'SimpleAdminMessages'
+});
+const MessagingPage = lazyLoad(() => import('./pages/messaging/MessagingPage'), {
+  name: 'MessagingPage'
+});
+
+// Service and booking components
+const ServiceSearchPage = lazyLoad(() => import('./pages/services/ServiceSearchPage'), {
+  name: 'ServiceSearchPage'
+});
+const BookingPage = lazyLoad(() => import('./pages/booking/BookingPage'), {
+  name: 'BookingPage'
+});
+const BookingConfirmationPage = lazyLoad(() => import('./pages/booking/BookingConfirmationPage'), {
+  name: 'BookingConfirmationPage'
+});
+const BookingDetailsPage = lazyLoad(() => import('./pages/booking/BookingDetailsPage'), {
+  name: 'BookingDetailsPage'
+});
+const BookingsListPage = lazyLoad(() => import('./pages/booking/BookingsListPage'), {
+  name: 'BookingsListPage'
+});
+
+// Warranty components
+const WarrantyClaimsPage = lazyLoad(() => import('./pages/warranty/VerySimpleWarrantyClaimsPage'), {
+  name: 'WarrantyClaimsPage'
+});
+const WarrantyClaimNewPage = lazyLoad(() => import('./pages/warranty/WarrantyClaimNewPage'), {
+  name: 'WarrantyClaimNewPage'
+});
+const WarrantyClaimDetailPage = lazyLoad(() => import('./pages/warranty/WarrantyClaimDetailPage'), {
+  name: 'WarrantyClaimDetailPage'
+});
+const WarrantyPage = lazyLoad(() => import('./pages/warranty/WarrantyPage'), {
+  name: 'WarrantyPage'
+});
+
+// Subscription components
+const SubscriptionDashboard = lazyLoad(() => import('./pages/EnhancedSubscriptionDashboard'), {
+  name: 'SubscriptionDashboard'
+});
+const SubscriptionPlans = lazyLoad(() => import('./pages/SubscriptionPlansStripe'), {
+  name: 'SubscriptionPlans'
+});
+
+// Other components
+const NotificationsPage = lazyLoad(() => import('./pages/notifications/NotificationsPage'), {
+  name: 'NotificationsPage'
+});
+const AvailabilityPage = lazyLoad(() => import('./pages/availability/AvailabilityPage'), {
+  name: 'AvailabilityPage'
+});
+const AuditLogPage = lazyLoad(() => import('./pages/admin/AuditLogPage'), {
+  name: 'AuditLogPage'
+});
+
+// Calculator pages
+const RemodelingCalculator = lazyLoad(() => import('./pages/calculator/RemodelingCalculator'), {
+  name: 'RemodelingCalculator'
+});
+const HandymanTaskEstimator = lazyLoad(() => import('./pages/calculator/HandymanTaskEstimator'), {
+  name: 'HandymanTaskEstimator'
+});
+const EstimateCalculators = lazyLoad(() => import('./pages/calculator/EstimateCalculators'), {
+  name: 'EstimateCalculators'
+});
 
 // Supabase client is now imported from lib/supabaseClient.js
 
@@ -103,7 +187,11 @@ function App() {
     <AuthProvider>
       <SubscriptionProvider>
         <Router>
-        <Suspense fallback={<Loading />}>
+        <Suspense fallback={
+          <div className="flex items-center justify-center min-h-screen">
+            <Loading />
+          </div>
+        }>
           <Routes>
             <Route path="/" element={<Home />} errorElement={<ErrorBoundary />} />
 
@@ -120,14 +208,14 @@ function App() {
             {/* Messaging Routes */}
             <Route path="/messages" element={<MessagingPage />} />
             <Route path="/messages/:conversationId" element={<MessagingPage />} />
-            <Route path="/dashboard/service-agent/messages" element={<ProtectedRoute><SimpleServiceAgentMessages /></ProtectedRoute>} />
+            <Route path="/dashboard/service-agent/messages" element={<ProtectedRoute><ServiceAgentMessages /></ProtectedRoute>} />
 
             {/* Notifications Routes */}
             <Route path="/notifications" element={<NotificationsPage />} />
 
             {/* Warranty Routes */}
             <Route path="/warranty" element={<ProtectedRoute><WarrantyPage /></ProtectedRoute>} />
-            <Route path="/warranty/claims" element={<ProtectedRoute><VerySimpleWarrantyClaimsPage /></ProtectedRoute>} />
+            <Route path="/warranty/claims" element={<ProtectedRoute><WarrantyClaimsPage /></ProtectedRoute>} />
             <Route path="/warranty/claims/new" element={<ProtectedRoute><WarrantyClaimNewPage /></ProtectedRoute>} />
             <Route path="/warranty/claims/:claimId" element={<ProtectedRoute><WarrantyClaimDetailPage /></ProtectedRoute>} />
 
@@ -147,6 +235,11 @@ function App() {
             <Route path="/messages" element={<MessagingPage />} />
             <Route path="/messages/:conversationId" element={<MessagingPage />} />
 
+            {/* Calculator Routes */}
+            <Route path="/calculator/remodeling" element={<RemodelingCalculator />} />
+            <Route path="/calculator/handyman" element={<HandymanTaskEstimator />} />
+            <Route path="/calculator/estimate" element={<EstimateCalculators />} />
+
             {/* Admin Routes */}
             <Route path="/admin/audit-logs" element={<AuditLogPage />} />
 
@@ -158,6 +251,7 @@ function App() {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </Suspense>
+        <AppVersionIndicator version="full" />
         </Router>
       </SubscriptionProvider>
     </AuthProvider>

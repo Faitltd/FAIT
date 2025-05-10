@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../../lib/supabaseClient';
 
 // Supabase client is now imported from lib/supabaseClient.js
@@ -72,7 +72,7 @@ const SignupPage = () => {
           alt="FAIT Co-op"
         />
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-          Create a new account
+          Create an Account
         </h2>
         <p className="mt-2 text-center text-sm text-gray-600">
           Or{' '}

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Test Page</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .status {
+      padding: 15px;
+      background-color: #e7f7e7;
+      border-left: 5px solid #28a745;
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Simple Test Page</h1>
+    <div class="status">
+      <p><strong>Status:</strong> If you can see this page, the CommonJS server is working correctly!</p>
+    </div>
+    <p>This is a very simple HTML page to test if the CommonJS server is properly serving static content.</p>
+    <p>Current time: <span id="current-time"></span></p>
+  </div>
+
+  <script>
+    // Update current time
+    document.getElementById('current-time').textContent = new Date().toLocaleString();
+  </script>
+</body>
+</html>

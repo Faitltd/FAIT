@@ -1,9 +1,5 @@
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../lib/supabaseClient';
 import { getDistance } from './geocodingApi';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * Search for services based on various criteria
@@ -36,7 +32,7 @@ export const searchServices = async (params) => {
       page = 1,
       limit = 10
     } = params;
-    
+
     // Start building the query
     let query = supabase
       .from('services')
@@ -47,35 +43,35 @@ export const searchServices = async (params) => {
         review_count:reviews (count)
       `, { count: 'exact' })
       .eq('is_active', true);
-    
+
     // Add search term filter if provided
     if (searchTerm) {
       query = query.or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
     }
-    
+
     // Add category filter if provided
     if (category) {
       query = query.eq('category', category);
     }
-    
+
     // Add price range filter
     query = query.gte('price', priceMin).lte('price', priceMax);
-    
+
     // Add rating filter
     if (ratingMin > 0) {
       query = query.gte('average_rating', ratingMin);
     }
-    
+
     // Add pagination
     const from = (page - 1) * limit;
     const to = from + limit - 1;
     query = query.range(from, to);
-    
+
     // Execute the query
     const { data, error, count } = await query;
-    
+
     if (error) throw error;
-    
+
     // Process the results
     let services = data.map(service => ({
       id: service.id,
@@ -93,7 +89,7 @@ export const searchServices = async (params) => {
       review_count: service.review_count,
       distance: null // Will be calculated below if zip code is provided
     }));
-    
+
     // Calculate distances if zip code is provided
     if (zipCode) {
       services = await Promise.all(
@@ -110,17 +106,17 @@ export const searchServices = async (params) => {
           }
         })
       );
-      
+
       // Filter by radius
-      services = services.filter(service => 
+      services = services.filter(service =>
         service.distance === null || service.distance <= radius
       );
     }
-    
+
     // Sort results
     services.sort((a, b) => {
       let comparison = 0;
-      
+
       switch (sortBy) {
         case 'price':
           comparison = a.price - b.price;
@@ -143,13 +139,13 @@ export const searchServices = async (params) => {
         default:
           comparison = 0;
       }
-      
+
       return sortDirection === 'asc' ? comparison : -comparison;
     });
-    
+
     // Calculate total pages
     const totalPages = Math.ceil(services.length / limit);
-    
+
     return {
       services,
       totalCount: services.length,
@@ -177,9 +173,9 @@ export const getServiceById = async (serviceId) => {
       `)
       .eq('id', serviceId)
       .single();
-    
+
     if (error) throw error;
-    
+
     return {
       ...data,
       service_agent_name: `${data.service_agent.first_name} ${data.service_agent.last_name}`,
@@ -214,9 +210,9 @@ export const getServicesByServiceAgentId = async (serviceAgentId) => {
         review_count:reviews (count)
       `)
       .eq('service_agent_id', serviceAgentId);
-    
+
     if (error) throw error;
-    
+
     return data.map(service => ({
       id: service.id,
       name: service.name,
@@ -247,9 +243,9 @@ export const createService = async (service) => {
       .insert(service)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     return data;
   } catch (error) {
     console.error('Error creating service:', error);
@@ -271,9 +267,9 @@ export const updateService = async (serviceId, updates) => {
       .eq('id', serviceId)
       .select()
       .single();
-    
+
     if (error) throw error;
-    
+
     return data;
   } catch (error) {
     console.error('Error updating service:', error);
@@ -292,7 +288,7 @@ export const deleteService = async (serviceId) => {
       .from('services')
       .delete()
       .eq('id', serviceId);
-    
+
     if (error) throw error;
   } catch (error) {
     console.error('Error deleting service:', error);

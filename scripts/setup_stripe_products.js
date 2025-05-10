@@ -2,18 +2,26 @@
 
 /**
  * This script sets up the Stripe products and plans for the FAIT Cooperative Platform
- * 
+ *
  * Prerequisites:
  * - Node.js installed
- * - Stripe CLI installed
  * - Stripe API key set in environment variable STRIPE_SECRET_KEY
- * 
+ *
  * Usage:
- * export STRIPE_SECRET_KEY=sk_test_your_key
+ * export STRIPE_SECRET_KEY=sk_test_51RFha1BXhGFYU3zX4h9LnmB3xt4GYN23OBapKfhgRzuD6jfdrThOS72POKjH2iIqxn8hq2GHpgaopNhS5OJBMdlf00ghjOwdV9
  * node scripts/setup_stripe_products.js
  */
 
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
+import Stripe from 'stripe';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Initialize Stripe with the secret key
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 // Configuration for products and plans
 const productsConfig = [
@@ -104,23 +112,25 @@ const productsConfig = [
 async function setupStripeProducts() {
   try {
     console.log('Setting up Stripe products and plans...');
-    
+
+    // Store all price IDs
+    const priceIds = {};
+
     // Create each product and its plans
     for (const config of productsConfig) {
       // Create the product
       console.log(`Creating product: ${config.product.name}`);
       const product = await stripe.products.create({
         name: config.product.name,
-        description: config.product.description,
-        type: config.product.type
+        description: config.product.description
       });
-      
+
       console.log(`Product created with ID: ${product.id}`);
-      
+
       // Create plans for the product
       for (const planConfig of config.plans) {
         console.log(`Creating plan: ${planConfig.nickname}`);
-        
+
         const price = await stripe.prices.create({
           product: product.id,
           nickname: planConfig.nickname,
@@ -130,19 +140,41 @@ async function setupStripeProducts() {
             interval: planConfig.interval
           }
         });
-        
+
         console.log(`Plan created with ID: ${price.id}`);
-        
-        // Store the price ID in environment variables
+
+        // Store the price ID
         const envVarName = `STRIPE_PRICE_${planConfig.nickname.replace(/\s+/g, '_').toUpperCase()}`;
-        console.log(`Set this environment variable: ${envVarName}=${price.id}`);
+        priceIds[envVarName] = price.id;
+        console.log(`Price ID stored: ${envVarName}=${price.id}`);
       }
-      
+
       console.log('---');
     }
-    
+
+    // Update .env file with price IDs
+    const envFilePath = path.resolve(path.dirname(__dirname), '.env');
+    let envContent = fs.readFileSync(envFilePath, 'utf8');
+
+    // Add each price ID to the .env file
+    for (const [envVarName, priceId] of Object.entries(priceIds)) {
+      if (envContent.includes(`${envVarName}=`)) {
+        // Replace existing value
+        envContent = envContent.replace(
+          new RegExp(`${envVarName}=.*`),
+          `${envVarName}=${priceId}`
+        );
+      } else {
+        // Add new value
+        envContent += `\n${envVarName}=${priceId}`;
+      }
+    }
+
+    // Write the updated content back to the .env file
+    fs.writeFileSync(envFilePath, envContent);
+
     console.log('Stripe products and plans setup completed successfully!');
-    console.log('Please set the environment variables listed above in your Supabase project.');
+    console.log('Price IDs have been added to your .env file.');
   } catch (error) {
     console.error('Error setting up Stripe products and plans:', error);
   }

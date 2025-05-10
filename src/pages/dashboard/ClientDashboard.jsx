@@ -6,7 +6,8 @@ import ActiveWarrantiesCard from '../../components/client/ActiveWarrantiesCard';
 import ServiceSearchCard from '../../components/client/ServiceSearchCard';
 import RecentMessagesCard from '../../components/client/RecentMessagesCard';
 import { getClientDashboardStats } from '../../api/dashboardStatsApi';
-import { supabase } from '../../lib/supabase';
+import { supabase } from '../../lib/supabaseClient';
+import { useAuth } from '../../contexts/AuthContext';
 
 // Main client dashboard page
 
@@ -14,29 +15,27 @@ const ClientDashboard = () => {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [user, setUser] = useState(null);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchUser = async () => {
+    const loadDashboard = async () => {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        setUser(user);
-
         if (user) {
-          fetchDashboardData(user.id);
+          await fetchDashboardData(user.id);
         } else {
+          console.log('No user found in AuthContext');
           setError('You must be logged in to access this page');
           setLoading(false);
         }
       } catch (err) {
-        console.error('Error fetching user:', err);
-        setError('An error occurred while loading your profile');
+        console.error('Error loading dashboard:', err);
+        setError('An error occurred while loading your dashboard');
         setLoading(false);
       }
     };
 
-    fetchUser();
-  }, []);
+    loadDashboard();
+  }, [user]);
 
   const fetchDashboardData = async (userId) => {
     try {

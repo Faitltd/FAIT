@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { ChevronLeft, ChevronRight, Star, MapPin } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Star, MapPin, Navigation } from 'lucide-react';
 import { formatCurrency } from '../../utils/formatters';
 import { ServicePackage } from '../../pages/services/EnhancedServiceSearchPage';
 import ServiceCard from './ServiceCard';
@@ -11,6 +11,7 @@ interface ServiceSearchResultsProps {
   page: number;
   totalPages: number;
   onPageChange: (page: number) => void;
+  onGetDirections?: (serviceId: string) => void;
 }
 
 const ServiceSearchResults: React.FC<ServiceSearchResultsProps> = ({
@@ -18,7 +19,8 @@ const ServiceSearchResults: React.FC<ServiceSearchResultsProps> = ({
   viewMode,
   page,
   totalPages,
-  onPageChange
+  onPageChange,
+  onGetDirections
 }) => {
   // Helper function to render star ratings
   const renderStars = (rating: number, serviceId: string, reviewCount: number) => {
@@ -47,7 +49,11 @@ const ServiceSearchResults: React.FC<ServiceSearchResultsProps> = ({
     return (
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {services.map((service) => (
-          <ServiceCard key={service.id} service={service} />
+          <ServiceCard
+            key={service.id}
+            service={service}
+            onGetDirections={onGetDirections}
+          />
         ))}
       </div>
     );
@@ -141,12 +147,23 @@ const ServiceSearchResults: React.FC<ServiceSearchResultsProps> = ({
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                  <Link
-                    to={`/book/${service.id}`}
-                    className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md"
-                  >
-                    Book
-                  </Link>
+                  <div className="flex space-x-2 justify-end">
+                    <Link
+                      to={`/book/${service.id}`}
+                      className="text-blue-600 hover:text-blue-900 bg-blue-50 px-3 py-1 rounded-md"
+                    >
+                      Book
+                    </Link>
+                    {onGetDirections && (
+                      <button
+                        onClick={() => onGetDirections(service.id)}
+                        className="text-gray-600 hover:text-gray-900 bg-gray-100 px-3 py-1 rounded-md flex items-center"
+                      >
+                        <Navigation className="h-3 w-3 mr-1" />
+                        Directions
+                      </button>
+                    )}
+                  </div>
                 </td>
               </tr>
             ))}

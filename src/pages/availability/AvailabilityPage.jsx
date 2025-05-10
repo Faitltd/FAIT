@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
+import supabase from '../../utils/supabaseClient';
 import MainLayout from '../../components/MainLayout';
 import AvailabilityCalendar from '../../components/availability/AvailabilityCalendar';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const AvailabilityPage = () => {
   const [user, setUser] = useState(null);
@@ -17,7 +17,7 @@ const AvailabilityPage = () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
         setUser(user);
-        
+
         if (!user) {
           setError('You must be logged in to access this page');
         } else {
@@ -27,9 +27,9 @@ const AvailabilityPage = () => {
             .select('user_type')
             .eq('id', user.id)
             .single();
-          
+
           if (profileError) throw profileError;
-          
+
           if (profile.user_type !== 'service_agent') {
             setError('Only service agents can access this page');
           }
@@ -41,7 +41,7 @@ const AvailabilityPage = () => {
         setLoading(false);
       }
     };
-    
+
     fetchUser();
   }, []);
 
@@ -69,7 +69,7 @@ const AvailabilityPage = () => {
                   <p className="text-gray-500">
                     Set your regular working hours and mark specific dates as unavailable. This helps clients know when they can book your services.
                   </p>
-                  
+
                   <AvailabilityCalendar />
                 </div>
               )}

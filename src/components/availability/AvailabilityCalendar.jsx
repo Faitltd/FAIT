@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { 
-  getServiceAgentAvailability, 
+import supabase from '../../utils/supabaseClient';
+import {
+  getServiceAgentAvailability,
   getServiceAgentUnavailableDates,
   updateServiceAgentAvailability,
   addUnavailableDate,
@@ -11,7 +11,7 @@ import { format, addDays, startOfWeek, isSameDay, parseISO } from 'date-fns';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Using singleton Supabase client;
 
 const DAYS_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 const TIME_SLOTS = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, '0')}:00`);
@@ -33,13 +33,13 @@ const AvailabilityCalendar = () => {
     const fetchUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       setUser(user);
-      
+
       if (user) {
         fetchAvailability(user.id);
         fetchUnavailableDates(user.id);
       }
     };
-    
+
     fetchUser();
   }, []);
 
@@ -47,25 +47,25 @@ const AvailabilityCalendar = () => {
     // Initialize selected time slots based on availability
     if (availability.length > 0) {
       const slots = {};
-      
+
       DAYS_OF_WEEK.forEach((_, dayIndex) => {
         slots[dayIndex] = {};
         TIME_SLOTS.forEach(time => {
           slots[dayIndex][time] = false;
         });
       });
-      
+
       availability.forEach(slot => {
         const dayIndex = slot.day_of_week;
         const startHour = parseInt(slot.start_time.split(':')[0]);
         const endHour = parseInt(slot.end_time.split(':')[0]);
-        
+
         for (let hour = startHour; hour < endHour; hour++) {
           const timeSlot = `${hour.toString().padStart(2, '0')}:00`;
           slots[dayIndex][timeSlot] = true;
         }
       });
-      
+
       setSelectedTimeSlots(slots);
     }
   }, [availability]);
@@ -105,28 +105,28 @@ const AvailabilityCalendar = () => {
 
   const handleSaveAvailability = async () => {
     if (!user) return;
-    
+
     try {
       setSaving(true);
-      
+
       // Convert selected time slots to availability format
       const newAvailability = [];
-      
+
       Object.entries(selectedTimeSlots).forEach(([dayIndex, timeSlots]) => {
         const day = parseInt(dayIndex);
         let currentStart = null;
         let currentEnd = null;
-        
+
         // Sort time slots
         const sortedTimeSlots = Object.entries(timeSlots)
           .sort(([timeA], [timeB]) => {
             return timeA.localeCompare(timeB);
           });
-        
+
         // Find continuous blocks
         sortedTimeSlots.forEach(([time, isSelected], index) => {
           const hour = parseInt(time.split(':')[0]);
-          
+
           if (isSelected && currentStart === null) {
             // Start a new block
             currentStart = hour;
@@ -144,7 +144,7 @@ const AvailabilityCalendar = () => {
             currentStart = null;
             currentEnd = null;
           }
-          
+
           // Handle last slot
           if (index === sortedTimeSlots.length - 1 && currentStart !== null) {
             newAvailability.push({
@@ -155,12 +155,12 @@ const AvailabilityCalendar = () => {
           }
         });
       });
-      
+
       await updateServiceAgentAvailability(user.id, newAvailability);
-      
+
       // Refresh availability
       await fetchAvailability(user.id);
-      
+
       alert('Availability saved successfully');
     } catch (err) {
       console.error('Error saving availability:', err);
@@ -173,22 +173,22 @@ const AvailabilityCalendar = () => {
 
   const handleAddUnavailableDate = async () => {
     if (!user || !selectedDate) return;
-    
+
     try {
       setSaving(true);
-      
+
       await addUnavailableDate(
         user.id,
         format(selectedDate, 'yyyy-MM-dd'),
         unavailableDateReason
       );
-      
+
       // Refresh unavailable dates
       await fetchUnavailableDates(user.id);
-      
+
       // Reset form
       setUnavailableDateReason('');
-      
+
       alert('Date marked as unavailable');
     } catch (err) {
       console.error('Error adding unavailable date:', err);
@@ -200,15 +200,15 @@ const AvailabilityCalendar = () => {
 
   const handleRemoveUnavailableDate = async (date) => {
     if (!user) return;
-    
+
     try {
       setSaving(true);
-      
+
       await removeUnavailableDate(user.id, date);
-      
+
       // Refresh unavailable dates
       await fetchUnavailableDates(user.id);
-      
+
       alert('Date removed from unavailable dates');
     } catch (err) {
       console.error('Error removing unavailable date:', err);
@@ -219,7 +219,7 @@ const AvailabilityCalendar = () => {
   };
 
   const isDateUnavailable = (date) => {
-    return unavailableDates.some(unavailableDate => 
+    return unavailableDates.some(unavailableDate =>
       isSameDay(parseISO(unavailableDate.date), date)
     );
   };
@@ -242,7 +242,7 @@ const AvailabilityCalendar = () => {
           Set your regular working hours and mark specific dates as unavailable.
         </p>
       </div>
-      
+
       <div className="border-t border-gray-200">
         <div className="px-4 py-5 sm:p-6">
           <div className="mb-4">
@@ -286,7 +286,7 @@ const AvailabilityCalendar = () => {
               </div>
             </div>
           </div>
-          
+
           {activeTab === 'weekly' && (
             <div>
               <div className="mb-4">
@@ -307,7 +307,7 @@ const AvailabilityCalendar = () => {
                   ))}
                 </select>
               </div>
-              
+
               <div className="mb-6">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">
                   Select Available Hours for {DAYS_OF_WEEK[selectedDay]}
@@ -328,7 +328,7 @@ const AvailabilityCalendar = () => {
                   ))}
                 </div>
               </div>
-              
+
               <div className="flex justify-end">
                 <button
                   type="button"
@@ -343,7 +343,7 @@ const AvailabilityCalendar = () => {
               </div>
             </div>
           )}
-          
+
           {activeTab === 'dates' && (
             <div>
               <div className="mb-6">
@@ -366,7 +366,7 @@ const AvailabilityCalendar = () => {
                       />
                     </div>
                   </div>
-                  
+
                   <div className="sm:col-span-3">
                     <label htmlFor="reason" className="block text-sm font-medium text-gray-700">
                       Reason (optional)
@@ -384,7 +384,7 @@ const AvailabilityCalendar = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <div className="mt-4">
                   <button
                     type="button"
@@ -403,12 +403,12 @@ const AvailabilityCalendar = () => {
                   )}
                 </div>
               </div>
-              
+
               <div className="mt-8">
                 <h4 className="text-sm font-medium text-gray-700 mb-4">
                   Your Unavailable Dates
                 </h4>
-                
+
                 {unavailableDates.length === 0 ? (
                   <p className="text-sm text-gray-500">
                     You haven't marked any dates as unavailable.
