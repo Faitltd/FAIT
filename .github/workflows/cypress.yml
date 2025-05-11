@@ -1,0 +1,64 @@
+name: Cypress Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      fail-fast: false
+      matrix:
+        containers: [1, 2, 3]
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Verify Cypress
+        run: npx cypress verify
+      
+      - name: Start development server
+        run: npm run dev & npx wait-on http://localhost:5173
+      
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          browser: chrome
+          record: true
+          parallel: true
+          group: 'UI Tests'
+          spec: cypress/e2e/**/*.cy.js
+          config-file: cypress.config.js
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 120
+        env:
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CYPRESS_adminEmail: ${{ secrets.CYPRESS_ADMIN_EMAIL }}
+          CYPRESS_adminPassword: ${{ secrets.CYPRESS_ADMIN_PASSWORD }}
+          CYPRESS_clientEmail: ${{ secrets.CYPRESS_CLIENT_EMAIL }}
+          CYPRESS_clientPassword: ${{ secrets.CYPRESS_CLIENT_PASSWORD }}
+          CYPRESS_serviceEmail: ${{ secrets.CYPRESS_SERVICE_EMAIL }}
+          CYPRESS_servicePassword: ${{ secrets.CYPRESS_SERVICE_PASSWORD }}
+      
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v3
+        if: failure()
+        with:
+          name: cypress-screenshots-${{ matrix.containers }}
+          path: cypress/screenshots
+          if-no-files-found: ignore

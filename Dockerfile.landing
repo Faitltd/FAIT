@@ -1,0 +1,14 @@
+# Use the official lightweight Node.js image.
+FROM --platform=linux/amd64 node:18-slim
+
+# Create and change to the app directory.
+WORKDIR /usr/src/app
+
+# Copy server.js to the container
+COPY server.js .
+
+# Expose the port the app runs on
+EXPOSE 8080
+
+# Run the web service on container startup.
+CMD [ "node", "server.js" ]

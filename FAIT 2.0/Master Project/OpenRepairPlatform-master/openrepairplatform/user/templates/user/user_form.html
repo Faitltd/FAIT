@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load bootstrap5 assets static %}
+{% block title %}
+{% if object %}
+  Mise à jour du profil de {{user}}
+{% else %}
+  Créer un profil sur Reparon
+{% endif %}
+{% endblock %}
+
+{% block content %}
+  {% if object %}
+    {% include "breadcrumb.html" with current="Mise à jour" second_parent_url=user_detail_url second_parent_text="Communauté" first_parent_url=user_detail_url first_parent_text=object %}
+  {% else %}
+    {% include "breadcrumb.html" with current="Création" first_parent_text="Communauté" %}
+  {% endif %}
+<div class="container bg-white">
+  <div class="row justify-content-md-center">
+    <div class="card p-3 mt-4">
+        <h1 class="text-center col-lg bg-white">Créer un compte</h1>
+      <form method="post" enctype="multipart/form-data">
+        <fieldset>
+          {% csrf_token %}
+          {% bootstrap_form form %}
+          <button type="submit" class="btn btn-success btn-block">Enregistrer</button>
+        </fieldset>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+  {{ form.media }}
+  {% assets "js_create_edit_user" %}
+    <script src="{{ ASSET_URL }}"></script>
+  {% endassets %}
+{% endblock %}

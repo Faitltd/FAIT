@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIT Auth Test</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .status {
+      padding: 15px;
+      background-color: #e7f7e7;
+      border-left: 5px solid #28a745;
+      margin-bottom: 20px;
+    }
+    .error {
+      padding: 15px;
+      background-color: #f8d7da;
+      border-left: 5px solid #dc3545;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    input {
+      padding: 10px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .test-account {
+      background-color: #f8f9fa;
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FAIT Authentication Test</h1>
+    
+    <div id="auth-status" class="status">
+      <p><strong>Status:</strong> Checking authentication mode...</p>
+    </div>
+    
+    <h2>Test Login</h2>
+    <div>
+      <input type="email" id="email" placeholder="Email" value="admin@itsfait.com">
+      <input type="password" id="password" placeholder="Password" value="admin123">
+      <button id="login-btn">Test Login</button>
+      <button id="toggle-auth-btn">Toggle Auth Mode</button>
+    </div>
+    
+    <div id="login-result" style="margin-top: 20px;"></div>
+    
+    <h2>Test Accounts</h2>
+    <div class="test-account">
+      <strong>Admin:</strong> admin@itsfait.com / admin123
+    </div>
+    <div class="test-account">
+      <strong>Client:</strong> client@itsfait.com / client123
+    </div>
+    <div class="test-account">
+      <strong>Service Agent:</strong> service@itsfait.com / service123
+    </div>
+  </div>
+
+  <script>
+    // Check if localStorage is available
+    function isLocalStorageAvailable() {
+      try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+
+    // Check current auth mode
+    function checkAuthMode() {
+      if (!isLocalStorageAvailable()) {
+        document.getElementById('auth-status').innerHTML = 
+          '<p><strong>Error:</strong> LocalStorage is not available. Authentication will not work.</p>';
+        document.getElementById('auth-status').className = 'error';
+        return;
+      }
+      
+      const useLocalAuth = localStorage.getItem('useLocalAuth');
+      const authMode = useLocalAuth === 'true' ? 'Local Authentication' : 'Supabase Authentication';
+      
+      document.getElementById('auth-status').innerHTML = 
+        `<p><strong>Current Auth Mode:</strong> ${authMode}</p>`;
+    }
+
+    // Toggle auth mode
+    function toggleAuthMode() {
+      if (!isLocalStorageAvailable()) return;
+      
+      const currentMode = localStorage.getItem('useLocalAuth');
+      const newMode = currentMode === 'true' ? 'false' : 'true';
+      
+      localStorage.setItem('useLocalAuth', newMode);
+      checkAuthMode();
+      
+      document.getElementById('login-result').innerHTML = 
+        `<p>Auth mode toggled. Please refresh the main application page.</p>`;
+    }
+
+    // Initialize
+    checkAuthMode();
+    
+    // Add event listeners
+    document.getElementById('toggle-auth-btn').addEventListener('click', toggleAuthMode);
+    
+    document.getElementById('login-btn').addEventListener('click', function() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      
+      document.getElementById('login-result').innerHTML = 
+        `<p>Testing login with: ${email} / ${password.replace(/./g, '*')}</p>`;
+      
+      // Redirect to login page with credentials in URL parameters
+      window.location.href = `/login?test_email=${encodeURIComponent(email)}&test_password=${encodeURIComponent(password)}`;
+    });
+  </script>
+</body>
+</html>

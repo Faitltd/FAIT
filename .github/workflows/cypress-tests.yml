@@ -1,0 +1,107 @@
+name: Cypress E2E Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  # Allow manual triggering
+  workflow_dispatch:
+
+jobs:
+  cypress-run:
+    runs-on: ubuntu-latest
+
+    strategy:
+      # When one test fails, don't cancel the other tests
+      fail-fast: false
+      matrix:
+        # Run in parallel on different browsers
+        containers: [1, 2, 3]
+        browser: [chrome]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20.x
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Cypress
+        run: npx cypress install
+
+      - name: Install Mochawesome dependencies
+        run: npm install --save-dev mochawesome mochawesome-merge mochawesome-report-generator
+
+      - name: Create Cypress config for CI
+        run: |
+          echo '{
+            "reporter": "mochawesome",
+            "reporterOptions": {
+              "reportDir": "cypress/results",
+              "overwrite": false,
+              "html": false,
+              "json": true
+            }
+          }' > cypress.json
+
+      - name: Run Cypress tests
+        uses: cypress-io/github-action@v5
+        with:
+          browser: ${{ matrix.browser }}
+          start: npm run dev
+          wait-on: 'http://localhost:5173'
+          wait-on-timeout: 120
+          record: false
+          parallel: true
+          group: 'UI Tests'
+          spec: |
+            cypress/e2e/basic-test.cy.js
+            cypress/e2e/fixed-login-test.cy.js
+            cypress/e2e/fixed-navigation-test.cy.js
+            cypress/e2e/fixed-dashboard-test.cy.js
+            cypress/e2e/fixed-client-features.cy.js
+            cypress/e2e/fixed-service-agent-features.cy.js
+            cypress/e2e/fixed-booking-test.cy.js
+            cypress/e2e/fixed-messaging-test.cy.js
+            cypress/e2e/fixed-project-test.cy.js
+            cypress/e2e/fixed-visual-test.cy.js
+            cypress/e2e/fixed-test-data-management.cy.js
+        env:
+          # Pass GitHub token to allow accurately detecting a build vs a re-run build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Pass the dashboard record key as an environment variable
+          CYPRESS_RECORD_KEY: ${{ secrets.CYPRESS_RECORD_KEY || '' }}
+          # Pass CI environment variables
+          CYPRESS_CI: true
+
+      - name: Generate Mochawesome report
+        if: always()
+        run: |
+          npx mochawesome-merge cypress/results/*.json > cypress/results/report.json
+          npx marge cypress/results/report.json -f report -o cypress/results
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: cypress-results-${{ matrix.browser }}-${{ matrix.containers }}
+          path: |
+            cypress/results
+            cypress/screenshots
+            cypress/videos
+          retention-days: 30
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-artifacts
+          path: dist
+          retention-days: 7

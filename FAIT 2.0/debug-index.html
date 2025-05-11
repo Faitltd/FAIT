@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIT Co-op Debug Page</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7fafc;
+      color: #333;
+    }
+    #debug-container {
+      padding: 20px;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    #root {
+      border: 2px dashed red;
+      min-height: 200px;
+      padding: 20px;
+      margin-bottom: 20px;
+      background-color: #fff;
+    }
+    .debug-panel {
+      background-color: #f0f0f0;
+      border: 1px solid #ddd;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    pre {
+      background-color: #f8f8f8;
+      padding: 10px;
+      border-radius: 5px;
+      overflow: auto;
+      max-height: 300px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
+</head>
+<body>
+  <!-- Original React root element -->
+  <div id="root"></div>
+  
+  <!-- Debug container -->
+  <div id="debug-container">
+    <h1>FAIT Co-op Debug Page</h1>
+    
+    <div class="debug-panel">
+      <h2>React Root Element</h2>
+      <p>The red-bordered area above is the #root element where React should render.</p>
+      <p>If you see this text but no content in the red box, React is not rendering properly.</p>
+    </div>
+    
+    <div class="debug-panel">
+      <h2>Console Output</h2>
+      <pre id="console-output">Waiting for console output...</pre>
+    </div>
+    
+    <div class="debug-panel">
+      <h2>Browser Information</h2>
+      <pre id="browser-info"></pre>
+    </div>
+    
+    <div class="debug-panel">
+      <h2>Debug Actions</h2>
+      <button id="check-root">Check Root Element</button>
+      <button id="check-styles">Check CSS</button>
+      <button id="force-render">Force Render Test Content</button>
+    </div>
+  </div>
+
+  <!-- Original React script -->
+  <script type="module" src="/src/main.tsx"></script>
+  
+  <!-- Debug script -->
+  <script>
+    // Capture console output
+    const originalConsole = {
+      log: console.log,
+      error: console.error,
+      warn: console.warn,
+      info: console.info
+    };
+    
+    const consoleOutput = document.getElementById('console-output');
+    
+    function appendToConsole(type, args) {
+      const timestamp = new Date().toLocaleTimeString();
+      const message = Array.from(args).map(arg => 
+        typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+      ).join(' ');
+      
+      consoleOutput.innerHTML += `[${timestamp}] [${type}] ${message}\n`;
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+    
+    console.log = function() {
+      originalConsole.log.apply(console, arguments);
+      appendToConsole('LOG', arguments);
+    };
+    
+    console.error = function() {
+      originalConsole.error.apply(console, arguments);
+      appendToConsole('ERROR', arguments);
+    };
+    
+    console.warn = function() {
+      originalConsole.warn.apply(console, arguments);
+      appendToConsole('WARN', arguments);
+    };
+    
+    console.info = function() {
+      originalConsole.info.apply(console, arguments);
+      appendToConsole('INFO', arguments);
+    };
+    
+    // Display browser information
+    const browserInfoElement = document.getElementById('browser-info');
+    browserInfoElement.textContent = `
+User Agent: ${navigator.userAgent}
+Window Size: ${window.innerWidth} x ${window.innerHeight}
+Platform: ${navigator.platform}
+Vendor: ${navigator.vendor}
+Language: ${navigator.language}
+    `;
+    
+    // Debug buttons functionality
+    document.getElementById('check-root').addEventListener('click', function() {
+      const root = document.getElementById('root');
+      console.log('Root element:', root);
+      console.log('Root dimensions:', root.offsetWidth, 'x', root.offsetHeight);
+      console.log('Root children count:', root.childNodes.length);
+      console.log('Root HTML:', root.innerHTML.substring(0, 500) + (root.innerHTML.length > 500 ? '...' : ''));
+      
+      // Check computed styles
+      const computedStyle = window.getComputedStyle(root);
+      console.log('Root display:', computedStyle.display);
+      console.log('Root visibility:', computedStyle.visibility);
+      console.log('Root opacity:', computedStyle.opacity);
+      console.log('Root background:', computedStyle.background);
+      console.log('Root color:', computedStyle.color);
+    });
+    
+    document.getElementById('check-styles').addEventListener('click', function() {
+      // Check for any CSS that might be hiding content
+      const styleSheets = document.styleSheets;
+      console.log('Number of style sheets:', styleSheets.length);
+      
+      try {
+        for (let i = 0; i < styleSheets.length; i++) {
+          const sheet = styleSheets[i];
+          console.log(`Style sheet ${i + 1}:`, sheet.href || 'inline');
+          
+          try {
+            const rules = sheet.cssRules || sheet.rules;
+            for (let j = 0; j < rules.length; j++) {
+              const rule = rules[j];
+              if (rule.selectorText && (
+                rule.style.display === 'none' || 
+                rule.style.visibility === 'hidden' || 
+                rule.style.opacity === '0'
+              )) {
+                console.warn('Potentially hiding CSS rule:', rule.selectorText, rule.cssText);
+              }
+            }
+          } catch (e) {
+            console.error('Cannot access rules in stylesheet', i, e);
+          }
+        }
+      } catch (e) {
+        console.error('Error checking stylesheets:', e);
+      }
+    });
+    
+    document.getElementById('force-render').addEventListener('click', function() {
+      const root = document.getElementById('root');
+      root.innerHTML = `
+        <div style="padding: 20px; background-color: #e7f7e7; color: #333;">
+          <h2 style="color: #2c3e50;">Test Content</h2>
+          <p>This is test content manually injected into the root element.</p>
+          <p>If you can see this, the root element is working correctly, but React is not rendering.</p>
+          <button style="background-color: #4CAF50; color: white; border: none; padding: 10px 15px; border-radius: 4px; cursor: pointer;">Test Button</button>
+        </div>
+      `;
+      console.log('Forced test content into root element');
+    });
+    
+    // Log page load
+    window.addEventListener('load', function() {
+      console.log('Page fully loaded');
+      setTimeout(() => {
+        console.log('Checking root element after 2 seconds');
+        const root = document.getElementById('root');
+        console.log('Root children count:', root.childNodes.length);
+      }, 2000);
+    });
+  </script>
+</body>
+</html>

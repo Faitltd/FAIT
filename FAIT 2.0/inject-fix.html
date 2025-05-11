@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIT Link Fix</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f0f0;
+      color: #333;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #2c3e50;
+    }
+    .status {
+      padding: 15px;
+      background-color: #e7f7e7;
+      border-left: 5px solid #28a745;
+      margin-bottom: 20px;
+    }
+    .error {
+      padding: 15px;
+      background-color: #f8d7da;
+      border-left: 5px solid #dc3545;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      margin-right: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background-color: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .log {
+      background-color: #f8f9fa;
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>FAIT Link Fix</h1>
+    
+    <div id="status" class="status">
+      <p>This tool will fix the "Get Started" and "Browse Services" links on the home page.</p>
+    </div>
+    
+    <div>
+      <h2>Instructions</h2>
+      <ol>
+        <li>Click the "Apply Fix" button below</li>
+        <li>Go to the <a href="/" target="_blank">home page</a> in a new tab</li>
+        <li>The "Get Started" and "Browse Services" links should now work correctly</li>
+      </ol>
+      
+      <button id="apply-fix">Apply Fix</button>
+      <button id="open-home">Open Home Page</button>
+      
+      <div id="result" style="margin-top: 20px;"></div>
+    </div>
+    
+    <div style="margin-top: 30px;">
+      <h2>Fix Details</h2>
+      <p>This fix adds a script to the page that intercepts clicks on the "Get Started" and "Browse Services" buttons and redirects to the correct pages.</p>
+      
+      <pre><code>// Fix for navigation links
+(function() {
+  // Check if we're on the home page
+  if (window.location.pathname === '/') {
+    console.log('Fixing links on the home page...');
+    
+    // Find all links in the Hero component
+    const links = document.querySelectorAll('a');
+    
+    // Find the "Get Started" and "Browse Services" buttons
+    let getStartedLink = null;
+    let browseServicesLink = null;
+    
+    links.forEach(link => {
+      const text = link.textContent.trim();
+      
+      if (text === 'Get Started') {
+        getStartedLink = link;
+      } else if (text === 'Browse Services') {
+        browseServicesLink = link;
+      }
+    });
+    
+    // Fix the "Get Started" link
+    if (getStartedLink) {
+      getStartedLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/register';
+      });
+    }
+    
+    // Fix the "Browse Services" link
+    if (browseServicesLink) {
+      browseServicesLink.addEventListener('click', function(e) {
+        e.preventDefault();
+        window.location.href = '/services';
+      });
+    }
+  }
+})();</code></pre>
+    </div>
+    
+    <div class="log" id="log"></div>
+  </div>
+
+  <script>
+    // Logging function
+    function log(message) {
+      const logElement = document.getElementById('log');
+      const timestamp = new Date().toLocaleTimeString();
+      logElement.innerHTML += `[${timestamp}] ${message}\n`;
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+    
+    // Apply fix function
+    function applyFix() {
+      log('Applying fix for navigation links...');
+      
+      // Create a script element to inject the fix
+      const script = document.createElement('script');
+      script.textContent = `
+        // Store the fix script in localStorage
+        localStorage.setItem('fixLinksScript', \`
+          // Fix for navigation links
+          (function() {
+            // Check if we're on the home page
+            if (window.location.pathname === '/' || window.location.pathname === '') {
+              console.log('Fixing links on the home page...');
+              
+              // Function to find and fix links
+              function fixLinks() {
+                // Find all links in the Hero component
+                const links = document.querySelectorAll('a');
+                
+                // Find the "Get Started" and "Browse Services" buttons
+                let getStartedLink = null;
+                let browseServicesLink = null;
+                
+                links.forEach(link => {
+                  const text = link.textContent.trim();
+                  
+                  if (text === 'Get Started') {
+                    getStartedLink = link;
+                  } else if (text === 'Browse Services') {
+                    browseServicesLink = link;
+                  }
+                });
+                
+                // Fix the "Get Started" link
+                if (getStartedLink) {
+                  console.log('Found "Get Started" link, fixing...');
+                  getStartedLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Navigating to /register');
+                    window.location.href = '/register';
+                  });
+                }
+                
+                // Fix the "Browse Services" link
+                if (browseServicesLink) {
+                  console.log('Found "Browse Services" link, fixing...');
+                  browseServicesLink.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    console.log('Navigating to /services');
+                    window.location.href = '/services';
+                  });
+                }
+              }
+              
+              // Try to fix links immediately
+              fixLinks();
+              
+              // Also try again after a short delay to ensure the DOM is fully loaded
+              setTimeout(fixLinks, 1000);
+              setTimeout(fixLinks, 2000);
+              setTimeout(fixLinks, 3000);
+            }
+          })();
+        \`);
+        
+        // Create a script to inject the fix when the home page loads
+        localStorage.setItem('injectFixScript', \`
+          // Create and inject the fix script
+          const fixScript = document.createElement('script');
+          fixScript.textContent = localStorage.getItem('fixLinksScript');
+          document.body.appendChild(fixScript);
+        \`);
+        
+        // Create a script element to inject the fix script
+        const injectScript = document.createElement('script');
+        injectScript.textContent = localStorage.getItem('injectFixScript');
+        document.body.appendChild(injectScript);
+        
+        console.log('Fix applied successfully!');
+      `;
+      
+      document.body.appendChild(script);
+      
+      document.getElementById('result').innerHTML = 
+        '<p style="color: green;">✅ Fix applied successfully! Now open the home page and try the links.</p>';
+      
+      log('Fix applied successfully!');
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', function() {
+      log('Link fix tool initialized');
+      
+      // Add event listeners
+      document.getElementById('apply-fix').addEventListener('click', applyFix);
+      document.getElementById('open-home').addEventListener('click', function() {
+        window.open('/', '_blank');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FAIT Authentication Fix</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+    h1, h2 {
+      color: #333;
+    }
+    .card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .success {
+      color: green;
+      font-weight: bold;
+    }
+    .error {
+      color: red;
+      font-weight: bold;
+    }
+    .warning {
+      color: orange;
+      font-weight: bold;
+    }
+    button {
+      background-color: #4285F4;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #3367D6;
+    }
+    pre {
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    .log {
+      height: 200px;
+      overflow-y: auto;
+      background-color: #f0f0f0;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>FAIT Authentication Fix</h1>
+  
+  <div class="card">
+    <h2>Current Authentication Status</h2>
+    <p>Auth Mode: <span id="current-mode">Checking...</span></p>
+    <p>Local Storage: <span id="storage-status">Checking...</span></p>
+    <div id="status"></div>
+  </div>
+  
+  <div class="card">
+    <h2>Fix Authentication</h2>
+    <button onclick="enableLocalAuth()">Enable Local Auth</button>
+    <button onclick="resetLocalStorage()">Reset Local Storage</button>
+    <button onclick="setupTestCredentials()">Setup Test Credentials</button>
+    <button onclick="testCredentials()">Test Credentials</button>
+  </div>
+  
+  <div class="card">
+    <h2>Log</h2>
+    <div id="log" class="log"></div>
+  </div>
+  
+  <script>
+    // Check if localStorage is available
+    function isLocalStorageAvailable() {
+      try {
+        localStorage.setItem('test', 'test');
+        localStorage.removeItem('test');
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    
+    // Log to the log div
+    function log(message) {
+      const logDiv = document.getElementById('log');
+      const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+      logDiv.innerHTML += `<div>[${timestamp}] ${message}</div>`;
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+    
+    // Check current auth mode
+    function checkAuthMode() {
+      if (!isLocalStorageAvailable()) {
+        document.getElementById('status').innerHTML =
+          '<p class="error">Error: LocalStorage is not available. Authentication will not work.</p>';
+        document.getElementById('storage-status').innerHTML = '<span class="error">Not Available</span>';
+        return;
+      }
+      
+      document.getElementById('storage-status').innerHTML = '<span class="success">Available</span>';
+      
+      const useLocalAuth = localStorage.getItem('useLocalAuth');
+      const authMode = useLocalAuth === 'true' ? 'Local Authentication' : 'Supabase Authentication';
+      
+      document.getElementById('current-mode').textContent = authMode;
+      log(`Current auth mode: ${authMode}`);
+    }
+    
+    // Enable local auth
+    function enableLocalAuth() {
+      if (!isLocalStorageAvailable()) return;
+      
+      localStorage.setItem('useLocalAuth', 'true');
+      log('Local authentication enabled');
+      checkAuthMode();
+    }
+    
+    // Reset local storage
+    function resetLocalStorage() {
+      if (!isLocalStorageAvailable()) return;
+      
+      // Clear only auth-related items
+      localStorage.removeItem('useLocalAuth');
+      localStorage.removeItem('local_auth_session');
+      localStorage.removeItem('supabase.auth.token');
+      localStorage.removeItem('localAuthUser');
+      localStorage.removeItem('directAuthSession');
+      
+      log('Auth-related localStorage items cleared');
+      checkAuthMode();
+    }
+    
+    // Setup test credentials
+    function setupTestCredentials() {
+      if (!isLocalStorageAvailable()) return;
+      
+      // Enable local auth
+      localStorage.setItem('useLocalAuth', 'true');
+      
+      // Create test users in localStorage
+      const testUsers = {
+        'admin@itsfait.com': {
+          id: 'admin-uuid',
+          email: 'admin@itsfait.com',
+          password: 'admin123',
+          user_type: 'admin',
+          full_name: 'Admin User',
+          created_at: new Date().toISOString(),
+          user_metadata: {
+            full_name: 'Admin User',
+            user_type: 'admin'
+          },
+          app_metadata: {
+            provider: 'email',
+            providers: ['email']
+          }
+        },
+        'client@itsfait.com': {
+          id: 'client-uuid',
+          email: 'client@itsfait.com',
+          password: 'client123',
+          user_type: 'client',
+          full_name: 'Client User',
+          created_at: new Date().toISOString(),
+          user_metadata: {
+            full_name: 'Client User',
+            user_type: 'client'
+          },
+          app_metadata: {
+            provider: 'email',
+            providers: ['email']
+          }
+        },
+        'service@itsfait.com': {
+          id: 'service-uuid',
+          email: 'service@itsfait.com',
+          password: 'service123',
+          user_type: 'service_agent',
+          full_name: 'Service Agent',
+          created_at: new Date().toISOString(),
+          user_metadata: {
+            full_name: 'Service Agent',
+            user_type: 'service_agent'
+          },
+          app_metadata: {
+            provider: 'email',
+            providers: ['email']
+          }
+        }
+      };
+      
+      // Store test users
+      localStorage.setItem('testUsers', JSON.stringify(testUsers));
+      
+      log('Test credentials set up successfully');
+      checkAuthMode();
+    }
+    
+    // Test credentials
+    function testCredentials() {
+      log('Testing credentials...');
+      
+      const credentials = [
+        { email: 'admin@itsfait.com', password: 'admin123', type: 'Admin' },
+        { email: 'client@itsfait.com', password: 'client123', type: 'Client' },
+        { email: 'service@itsfait.com', password: 'service123', type: 'Service Agent' }
+      ];
+      
+      credentials.forEach(cred => {
+        log(`Testing ${cred.type} credentials: ${cred.email}`);
+      });
+      
+      log('Test complete. Please try logging in at the login page.');
+    }
+    
+    // Initialize
+    window.onload = function() {
+      checkAuthMode();
+      log('Authentication diagnostic tool loaded');
+    };
+  </script>
+</body>
+</html>

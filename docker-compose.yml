@@ -1,0 +1,132 @@
+version: '3.8'
+
+services:
+  # Frontend service - only service that exposes a port to the host
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    image: fait-coop/frontend:latest
+    container_name: fait-coop-frontend
+    ports:
+      - "3000:3000"  # Only expose the frontend port
+    volumes:
+      - ./src:/app/src
+      - ./public:/app/public
+      - node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_SUPABASE_URL=${SUPABASE_URL}
+      - VITE_SUPABASE_ANON_KEY=${SUPABASE_ANON_KEY}
+      - VITE_API_URL=http://api:8000
+    depends_on:
+      - api
+    networks:
+      - fait-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # API service - not exposed to host
+  api:
+    build:
+      context: .
+      dockerfile: docker/api/Dockerfile
+    image: fait-coop/api:latest
+    container_name: fait-coop-api
+    volumes:
+      - ./api:/app
+      - api_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fait_coop
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - JWT_SECRET=${JWT_SECRET}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - fait-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+
+  # Database service - not exposed to host
+  db:
+    image: postgres:15-alpine
+    container_name: fait-coop-db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/db/init:/docker-entrypoint-initdb.d
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=fait_coop
+    networks:
+      - fait-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  # Redis for caching - not exposed to host
+  redis:
+    image: redis:7-alpine
+    container_name: fait-coop-redis
+    volumes:
+      - redis_data:/data
+    networks:
+      - fait-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Background worker for scheduled tasks - not exposed to host
+  worker:
+    build:
+      context: .
+      dockerfile: docker/worker/Dockerfile
+    image: fait-coop/worker:latest
+    container_name: fait-coop-worker
+    volumes:
+      - ./worker:/app
+      - worker_node_modules:/app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/fait_coop
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+    networks:
+      - fait-network
+    restart: unless-stopped
+
+networks:
+  fait-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
+  node_modules:
+  api_node_modules:
+  worker_node_modules:

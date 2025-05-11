@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Dashboard</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f7fafc;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .card {
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      background-color: white;
+    }
+    .card-header {
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 18px;
+      font-weight: 600;
+      margin: 0;
+    }
+    .card-content {
+      color: #4a5568;
+    }
+    .button {
+      background-color: #3182ce;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 8px 16px;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .button:hover {
+      background-color: #2c5282;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Service Agent Dashboard</h1>
+    
+    <div class="grid">
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Bookings</h3>
+        </div>
+        <div class="card-content">
+          <p>Manage your upcoming and past bookings</p>
+          <button class="button">View Bookings</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Messages</h3>
+        </div>
+        <div class="card-content">
+          <p>Communicate with clients</p>
+          <button class="button">View Messages</button>
+        </div>
+      </div>
+      
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Services</h3>
+        </div>
+        <div class="card-content">
+          <p>Manage your service offerings</p>
+          <button class="button">Manage Services</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
