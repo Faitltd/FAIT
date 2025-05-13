@@ -3,9 +3,9 @@
 # Script to deploy to Cloud Run
 
 # Default values
-IMAGE_NAME="gcr.io/fait-444705/fait-coop"
+IMAGE_NAME="gcr.io/fait-444705/fait-coop-sveltekit"
 TAG="v1"
-SERVICE_NAME="fait-coop"
+SERVICE_NAME="fait-coop-sveltekit"
 REGION="us-central1"
 
 # Parse command line arguments
