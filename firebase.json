@@ -1,19 +1,39 @@
 {
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "fait-coop",
-          "region": "us-central1"
+  "hosting": [
+    {
+      "target": "fait-coop-react",
+      "site": "fait-444705",
+      "public": "dist",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "run": {
+            "serviceId": "fait-coop",
+            "region": "us-central1"
+          }
         }
-      }
-    ]
-  }
+      ]
+    },
+    {
+      "target": "fait-coop-sveltekit",
+      "site": "fait-sveltekit",
+      "public": "fait-mono/apps/fait-hub-sveltekit/build",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ],
+      "rewrites": [
+        {
+          "source": "**",
+          "destination": "/index.html"
+        }
+      ]
+    }
+  ]
 }

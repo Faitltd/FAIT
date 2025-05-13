@@ -3,6 +3,17 @@
     "default": "fait-444705",
     "production": "fait-444705"
   },
-  "targets": {},
+  "targets": {
+    "fait-444705": {
+      "hosting": {
+        "fait-coop-react": [
+          "fait-444705"
+        ],
+        "fait-coop-sveltekit": [
+          "fait-sveltekit"
+        ]
+      }
+    }
+  },
   "etags": {}
 }
