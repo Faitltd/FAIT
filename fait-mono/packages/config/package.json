@@ -1,0 +1,13 @@
+{
+  "name": "@fait/config",
+  "version": "0.0.1",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "eslint-preset.js",
+    "tailwind.preset.js"
+  ],
+  "dependencies": {
+    "tailwindcss": "^3.3.5"
+  }
+}

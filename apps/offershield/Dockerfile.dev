@@ -1,0 +1,27 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package.json files for workspace
+COPY package.json package-lock.json ./
+COPY apps/offershield/package.json ./apps/offershield/
+COPY packages/ui/package.json ./packages/ui/
+COPY packages/auth/package.json ./packages/auth/
+COPY packages/config/package.json ./packages/config/
+COPY packages/utils/package.json ./packages/utils/
+COPY packages/theme/package.json ./packages/theme/
+COPY packages/api-client/package.json ./packages/api-client/
+COPY packages/hooks/package.json ./packages/hooks/
+COPY packages/analytics/package.json ./packages/analytics/
+
+# Install dependencies
+RUN npm install
+
+# Copy the rest of the monorepo
+COPY . .
+
+# Expose port
+EXPOSE 3000
+
+# Start development server
+CMD ["npm", "run", "dev", "--workspace=offershield"]

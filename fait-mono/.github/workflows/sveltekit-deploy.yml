@@ -1,0 +1,157 @@
+name: Deploy SvelteKit Apps
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/fait-hub-sveltekit/**'
+      - 'apps/flippercalc-sveltekit/**'
+      - 'apps/offershield-sveltekit/**'
+      - 'packages/sveltekit-ui/**'
+      - 'packages/sveltekit-template/**'
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: fait-444705
+  REGION: us-central1
+
+jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      fait-hub-sveltekit: ${{ steps.filter.outputs.fait-hub-sveltekit }}
+      flippercalc-sveltekit: ${{ steps.filter.outputs.flippercalc-sveltekit }}
+      offershield-sveltekit: ${{ steps.filter.outputs.offershield-sveltekit }}
+      sveltekit-ui: ${{ steps.filter.outputs.sveltekit-ui }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            fait-hub-sveltekit:
+              - 'apps/fait-hub-sveltekit/**'
+              - 'packages/sveltekit-ui/**'
+            flippercalc-sveltekit:
+              - 'apps/flippercalc-sveltekit/**'
+              - 'packages/sveltekit-ui/**'
+            offershield-sveltekit:
+              - 'apps/offershield-sveltekit/**'
+              - 'packages/sveltekit-ui/**'
+            sveltekit-ui:
+              - 'packages/sveltekit-ui/**'
+
+  build-and-deploy-fait-hub:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.fait-hub-sveltekit == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build --filter=fait-hub-sveltekit
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      
+      - name: Build and push Docker image
+        run: |
+          gcloud builds submit --config=apps/fait-hub-sveltekit/cloudbuild.yaml --substitutions=_SERVICE_NAME=fait-hub-sveltekit
+      
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy fait-hub-sveltekit \
+            --image gcr.io/${{ env.PROJECT_ID }}/fait-hub-sveltekit:latest \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated
+
+  build-and-deploy-flippercalc:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.flippercalc-sveltekit == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build --filter=flippercalc-sveltekit
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      
+      - name: Build and push Docker image
+        run: |
+          gcloud builds submit --config=apps/flippercalc-sveltekit/cloudbuild.yaml --substitutions=_SERVICE_NAME=flippercalc-sveltekit
+      
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy flippercalc-sveltekit \
+            --image gcr.io/${{ env.PROJECT_ID }}/flippercalc-sveltekit:latest \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated
+
+  build-and-deploy-offershield:
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.offershield-sveltekit == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build --filter=offershield-sveltekit
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      
+      - name: Build and push Docker image
+        run: |
+          gcloud builds submit --config=apps/offershield-sveltekit/cloudbuild.yaml --substitutions=_SERVICE_NAME=offershield-sveltekit
+      
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy offershield-sveltekit \
+            --image gcr.io/${{ env.PROJECT_ID }}/offershield-sveltekit:latest \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated

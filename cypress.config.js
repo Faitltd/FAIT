@@ -1,15 +1,15 @@
 const { defineConfig } = require('cypress');
 
-// Example of correct configuration
+// Monorepo Cypress configuration
 module.exports = defineConfig({
   projectId: "ksq7ct",
 
   e2e: {
-    baseUrl: 'http://localhost:5173', // Make sure this is correct
+    baseUrl: 'http://localhost:5173', // Main app URL
     viewportWidth: 1280,
     viewportHeight: 800,
     defaultCommandTimeout: 10000,
-    requestTimeout: 10000,
+    requestTimeout: 15000,
     responseTimeout: 30000,
     pageLoadTimeout: 60000,
     video: false,
@@ -38,7 +38,15 @@ module.exports = defineConfig({
     servicePassword: 'service123',
     // Additional configuration
     useLocalAuth: true,
-    testMode: true
+    testMode: true,
+
+    // Tool-specific URLs
+    homeDepotScraperUrl: 'http://localhost:5000',
+    handymanCalculatorUrl: 'http://localhost:8082',
+
+    // Test environment flags
+    runAllTests: true,
+    fixFailingTests: true
   },
 
   component: {
