@@ -190,7 +190,7 @@ const Navbar = () => {
   const isActive = (path: string) => location.pathname === path || location.pathname.startsWith(path + '/');
 
   return (
-    <nav style={{ backgroundColor: '#c0e2ff' }} className="shadow-sm">
+    <nav style={{ backgroundColor: '#c0e2ff' }} className="shadow-sm" aria-label="Primary navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -231,10 +231,13 @@ const Navbar = () => {
             {/* Navigation dropdown menu */}
             <div className="relative mr-4 hidden md:block">
               <button
+                id="more-options-button"
                 onClick={() => setIsNavDropdownOpen(!isNavDropdownOpen)}
                 className="inline-flex items-center px-3 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 style={{ backgroundColor: '#c0e2ff' }}
                 data-testid="more-options-button"
+                aria-haspopup="true"
+                aria-expanded={isNavDropdownOpen}
               >
                 <span>More Options</span>
                 <svg className="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
@@ -243,13 +246,21 @@ const Navbar = () => {
               </button>
 
               {isNavDropdownOpen && (
-                <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-                  <div className="py-1" role="menu" aria-orientation="vertical">
+                <div
+                  className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
+                >
+                  <div
+                    className="py-1"
+                    role="menu"
+                    aria-orientation="vertical"
+                    aria-labelledby="more-options-button"
+                  >
                     <Link
                       to="/services"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
                       data-testid="dropdown-link-services"
+                      role="menuitem"
                     >
                       <Tool className="mr-3 h-5 w-5" />
                       Services
@@ -259,6 +270,7 @@ const Navbar = () => {
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
                       data-testid="dropdown-link-estimates"
+                      role="menuitem"
                     >
                       <FileText className="mr-3 h-5 w-5" />
                       Estimates
@@ -268,6 +280,7 @@ const Navbar = () => {
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
                       data-testid="dropdown-link-warranties"
+                      role="menuitem"
                     >
                       <Shield className="mr-3 h-5 w-5" />
                       Warranties
@@ -277,6 +290,7 @@ const Navbar = () => {
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
                       data-testid="dropdown-link-gamification"
+                      role="menuitem"
                     >
                       <Award className="mr-3 h-5 w-5" />
                       Gamification
@@ -285,6 +299,7 @@ const Navbar = () => {
                       to="/forum"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
+                      role="menuitem"
                     >
                       <MessageCircle className="mr-3 h-5 w-5" />
                       Community
@@ -297,6 +312,7 @@ const Navbar = () => {
                           to="/dashboard/client/bookings"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <Calendar className="mr-3 h-5 w-5" />
                           Bookings
@@ -305,6 +321,7 @@ const Navbar = () => {
                           to="/dashboard/client/messages"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <MessageSquare className="mr-3 h-5 w-5" />
                           Messages
@@ -313,6 +330,7 @@ const Navbar = () => {
                           to="/dashboard/client/warranty"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <Shield className="mr-3 h-5 w-5" />
                           Warranty
@@ -327,6 +345,7 @@ const Navbar = () => {
                           to="/dashboard/service-agent/listings"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <Tool className="mr-3 h-5 w-5" />
                           My Services
@@ -335,6 +354,7 @@ const Navbar = () => {
                           to="/dashboard/service-agent/messages"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <MessageSquare className="mr-3 h-5 w-5" />
                           Messages
@@ -343,6 +363,7 @@ const Navbar = () => {
                           to="/dashboard/service-agent/referrals"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <Gift className="mr-3 h-5 w-5" />
                           Grow Your Network
@@ -354,6 +375,7 @@ const Navbar = () => {
                       to="/messaging/sms"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
+                      role="menuitem"
                     >
                       <MessageCircle className="mr-3 h-5 w-5" />
                       SMS
@@ -362,6 +384,7 @@ const Navbar = () => {
                       to="/subscription/dashboard"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setIsNavDropdownOpen(false)}
+                      role="menuitem"
                     >
                       <Building2 className="mr-3 h-5 w-5" />
                       Membership
@@ -372,6 +395,7 @@ const Navbar = () => {
                           to="/points"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <Award className="mr-3 h-5 w-5" />
                           Points
@@ -380,6 +404,7 @@ const Navbar = () => {
                           to="/governance"
                           className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
+                          role="menuitem"
                         >
                           <Vote className="mr-3 h-5 w-5" />
                           Governance
@@ -443,7 +468,12 @@ const Navbar = () => {
                   <button
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     className="inline-flex items-center justify-center p-2 rounded-md text-gray-700 hover:text-gray-900 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+                    aria-controls="mobile-menu"
+                    aria-expanded={isMobileMenuOpen}
                   >
+                    <span className="sr-only">
+                      {isMobileMenuOpen ? 'Close main menu' : 'Open main menu'}
+                    </span>
                     {isMobileMenuOpen ? (
                       <X className="h-6 w-6" />
                     ) : (
@@ -475,7 +505,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {isMobileMenuOpen && (
-        <div className="md:hidden">
+        <div className="md:hidden" id="mobile-menu">
           <div className="px-2 pt-2 pb-3 space-y-1">
             <Link
               to="/"

@@ -41,7 +41,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
   };
 
   return (
-    <nav className={`bg-white shadow-sm ${className}`}>
+    <nav className={`bg-white shadow-sm ${className}`} aria-label="Primary navigation">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex">
@@ -176,8 +176,12 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
             <button
               onClick={toggleMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-500"
+              aria-controls="mobile-menu"
+              aria-expanded={isMenuOpen}
             >
-              <span className="sr-only">Open main menu</span>
+              <span className="sr-only">
+                {isMenuOpen ? 'Close main menu' : 'Open main menu'}
+              </span>
               {isMenuOpen ? (
                 <svg
                   className="block h-6 w-6"
@@ -218,7 +222,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
 
       {/* Mobile menu */}
       {isMenuOpen && (
-        <div className="sm:hidden">
+        <div className="sm:hidden" id="mobile-menu">
           <div className="pt-2 pb-3 space-y-1">
             <Link
               to="/example"
@@ -228,6 +232,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                   : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
               }`}
               onClick={closeMenu}
+              role="menuitem"
             >
               Example
             </Link>
@@ -242,6 +247,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                   }`}
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Projects
                 </Link>
@@ -254,6 +260,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                   }`}
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Bookings
                 </Link>
@@ -266,6 +273,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                   }`}
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Estimation
                 </Link>
@@ -278,6 +286,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                   }`}
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Messages
                 </Link>
@@ -290,6 +299,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                   }`}
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Maps
                 </Link>
@@ -302,6 +312,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                       : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                   }`}
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Warranties
                 </Link>
@@ -316,6 +327,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                         : 'border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700'
                     }`}
                     onClick={closeMenu}
+                    role="menuitem"
                   >
                     Admin
                   </Link>
@@ -348,6 +360,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                     to="/profile"
                     className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                     onClick={closeMenu}
+                    role="menuitem"
                   >
                     Your Profile
                   </Link>
@@ -368,6 +381,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                   to="/login"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Login
                 </Link>
@@ -375,6 +389,7 @@ export const Navigation: React.FC<NavigationProps> = ({ className }) => {
                   to="/register"
                   className="block px-4 py-2 text-base font-medium text-gray-500 hover:text-gray-800 hover:bg-gray-100"
                   onClick={closeMenu}
+                  role="menuitem"
                 >
                   Register
                 </Link>
