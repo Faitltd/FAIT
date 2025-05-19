@@ -16,7 +16,7 @@ import GlobalErrorBoundary from './components/GlobalErrorBoundary';
 import { ToastContainer } from './components/common';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import EnhancedHome from './pages/EnhancedHome';
+import EnhancedHomeWithAnimations from './pages/EnhancedHomeWithAnimations';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import DirectLogin from './pages/DirectLogin';
@@ -105,7 +105,7 @@ function EnhancedMinimalApp() {
       <Route element={<Layout />} errorElement={<PageErrorBoundary />}>
         <Route
           path="/"
-          element={<EnhancedHome />}
+          element={<EnhancedHomeWithAnimations />}
         />
         <Route
           path="/login"

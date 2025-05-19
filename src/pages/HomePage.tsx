@@ -4,19 +4,64 @@ import { useAuth } from '../modules/core/contexts/AuthContext';
 import { UserRole } from '../modules/core/types/common';
 import { Button } from '../modules/core/components/ui/Button';
 import { Navigation } from '../modules/core/components/layout/Navigation';
+import HomeRemodellingGallery from '../components/HomeRemodellingGallery';
+import HomeRemodellingGallery from '../components/HomeRemodellingGallery';
+
+const serviceImages = [
+  {
+    src: 'https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?auto=format&fit=crop&w=800&q=80',
+    alt: 'Modern kitchen remodel with white cabinets, island, and pendant lighting',
+    title: 'Kitchen Remodeling',
+    desc: 'Transform your kitchen with custom designs and professional craftsmanship.',
+    link: '/services/kitchen-remodeling',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1507089947368-19c1da9775ae?auto=format&fit=crop&w=800&q=80',
+    alt: 'Luxury bathroom remodel with walk-in shower and modern fixtures',
+    title: 'Bathroom Remodeling',
+    desc: 'Upgrade your bathroom with elegant finishes and modern amenities.',
+    link: '/services/bathroom-remodeling',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=800&q=80',
+    alt: 'Hardwood flooring installation in a bright living room',
+    title: 'Flooring Installation',
+    desc: 'Quality flooring solutions from hardwood to tile, installed by experts.',
+    link: '/services/flooring-installation',
+  },
+  {
+    src: 'https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=800&q=80',
+    alt: 'Professional painting of a modern living room with accent wall',
+    title: 'Professional Painting',
+    desc: 'Interior and exterior painting services with premium materials and attention to detail.',
+    link: '/services/painting',
+  },
+];
 
 /**
  * HomePage component for the landing page
  */
 const HomePage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  
+
   // Refs for scroll animations
   const heroRef = useRef<HTMLDivElement>(null);
   const featuresRef = useRef<HTMLDivElement>(null);
   const servicesRef = useRef<HTMLDivElement>(null);
   const testimonialsRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
+
+  // Force image reload
+  useEffect(() => {
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+      const src = img.src;
+      img.src = '';
+      setTimeout(() => {
+        img.src = src;
+      }, 100);
+    });
+  }, []);
 
   // Setup intersection observer for scroll animations
   useEffect(() => {
@@ -52,7 +97,7 @@ const HomePage: React.FC = () => {
   // Get dashboard link based on user role
   const getDashboardLink = () => {
     if (!isAuthenticated || !user) return '/login';
-    
+
     switch (user.role) {
       case UserRole.ADMIN:
         return '/admin';
@@ -66,66 +111,105 @@ const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#c0e2ff]">
       <Navigation />
-      
-      {/* Hero Section */}
-      <div
-        ref={heroRef}
-        className="relative bg-white overflow-hidden transition-all duration-600 opacity-0 transform translate-y-8"
-      >
-        <div className="max-w-7xl mx-auto">
-          <div className="relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:max-w-2xl lg:w-full lg:pb-28 xl:pb-32">
-            <svg
-              className="hidden lg:block absolute right-0 inset-y-0 h-full w-48 text-white transform translate-x-1/2"
-              fill="currentColor"
-              viewBox="0 0 100 100"
-              preserveAspectRatio="none"
-              aria-hidden="true"
-            >
-              <polygon points="50,0 100,0 50,100 0,100" />
-            </svg>
 
-            <main className="mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 lg:px-8 xl:mt-28">
-              <div className="sm:text-center lg:text-left">
-                <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl">
-                  <span className="block xl:inline">Connecting clients with</span>{' '}
-                  <span className="block text-blue-600 xl:inline">skilled service agents</span>
-                </h1>
-                <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                  FAIT Co-op is a platform that connects clients with skilled service agents for home improvement, 
-                  remodeling, and handyman services. Our platform makes it easy to find, book, and manage projects.
-                </p>
-                <div className="mt-5 sm:mt-8 sm:flex sm:justify-center lg:justify-start">
-                  <div className="rounded-md shadow">
-                    <Link
-                      to={isAuthenticated ? getDashboardLink() : '/register'}
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 md:py-4 md:text-lg md:px-10"
-                    >
-                      {isAuthenticated ? 'Go to Dashboard' : 'Get Started'}
-                    </Link>
-                  </div>
-                  <div className="mt-3 sm:mt-0 sm:ml-3">
-                    <Link
-                      to="/services"
-                      className="w-full flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-blue-100 hover:bg-blue-200 md:py-4 md:text-lg md:px-10"
-                    >
-                      Our Services
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            </main>
+      {/* HERO SECTION */}
+      <div className="relative w-full" style={{ minHeight: 480 }}>
+        {/* Background image */}
+        <div
+          className="absolute inset-0"
+          style={{
+            backgroundImage:
+              "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?auto=format&fit=crop&w=1500&q=80')",
+            backgroundSize: 'cover',
+            backgroundPosition: 'center',
+            zIndex: 0,
+          }}
+          aria-hidden="true"
+        />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/40" style={{ zIndex: 1 }} />
+        {/* Content */}
+        <div className="relative z-10 flex flex-col items-center justify-center text-center px-4 py-24 sm:py-32">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white mb-4 drop-shadow-lg">
+            Welcome to
+            <br />
+            <span className="text-blue-200">FAIT Co-Op Platform</span>
+          </h1>
+          <p className="mt-4 max-w-2xl mx-auto text-xl text-blue-100 font-medium drop-shadow">
+            Connecting homeowners with trusted service agents for all your home improvement needs.
+          </p>
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="/calculator/estimate"
+              className="px-10 py-4 border border-transparent text-lg font-medium rounded-md text-white bg-green-600 hover:bg-green-700 transition-colors shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center justify-center"
+            >
+              <svg className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              </svg>
+              Free Instant Estimate
+            </a>
+            <Link
+              to="/register"
+              className="px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-pink-400 hover:bg-pink-500 md:py-4 md:text-lg md:px-10 transition-colors"
+            >
+              Get Started
+            </Link>
+            <Link
+              to="/services/search"
+              className="px-8 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 md:py-4 md:text-lg md:px-10 transition-colors"
+            >
+              Find Services
+            </Link>
           </div>
         </div>
-        <div className="lg:absolute lg:inset-y-0 lg:right-0 lg:w-1/2">
-          <img
-            className="h-56 w-full object-cover sm:h-72 md:h-96 lg:w-full lg:h-full"
-            src="https://images.unsplash.com/photo-1556912172-45b7abe8b7e1?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80"
-            alt="Home renovation"
-          />
-        </div>
       </div>
+
+      {/* SERVICES SECTION */}
+      <section className="bg-[#c0e2ff] py-16">
+        <div className="max-w-6xl mx-auto px-4">
+          <h2 className="text-3xl font-extrabold text-gray-900 text-center mb-2">Our Services</h2>
+          <p className="text-lg text-gray-700 text-center mb-10">
+            Professional home services for every need
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {serviceImages.map((service) => (
+              <div
+                key={service.title}
+                className="relative rounded-xl shadow-card hover:shadow-card-hover transition-shadow overflow-hidden flex flex-col min-h-[220px]"
+              >
+                {/* Card background image */}
+                <div
+                  className="absolute inset-0"
+                  style={{
+                    backgroundImage: `url('${service.src}')`,
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
+                    zIndex: 0,
+                  }}
+                  aria-hidden="true"
+                />
+                {/* Overlay */}
+                <div className="absolute inset-0 bg-black/40" style={{ zIndex: 1 }} />
+                {/* Card content */}
+                <div className="relative p-6 flex-1 flex flex-col z-10">
+                  <h3 className="text-xl font-bold text-white drop-shadow mb-2">{service.title}</h3>
+                  <p className="text-white text-opacity-90 mb-4 flex-1 drop-shadow">
+                    {service.desc}
+                  </p>
+                  <Link
+                    to={service.link}
+                    className="inline-block px-6 py-2 rounded-md bg-pink-400 text-white font-semibold hover:bg-pink-500 transition-colors"
+                  >
+                    Learn More
+                  </Link>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* Features Section */}
       <div
@@ -159,7 +243,7 @@ const HomePage: React.FC = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                        d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                       />
                     </svg>
                   </div>
@@ -186,7 +270,7 @@ const HomePage: React.FC = () => {
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2}
-                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"
                       />
                     </svg>
                   </div>
@@ -277,6 +361,14 @@ const HomePage: React.FC = () => {
             Sign up for free
           </Link>
         </div>
+      </div>
+
+      {/* Add the gallery component */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <HomeRemodellingGallery 
+          title="Our Stunning Remodelling Projects" 
+          description="Browse through our portfolio of completed home renovation projects. Each image showcases our commitment to quality craftsmanship and attention to detail."
+        />
       </div>
 
       {/* Footer */}

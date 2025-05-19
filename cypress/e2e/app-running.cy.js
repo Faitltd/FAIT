@@ -2,8 +2,9 @@
 
 describe('Application Running Test', () => {
   it('should load the home page', () => {
-    cy.visit('/');
-    cy.contains('FAIT Co-op Test Page').should('be.visible');
+    cy.visit('/?version=full');
+    cy.get('#root').should('exist');
+    cy.contains('Find Services').should('be.visible');
   });
 
   it('should navigate to login page', () => {
@@ -13,11 +14,9 @@ describe('Application Running Test', () => {
     cy.get('input[type="password"]').should('exist');
   });
 
-  it('should display test credentials on login page', () => {
-    cy.visit('/login');
-    cy.contains('Test Credentials').should('be.visible');
-    cy.contains('Admin: admin@itsfait.com / admin123').should('be.visible');
-    cy.contains('Client: client@itsfait.com / client123').should('be.visible');
-    cy.contains('Service Agent: service@itsfait.com / service123').should('be.visible');
+  it('should navigate to services search page', () => {
+    cy.visit('/?version=full');
+    cy.contains('Find Services').click();
+    cy.url().should('include', '/services/search');
   });
 });

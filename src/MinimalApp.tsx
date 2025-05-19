@@ -14,6 +14,7 @@ import ServiceAgentDashboardWrapper from './pages/dashboard/ServiceAgentDashboar
 // Import other pages
 import ProjectsPage from './pages/projects/ProjectsPage.jsx';
 import ServicesPage from './pages/services/ServicesPage.jsx';
+import SimpleServiceSearchPage from './pages/services/SimpleServiceSearchPage.jsx';
 import EstimateCalculators from './pages/calculator/EstimateCalculators.tsx';
 import EstimatesPage from './pages/estimates/EstimatesPage.jsx';
 import WarrantyPageWrapper from './pages/warranty/WarrantyPageWrapper.jsx';
@@ -92,12 +93,20 @@ function MinimalApp() {
               </Layout>
             }
           />
-          {/* Services route */}
+          {/* Services routes */}
           <Route
             path="/services"
             element={
               <Layout>
                 <ServicesPage />
+              </Layout>
+            }
+          />
+          <Route
+            path="/services/search"
+            element={
+              <Layout>
+                <SimpleServiceSearchPage />
               </Layout>
             }
           />
