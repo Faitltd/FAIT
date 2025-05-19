@@ -1,1 +1,44 @@
+# Check if you have a remote repository already set up
+git remote -v
+
+# If you need to add or update the GitHub remote
+git remote add origin https://github.com/Faitltd/fait-coop-platform.git
+# Or if remote already exists but points to wrong URL
+# git remote set-url origin https://github.com/Faitltd/fait-coop-platform.git
+
+# Stage all changes
+git add .
+
+# Commit the changes
+git commit -m "Update project with new features and fixes"
+
+# Install Firebase Tools globally
+npm install -g firebase-tools
+
+# Run development server (if needed for testing before pushing)
 npm run dev
+
+# Push to GitHub
+git push -u origin main
+
+# Login to Google Cloud if you haven't already
+gcloud auth login
+
+# Set your Google Cloud project
+gcloud config set project fait-coop-platform
+
+# Deploy to Cloud Run
+gcloud run deploy fait-coop --image gcr.io/fait-coop-platform/fait-coop --platform managed
+
+# Deploy to App Engine
+gcloud app deploy
+
+# Firebase login and initialization
+firebase login
+firebase init
+
+# Build your project first (assuming you have a build script)
+npm run build
+
+# Deploy to Firebase
+firebase deploy
