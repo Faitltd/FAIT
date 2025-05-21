@@ -13,7 +13,7 @@
         {
           "source": "**",
           "run": {
-            "serviceId": "fait-coop",
+            "serviceId": "fait-coop-main",
             "region": "us-central1"
           }
         }
