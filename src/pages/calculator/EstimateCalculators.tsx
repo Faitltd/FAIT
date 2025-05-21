@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Calculator, Hammer, ArrowLeft } from 'lucide-react';
+import { Calculator, Hammer } from 'lucide-react';
 import SimpleRemodelingCalculator from './SimpleRemodelingCalculator';
 import SimpleHandymanCalculator from './SimpleHandymanCalculator';
 
@@ -8,14 +7,8 @@ const EstimateCalculators: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'remodeling' | 'handyman'>('remodeling');
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8">
+    <div className="bg-gray-50 py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <Link to="/" className="inline-flex items-center text-blue-600 hover:text-blue-800">
-            <ArrowLeft className="h-4 w-4 mr-1" />
-            Back to Home
-          </Link>
-        </div>
 
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
           <div className="p-6 sm:p-8">

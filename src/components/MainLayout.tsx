@@ -11,8 +11,10 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children, currentPage = 'home' }) => {
   return (
     <div className="min-h-screen flex flex-col">
-      <CommonNavbar currentPage={currentPage} />
-      <MenuBar />
+      <header className="sticky top-0 z-50">
+        <CommonNavbar currentPage={currentPage} />
+        <MenuBar />
+      </header>
       <main className="flex-grow">
         {children}
       </main>

@@ -819,10 +819,10 @@ const router = createBrowserRouter(
       <Route
         path="/calculator/estimate"
         element={
-          <div>
-            {console.log('Rendering EstimateCalculators route - direct')}
+          <MainLayout currentPage="services">
+            {console.log('Rendering EstimateCalculators route - with MainLayout')}
             <EstimateCalculators />
-          </div>
+          </MainLayout>
         }
       />
       <Route

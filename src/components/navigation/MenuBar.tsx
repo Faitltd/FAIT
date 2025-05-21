@@ -154,7 +154,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ className = '' }) => {
   };
 
   return (
-    <div className={`bg-white border-b border-gray-200 ${className}`} style={{ backgroundColor: '#f0f8ff' }}>
+    <div className={`bg-white border-b border-gray-200 shadow-sm ${className}`} style={{ backgroundColor: '#f0f8ff' }}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Desktop Menu */}
         <div className="hidden md:flex justify-between">
@@ -180,7 +180,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ className = '' }) => {
                 ) : (
                   <button
                     onClick={() => handleMenuItemClick(index, item)}
-                    className={`inline-flex items-center px-3 py-3 text-sm font-medium border-b-2 border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-900`}
+                    className={`inline-flex items-center px-3 py-3 text-sm font-medium border-b-2 border-transparent text-gray-700 hover:border-gray-300 hover:text-gray-900 focus:outline-none`}
                   >
                     {item.icon && <span className="mr-1.5">{item.icon}</span>}
                     {item.label}
@@ -202,7 +202,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ className = '' }) => {
                         <Link
                           key={childIndex}
                           to={child.path || '#'}
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700"
+                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 font-medium"
                           onClick={() => setOpenMenuIndex(null)}
                         >
                           {child.icon && <span className="mr-2">{child.icon}</span>}
@@ -237,7 +237,7 @@ const MenuBar: React.FC<MenuBarProps> = ({ className = '' }) => {
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-200">
+        <div className="md:hidden border-t border-gray-200 bg-white shadow-lg z-50">
           <div className="pt-2 pb-3 space-y-1">
             {menuItems.map((item, index) => (
               <div key={index}>
