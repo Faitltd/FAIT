@@ -1,6 +1,7 @@
 import React from 'react';
 import CommonNavbar from './CommonNavbar';
 import CommonFooter from './CommonFooter';
+import MenuBar from './navigation/MenuBar';
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -11,6 +12,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children, currentPage = 'home' 
   return (
     <div className="min-h-screen flex flex-col">
       <CommonNavbar currentPage={currentPage} />
+      <MenuBar />
       <main className="flex-grow">
         {children}
       </main>
