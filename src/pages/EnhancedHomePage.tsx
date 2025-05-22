@@ -5,19 +5,20 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import ParallaxBackground from '../components/ParallaxBackground';
 import EnhancedServiceCard from '../components/services/EnhancedServiceCard';
-import { 
-  Search, 
-  ArrowRight, 
-  CheckCircle, 
-  Star, 
-  Clock, 
-  Shield, 
-  Tool, 
-  Home, 
-  Zap, 
-  Droplet, 
-  Paintbrush, 
-  Leaf, 
+import ServiceCategoryNav from '../components/services/ServiceCategoryNav';
+import {
+  Search,
+  ArrowRight,
+  CheckCircle,
+  Star,
+  Clock,
+  Shield,
+  Tool,
+  Home,
+  Zap,
+  Droplet,
+  Paintbrush,
+  Leaf,
   MessageCircle,
   ChevronRight
 } from 'lucide-react';
@@ -61,16 +62,16 @@ const EnhancedHomePage: React.FC = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { scrollY } = useScroll();
-  
+
   // Parallax effects
   const featuredParallax = useTransform(scrollY, [0, 1000], [0, 200]);
   const howItWorksParallax = useTransform(scrollY, [500, 1500], [0, 200]);
-  
+
   // State
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredServices, setFeaturedServices] = useState<ServicePackage[]>([]);
   const [loading, setLoading] = useState(true);
-  
+
   // Testimonials data
   const testimonials: Testimonial[] = [
     {
@@ -101,7 +102,7 @@ const EnhancedHomePage: React.FC = () => {
       service: 'Electrical Work'
     }
   ];
-  
+
   // Service categories
   const serviceCategories = [
     { name: 'Home Repair', icon: <Home className="h-6 w-6" />, color: 'bg-blue-500' },
@@ -111,7 +112,7 @@ const EnhancedHomePage: React.FC = () => {
     { name: 'Landscaping', icon: <Leaf className="h-6 w-6" />, color: 'bg-green-500' },
     { name: 'Handyman', icon: <Tool className="h-6 w-6" />, color: 'bg-orange-500' }
   ];
-  
+
   // How it works steps
   const howItWorksSteps = [
     {
@@ -133,13 +134,13 @@ const EnhancedHomePage: React.FC = () => {
       color: 'bg-company-lightorange'
     }
   ];
-  
+
   // Fetch featured services
   useEffect(() => {
     const fetchFeaturedServices = async () => {
       try {
         setLoading(true);
-        
+
         const { data, error } = await supabase
           .from('service_packages')
           .select(`
@@ -153,9 +154,9 @@ const EnhancedHomePage: React.FC = () => {
           `)
           .eq('is_active', true)
           .limit(4);
-        
+
         if (error) throw error;
-        
+
         // Add demo properties for visual enhancement
         const enhancedServices = data.map((service, index) => ({
           ...service,
@@ -165,7 +166,7 @@ const EnhancedHomePage: React.FC = () => {
           verified: true,
           top_rated: index % 2 === 0
         }));
-        
+
         setFeaturedServices(enhancedServices);
       } catch (err) {
         console.error('Error fetching featured services:', err);
@@ -173,16 +174,16 @@ const EnhancedHomePage: React.FC = () => {
         setLoading(false);
       }
     };
-    
+
     fetchFeaturedServices();
   }, []);
-  
+
   // Handle search submission
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     navigate(`/services?search=${encodeURIComponent(searchTerm)}`);
   };
-  
+
   return (
     <div className="min-h-screen">
       {/* Hero Section with Parallax */}
@@ -204,17 +205,17 @@ const EnhancedHomePage: React.FC = () => {
               <br />
               <span className="text-white/90">Done Right</span>
             </motion.h1>
-            
+
             <motion.p
               className="mt-6 text-xl text-white/90 max-w-2xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
             >
-              Find trusted professionals for all your home service needs. 
+              Find trusted professionals for all your home service needs.
               From plumbing to painting, we've got you covered.
             </motion.p>
-            
+
             {/* Search Bar */}
             <motion.form
               className="mt-8 sm:flex"
@@ -242,7 +243,7 @@ const EnhancedHomePage: React.FC = () => {
                 Search
               </button>
             </motion.form>
-            
+
             {/* Trust Badges */}
             <motion.div
               className="mt-10 flex flex-wrap gap-6"
@@ -266,7 +267,7 @@ const EnhancedHomePage: React.FC = () => {
           </div>
         </div>
       </ParallaxBackground>
-      
+
       {/* Service Categories */}
       <div className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -276,32 +277,21 @@ const EnhancedHomePage: React.FC = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h2 className="text-3xl font-bold text-gray-900">Popular Service Categories</h2>
-            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto">
+            <h2 className="text-3xl font-bold text-gray-900 font-ivy">Popular Service Categories</h2>
+            <p className="mt-4 text-xl text-gray-600 max-w-3xl mx-auto font-inter">
               Browse our most popular service categories or search for exactly what you need
             </p>
           </motion.div>
-          
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {serviceCategories.map((category, index) => (
-              <motion.div
-                key={category.name}
-                className="flex flex-col items-center"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -5 }}
-              >
-                <Link to={`/services?category=${encodeURIComponent(category.name)}`}>
-                  <div className={`h-20 w-20 rounded-full ${category.color} flex items-center justify-center text-white mb-4 shadow-lg`}>
-                    {category.icon}
-                  </div>
-                  <h3 className="text-lg font-medium text-gray-900 text-center">{category.name}</h3>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
-          
+
+          {/* TaskRabbit-style Service Category Navigation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <ServiceCategoryNav />
+          </motion.div>
+
           <div className="mt-12 text-center">
             <Link
               to="/services"
@@ -313,14 +303,14 @@ const EnhancedHomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Featured Services with Parallax */}
       <div className="py-20 bg-gray-50 relative overflow-hidden">
         <motion.div
           className="absolute inset-0 bg-dots-pattern bg-repeat opacity-5"
           style={{ y: featuredParallax }}
         />
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-12"
@@ -333,7 +323,7 @@ const EnhancedHomePage: React.FC = () => {
               Discover our top-rated services from verified professionals
             </p>
           </motion.div>
-          
+
           {loading ? (
             <div className="flex justify-center py-12">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-company-lightpink"></div>
@@ -347,14 +337,14 @@ const EnhancedHomePage: React.FC = () => {
           )}
         </div>
       </div>
-      
+
       {/* How It Works with Parallax */}
       <div className="py-20 bg-white relative overflow-hidden">
         <motion.div
           className="absolute inset-0 bg-grid-pattern bg-repeat opacity-5"
           style={{ y: howItWorksParallax }}
         />
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="text-center mb-16"
@@ -367,7 +357,7 @@ const EnhancedHomePage: React.FC = () => {
               Getting the help you need is simple and straightforward
             </p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {howItWorksSteps.map((step, index) => (
               <motion.div
@@ -383,7 +373,7 @@ const EnhancedHomePage: React.FC = () => {
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-4">{index + 1}. {step.title}</h3>
                 <p className="text-gray-600">{step.description}</p>
-                
+
                 {/* Connector line between steps (only for desktop) */}
                 {index < howItWorksSteps.length - 1 && (
                   <div className="hidden md:block absolute top-1/2 -right-4 w-8 border-t-2 border-dashed border-gray-300"></div>
@@ -391,7 +381,7 @@ const EnhancedHomePage: React.FC = () => {
               </motion.div>
             ))}
           </div>
-          
+
           <div className="mt-12 text-center">
             <Link
               to="/register"
@@ -403,7 +393,7 @@ const EnhancedHomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Testimonials */}
       <div className="py-20 bg-gradient-to-r from-company-lightblue via-company-lightpink to-company-lightorange">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -418,7 +408,7 @@ const EnhancedHomePage: React.FC = () => {
               Don't just take our word for it — hear from our satisfied customers
             </p>
           </motion.div>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
               <motion.div
@@ -442,7 +432,7 @@ const EnhancedHomePage: React.FC = () => {
                     <p className="text-sm text-gray-500">{testimonial.role}</p>
                   </div>
                 </div>
-                
+
                 <div className="flex mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -453,16 +443,16 @@ const EnhancedHomePage: React.FC = () => {
                     />
                   ))}
                 </div>
-                
+
                 <p className="text-gray-600 mb-4">{testimonial.content}</p>
-                
+
                 <p className="text-sm text-company-lightpink font-medium">
                   Service: {testimonial.service}
                 </p>
               </motion.div>
             ))}
           </div>
-          
+
           <div className="mt-12 text-center">
             <Link
               to="/testimonials"
@@ -474,7 +464,7 @@ const EnhancedHomePage: React.FC = () => {
           </div>
         </div>
       </div>
-      
+
       {/* CTA Section */}
       <div className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -497,7 +487,7 @@ const EnhancedHomePage: React.FC = () => {
                 >
                   Join thousands of satisfied customers who have found reliable home service professionals through FAIT Co-Op.
                 </motion.p>
-                
+
                 <motion.div
                   className="mt-8 flex flex-col sm:flex-row gap-4"
                   initial={{ opacity: 0, y: 20 }}
@@ -517,7 +507,7 @@ const EnhancedHomePage: React.FC = () => {
                     Sign Up
                   </Link>
                 </motion.div>
-                
+
                 <motion.div
                   className="mt-8 flex items-center"
                   initial={{ opacity: 0, y: 20 }}
@@ -530,7 +520,7 @@ const EnhancedHomePage: React.FC = () => {
                   </span>
                 </motion.div>
               </div>
-              
+
               <div className="hidden lg:block relative">
                 <img
                   src="/images/cta-image.jpg"

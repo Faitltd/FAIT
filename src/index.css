@@ -2,6 +2,52 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Service Category Navigation Styles */
+.service-category-nav {
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(236, 72, 153, 0.5) transparent;
+}
+
+.service-category-nav::-webkit-scrollbar {
+  height: 6px;
+}
+
+.service-category-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.service-category-nav::-webkit-scrollbar-thumb {
+  background-color: rgba(236, 72, 153, 0.5);
+  border-radius: 20px;
+}
+
+@media (min-width: 600px) {
+  .service-category-nav button {
+    width: 20% !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .service-category-nav {
+    max-width: 1100px !important;
+    min-width: 1200px !important;
+  }
+}
+
+@media (min-width: 900px) {
+  .service-category-nav {
+    max-width: 100% !important;
+    min-width: 788px !important;
+    width: 1000px !important;
+  }
+
+  .service-category-nav .category-icon span {
+    margin-left: 15px !important;
+    margin-top: 9px !important;
+  }
+}
+
 @layer base {
   :root {
     --color-company-lightblue: #3b82f6;

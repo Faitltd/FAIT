@@ -3,13 +3,14 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import EnhancedServiceCard from '../components/services/EnhancedServiceCard';
-import { 
-  Search, 
-  Filter, 
-  MapPin, 
-  ChevronDown, 
-  ChevronUp, 
-  X, 
+import ServiceCategoryNav from '../components/services/ServiceCategoryNav';
+import {
+  Search,
+  Filter,
+  MapPin,
+  ChevronDown,
+  ChevronUp,
+  X,
   ArrowUpDown,
   Tool,
   Home,
@@ -56,11 +57,11 @@ interface Category {
 const EnhancedServicesPage: React.FC = () => {
   const { user } = useAuth();
   const { scrollY } = useScroll();
-  
+
   // Parallax effects
   const heroParallax = useTransform(scrollY, [0, 500], [0, 150]);
   const categoryParallax = useTransform(scrollY, [200, 700], [0, 100]);
-  
+
   // State
   const [services, setServices] = useState<ServicePackage[]>([]);
   const [filteredServices, setFilteredServices] = useState<ServicePackage[]>([]);
@@ -74,7 +75,7 @@ const EnhancedServicesPage: React.FC = () => {
   const [sortBy, setSortBy] = useState<'price_asc' | 'price_desc' | 'rating' | 'distance'>('rating');
   const [showFilters, setShowFilters] = useState(false);
   const [userZipCode, setUserZipCode] = useState<string | null>(null);
-  
+
   // Categories with icons
   const categories: Category[] = [
     {
@@ -118,16 +119,16 @@ const EnhancedServicesPage: React.FC = () => {
       subcategories: ['Lawn Mowing', 'Garden Design', 'Tree Trimming', 'Irrigation']
     }
   ];
-  
+
   useEffect(() => {
     fetchServices();
     fetchUserProfile();
   }, []);
-  
+
   useEffect(() => {
     applyFilters();
   }, [services, searchTerm, zipCode, selectedCategory, selectedSubcategory, priceRange, sortBy]);
-  
+
   const fetchUserProfile = async () => {
     if (user) {
       try {
@@ -136,9 +137,9 @@ const EnhancedServicesPage: React.FC = () => {
           .select('zip_code')
           .eq('id', user.id)
           .single();
-        
+
         if (error) throw error;
-        
+
         if (data?.zip_code) {
           setZipCode(data.zip_code);
           setUserZipCode(data.zip_code);
@@ -148,12 +149,12 @@ const EnhancedServicesPage: React.FC = () => {
       }
     }
   };
-  
+
   const fetchServices = async () => {
     try {
       setLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase
         .from('service_packages')
         .select(`
@@ -166,19 +167,19 @@ const EnhancedServicesPage: React.FC = () => {
           )
         `)
         .eq('is_active', true);
-      
+
       if (error) throw error;
-      
+
       // Fetch ratings
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('service_package_id, rating')
         .in('service_package_id', data.map(service => service.id));
-      
+
       if (reviewsError) {
         console.error('Error fetching reviews:', reviewsError);
       }
-      
+
       // Group reviews by service_package_id
       const reviewsByServiceId = (reviewsData || []).reduce((acc, review) => {
         if (!acc[review.service_package_id]) {
@@ -187,19 +188,19 @@ const EnhancedServicesPage: React.FC = () => {
         acc[review.service_package_id].push(review.rating);
         return acc;
       }, {});
-      
+
       // Add ratings and additional properties to services
       const servicesWithRatings = data.map((service, index) => {
         const ratings = reviewsByServiceId[service.id] || [];
         const avgRating = ratings.length > 0
           ? ratings.reduce((sum, rating) => sum + rating, 0) / ratings.length
           : 0;
-        
+
         // Add some demo properties for visual enhancement
         const featured = index % 7 === 0; // Every 7th item is featured
         const verified = avgRating > 3.5 || index % 3 === 0; // Verified if good rating or every 3rd
         const top_rated = avgRating >= 4.5; // Top rated if 4.5+ stars
-        
+
         return {
           ...service,
           avg_rating: avgRating,
@@ -209,7 +210,7 @@ const EnhancedServicesPage: React.FC = () => {
           top_rated
         };
       });
-      
+
       setServices(servicesWithRatings);
     } catch (err) {
       console.error('Error fetching services:', err);
@@ -223,10 +224,10 @@ const EnhancedServicesPage: React.FC = () => {
       setLoading(false);
     }
   };
-  
+
   const applyFilters = () => {
     let filtered = [...services];
-    
+
     // Apply search term filter
     if (searchTerm) {
       const term = searchTerm.toLowerCase();
@@ -237,7 +238,7 @@ const EnhancedServicesPage: React.FC = () => {
         (service.subcategory && service.subcategory.toLowerCase().includes(term))
       );
     }
-    
+
     // Apply zip code filter
     if (zipCode) {
       filtered = filtered.filter(service =>
@@ -245,22 +246,22 @@ const EnhancedServicesPage: React.FC = () => {
         service.service_agent.zip_code.substring(0, 3) === zipCode.substring(0, 3)
       );
     }
-    
+
     // Apply category filter
     if (selectedCategory) {
       filtered = filtered.filter(service => service.category === selectedCategory);
-      
+
       // Apply subcategory filter
       if (selectedSubcategory) {
         filtered = filtered.filter(service => service.subcategory === selectedSubcategory);
       }
     }
-    
+
     // Apply price range filter
     filtered = filtered.filter(service =>
       service.price >= priceRange[0] && service.price <= priceRange[1]
     );
-    
+
     // Apply sorting
     switch (sortBy) {
       case 'price_asc':
@@ -278,28 +279,28 @@ const EnhancedServicesPage: React.FC = () => {
           filtered.sort((a, b) => {
             const aZip = a.service_agent.zip_code || '';
             const bZip = b.service_agent.zip_code || '';
-            
+
             // Exact match comes first
             if (aZip === userZipCode && bZip !== userZipCode) return -1;
             if (bZip === userZipCode && aZip !== userZipCode) return 1;
-            
+
             // First 3 digits match comes next
             const aMatch = aZip.substring(0, 3) === userZipCode.substring(0, 3);
             const bMatch = bZip.substring(0, 3) === userZipCode.substring(0, 3);
-            
+
             if (aMatch && !bMatch) return -1;
             if (bMatch && !aMatch) return 1;
-            
+
             // Fall back to rating
             return (b.avg_rating || 0) - (a.avg_rating || 0);
           });
         }
         break;
     }
-    
+
     setFilteredServices(filtered);
   };
-  
+
   const clearFilters = () => {
     setSearchTerm('');
     setZipCode(userZipCode || '');
@@ -308,7 +309,7 @@ const EnhancedServicesPage: React.FC = () => {
     setPriceRange([0, 1000]);
     setSortBy('rating');
   };
-  
+
   return (
     <div className="min-h-screen pt-16 bg-gray-50">
       {/* Hero Section with Parallax */}
@@ -325,7 +326,7 @@ const EnhancedServicesPage: React.FC = () => {
         >
           <div className="absolute inset-0 bg-gradient-to-r from-company-lightblue/80 via-company-lightpink/80 to-company-lightorange/80"></div>
         </motion.div>
-        
+
         {/* Content */}
         <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-white">
           <motion.h1
@@ -344,7 +345,7 @@ const EnhancedServicesPage: React.FC = () => {
           >
             Browse our wide selection of professional home services
           </motion.p>
-          
+
           {/* Search Bar */}
           <motion.div
             className="mt-8 w-full max-w-2xl"
@@ -381,7 +382,7 @@ const EnhancedServicesPage: React.FC = () => {
           </motion.div>
         </div>
       </div>
-      
+
       {/* Service Categories with Parallax */}
       <div className="relative py-16 overflow-hidden">
         <motion.div
@@ -390,89 +391,28 @@ const EnhancedServicesPage: React.FC = () => {
             y: categoryParallax
           }}
         />
-        
+
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.h2
-            className="text-3xl font-bold text-gray-900 text-center mb-12"
+            className="text-3xl font-bold text-gray-900 text-center mb-8 font-ivy"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
             Browse by Category
           </motion.h2>
-          
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
-            {categories.map((category, index) => (
-              <motion.button
-                key={category.name}
-                className={`flex flex-col items-center p-4 rounded-lg transition-all ${
-                  selectedCategory === category.name
-                    ? 'bg-company-lightpink text-white shadow-md'
-                    : 'bg-white text-gray-700 hover:bg-gray-50 shadow-sm'
-                }`}
-                onClick={() => {
-                  setSelectedCategory(selectedCategory === category.name ? '' : category.name);
-                  setSelectedSubcategory('');
-                }}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
-                whileHover={{ y: -5 }}
-              >
-                <div className={`h-12 w-12 rounded-full flex items-center justify-center mb-2 ${
-                  selectedCategory === category.name
-                    ? 'bg-white text-company-lightpink'
-                    : 'bg-company-lightpink bg-opacity-10 text-company-lightpink'
-                }`}>
-                  {category.icon}
-                </div>
-                <span className="text-sm font-medium text-center">{category.name}</span>
-              </motion.button>
-            ))}
-          </div>
-          
-          {/* Subcategories */}
-          {selectedCategory && (
-            <motion.div
-              className="mt-8 flex flex-wrap gap-2 justify-center"
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <button
-                className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  selectedSubcategory === ''
-                    ? 'bg-company-lightpink text-white'
-                    : 'bg-white text-gray-700 hover:bg-gray-50'
-                }`}
-                onClick={() => setSelectedSubcategory('')}
-              >
-                All {selectedCategory}
-              </button>
-              {categories
-                .find(cat => cat.name === selectedCategory)
-                ?.subcategories.map((subcat, index) => (
-                  <motion.button
-                    key={subcat}
-                    className={`px-4 py-2 rounded-full text-sm font-medium ${
-                      selectedSubcategory === subcat
-                        ? 'bg-company-lightpink text-white'
-                        : 'bg-white text-gray-700 hover:bg-gray-50'
-                    }`}
-                    onClick={() => setSelectedSubcategory(selectedSubcategory === subcat ? '' : subcat)}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ duration: 0.3, delay: index * 0.05 }}
-                  >
-                    {subcat}
-                  </motion.button>
-                ))}
-            </motion.div>
-          )}
+
+          {/* TaskRabbit-style Service Category Navigation */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
+          >
+            <ServiceCategoryNav />
+          </motion.div>
         </div>
       </div>
-      
+
       {/* Services Section */}
       <div className="py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -492,7 +432,7 @@ const EnhancedServicesPage: React.FC = () => {
                 </button>
               )}
             </div>
-            
+
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setShowFilters(!showFilters)}
@@ -506,7 +446,7 @@ const EnhancedServicesPage: React.FC = () => {
                   <ChevronDown className="h-4 w-4 ml-2" />
                 )}
               </button>
-              
+
               <div className="relative">
                 <select
                   value={sortBy}
@@ -524,7 +464,7 @@ const EnhancedServicesPage: React.FC = () => {
               </div>
             </div>
           </div>
-          
+
           {/* Advanced Filters */}
           {showFilters && (
             <motion.div
@@ -535,7 +475,7 @@ const EnhancedServicesPage: React.FC = () => {
               transition={{ duration: 0.3 }}
             >
               <h3 className="text-lg font-medium text-gray-900 mb-4">Advanced Filters</h3>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -568,12 +508,12 @@ const EnhancedServicesPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 {/* Additional filters can be added here */}
               </div>
             </motion.div>
           )}
-          
+
           {/* Service Cards */}
           {loading ? (
             <div className="py-12 flex justify-center">
