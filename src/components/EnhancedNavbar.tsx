@@ -81,18 +81,18 @@ const EnhancedNavbar: React.FC = () => {
   useEffect(() => {
     const handleScroll = () => {
       const currentScrollPos = window.scrollY;
-      
+
       // Set scrolled state for styling
       setIsScrolled(currentScrollPos > 10);
-      
+
       // Hide/show navbar based on scroll direction
       const isScrollingDown = prevScrollPos < currentScrollPos;
       const isScrollingUp = prevScrollPos > currentScrollPos;
-      
+
       // Only hide when scrolling down and not at the top
       // Always show when scrolling up
       setVisible(isScrollingUp || currentScrollPos < 50);
-      
+
       setPrevScrollPos(currentScrollPos);
     };
 
@@ -132,31 +132,31 @@ const EnhancedNavbar: React.FC = () => {
   // Dropdown animation variants
   const dropdownVariants = {
     hidden: { opacity: 0, y: -10, scale: 0.95 },
-    visible: { 
-      opacity: 1, 
-      y: 0, 
+    visible: {
+      opacity: 1,
+      y: 0,
       scale: 1,
-      transition: { 
-        type: "spring", 
-        stiffness: 300, 
-        damping: 20 
-      } 
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 20
+      }
     },
-    exit: { 
-      opacity: 0, 
-      y: -10, 
+    exit: {
+      opacity: 0,
+      y: -10,
       scale: 0.95,
-      transition: { 
-        duration: 0.2 
-      } 
+      transition: {
+        duration: 0.2
+      }
     }
   };
 
   return (
     <motion.nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white shadow-md' 
+        isScrolled
+          ? 'bg-white shadow-md'
           : 'bg-gradient-to-r from-company-lightblue via-company-lightpink to-company-lightorange'
       }`}
       initial="visible"
@@ -170,17 +170,17 @@ const EnhancedNavbar: React.FC = () => {
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
               <img src="/fait-logo.svg" alt="FAIT Co-Op Logo" className="h-8 w-8" />
-              <span className={`ml-2 text-xl font-bold ${isScrolled ? 'text-gray-900' : 'text-white'}`}>
+              <span className={`ml-2 text-xl font-ivy ${isScrolled ? 'text-gray-900' : 'text-white'}`}>
                 FAIT Co-Op
               </span>
             </Link>
-            
+
             {/* Desktop Navigation Links */}
             <div className="hidden md:ml-8 md:flex md:space-x-6">
               <Link
                 to="/"
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                  isActive('/') && !location.pathname.startsWith('/dashboard') 
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-inter font-medium transition-colors ${
+                  isActive('/') && !location.pathname.startsWith('/dashboard')
                     ? `${isScrolled ? 'bg-company-lightpink text-white' : 'bg-white bg-opacity-20 text-white'}`
                     : `${isScrolled ? 'text-gray-700 hover:text-company-lightpink' : 'text-white hover:bg-white hover:bg-opacity-20'}`
                 }`}
@@ -188,10 +188,10 @@ const EnhancedNavbar: React.FC = () => {
                 <Home className="h-4 w-4 mr-1" />
                 Home
               </Link>
-              
+
               <Link
                 to="/services"
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-inter font-medium transition-colors ${
                   isActive('/services')
                     ? `${isScrolled ? 'bg-company-lightpink text-white' : 'bg-white bg-opacity-20 text-white'}`
                     : `${isScrolled ? 'text-gray-700 hover:text-company-lightpink' : 'text-white hover:bg-white hover:bg-opacity-20'}`
@@ -200,10 +200,10 @@ const EnhancedNavbar: React.FC = () => {
                 <Tool className="h-4 w-4 mr-1" />
                 Services
               </Link>
-              
+
               <Link
                 to="/help"
-                className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center px-3 py-2 rounded-md text-sm font-inter font-medium transition-colors ${
                   isActive('/help')
                     ? `${isScrolled ? 'bg-company-lightpink text-white' : 'bg-white bg-opacity-20 text-white'}`
                     : `${isScrolled ? 'text-gray-700 hover:text-company-lightpink' : 'text-white hover:bg-white hover:bg-opacity-20'}`
@@ -212,12 +212,12 @@ const EnhancedNavbar: React.FC = () => {
                 <HelpCircle className="h-4 w-4 mr-1" />
                 Help
               </Link>
-              
+
               {/* More dropdown */}
               <div className="relative" id="nav-dropdown">
                 <button
                   onClick={() => setIsNavDropdownOpen(!isNavDropdownOpen)}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  className={`flex items-center px-3 py-2 rounded-md text-sm font-inter font-medium transition-colors ${
                     isScrolled ? 'text-gray-700 hover:text-company-lightpink' : 'text-white hover:bg-white hover:bg-opacity-20'
                   }`}
                   aria-expanded={isNavDropdownOpen}
@@ -225,7 +225,7 @@ const EnhancedNavbar: React.FC = () => {
                   More
                   <ChevronDown className={`ml-1 h-4 w-4 transition-transform ${isNavDropdownOpen ? 'rotate-180' : ''}`} />
                 </button>
-                
+
                 <AnimatePresence>
                   {isNavDropdownOpen && (
                     <motion.div
@@ -238,7 +238,7 @@ const EnhancedNavbar: React.FC = () => {
                       <div className="py-1" role="menu">
                         <Link
                           to="/estimates"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="flex items-center px-4 py-2 text-sm font-inter text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
                         >
                           <FileText className="mr-3 h-5 w-5 text-company-lightpink" />
@@ -246,7 +246,7 @@ const EnhancedNavbar: React.FC = () => {
                         </Link>
                         <Link
                           to="/warranty"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="flex items-center px-4 py-2 text-sm font-inter text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
                         >
                           <Shield className="mr-3 h-5 w-5 text-company-lightpink" />
@@ -254,7 +254,7 @@ const EnhancedNavbar: React.FC = () => {
                         </Link>
                         <Link
                           to="/community"
-                          className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                          className="flex items-center px-4 py-2 text-sm font-inter text-gray-700 hover:bg-gray-100"
                           onClick={() => setIsNavDropdownOpen(false)}
                         >
                           <MessageCircle className="mr-3 h-5 w-5 text-company-lightpink" />
@@ -271,7 +271,7 @@ const EnhancedNavbar: React.FC = () => {
           {/* Right side - user menu, notifications, etc. */}
           <div className="flex items-center">
             {/* Search button */}
-            <button 
+            <button
               className={`p-2 rounded-full ${
                 isScrolled ? 'text-gray-700 hover:bg-gray-100' : 'text-white hover:bg-white hover:bg-opacity-20'
               }`}
@@ -279,7 +279,7 @@ const EnhancedNavbar: React.FC = () => {
             >
               <Search className="h-5 w-5" />
             </button>
-            
+
             {/* User is logged in */}
             {user ? (
               <>
@@ -287,7 +287,7 @@ const EnhancedNavbar: React.FC = () => {
                 <div className="ml-4">
                   {isUsingLocalAuth() ? <MockNotificationBell /> : <NotificationBell />}
                 </div>
-                
+
                 {/* User dropdown */}
                 <div className="ml-4 relative" id="user-dropdown">
                   <button
@@ -303,7 +303,7 @@ const EnhancedNavbar: React.FC = () => {
                       <User className="h-5 w-5" />
                     </div>
                   </button>
-                  
+
                   <AnimatePresence>
                     {isUserDropdownOpen && (
                       <motion.div
@@ -343,7 +343,7 @@ const EnhancedNavbar: React.FC = () => {
                               My Dashboard
                             </Link>
                           )}
-                          
+
                           <Link
                             to="/settings/profile"
                             className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -352,7 +352,7 @@ const EnhancedNavbar: React.FC = () => {
                             <Settings className="mr-3 h-5 w-5 text-company-lightpink" />
                             Settings
                           </Link>
-                          
+
                           <button
                             onClick={() => {
                               setIsUserDropdownOpen(false);
@@ -374,9 +374,9 @@ const EnhancedNavbar: React.FC = () => {
               <div className="flex items-center ml-4 space-x-2">
                 <Link
                   to="/login"
-                  className={`px-3 py-2 rounded-md text-sm font-medium ${
-                    isScrolled 
-                      ? 'text-gray-700 hover:text-company-lightpink' 
+                  className={`px-3 py-2 rounded-md text-sm font-inter font-medium ${
+                    isScrolled
+                      ? 'text-gray-700 hover:text-company-lightpink'
                       : 'text-white hover:bg-white hover:bg-opacity-20'
                   }`}
                 >
@@ -384,9 +384,9 @@ const EnhancedNavbar: React.FC = () => {
                 </Link>
                 <Link
                   to="/register"
-                  className={`px-4 py-2 rounded-md text-sm font-medium ${
-                    isScrolled 
-                      ? 'bg-company-lightpink text-white hover:bg-company-lighterpink' 
+                  className={`px-4 py-2 rounded-md text-sm font-inter font-medium ${
+                    isScrolled
+                      ? 'bg-company-lightpink text-white hover:bg-company-lighterpink'
                       : 'bg-white text-company-lightpink hover:bg-opacity-90'
                   }`}
                 >
@@ -394,7 +394,7 @@ const EnhancedNavbar: React.FC = () => {
                 </Link>
               </div>
             )}
-            
+
             {/* Mobile menu button */}
             <div className="ml-4 md:hidden">
               <button
@@ -424,7 +424,7 @@ const EnhancedNavbar: React.FC = () => {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <Link
                 to="/"
-                className="flex items-center px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:bg-gray-100"
+                className="flex items-center px-3 py-2 rounded-md text-base font-inter font-medium text-gray-700 hover:bg-gray-100"
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 <Home className="h-5 w-5 mr-2 text-company-lightpink" />
@@ -446,7 +446,7 @@ const EnhancedNavbar: React.FC = () => {
                 <HelpCircle className="h-5 w-5 mr-2 text-company-lightpink" />
                 Help
               </Link>
-              
+
               {/* Additional mobile menu items */}
               <Link
                 to="/estimates"
@@ -472,7 +472,7 @@ const EnhancedNavbar: React.FC = () => {
                 <MessageCircle className="h-5 w-5 mr-2 text-company-lightpink" />
                 Community
               </Link>
-              
+
               {/* User-specific mobile menu items */}
               {user ? (
                 <>

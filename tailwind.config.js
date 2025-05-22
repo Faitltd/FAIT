@@ -3,6 +3,15 @@ module.exports = {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
     extend: {
+      fontFamily: {
+        'sans': ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'sans-serif'],
+        'serif': ['IvyPrestoHeadline', 'ui-serif', 'Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+        'display': ['Bricolage Grotesque', 'Inter', 'ui-sans-serif', 'system-ui'],
+        'ivy': ['IvyPrestoHeadline', 'serif'],
+        'inter': ['Inter', 'sans-serif'],
+        'bricolage': ['Bricolage Grotesque', 'sans-serif'],
+        'icomoon': ['icomoon', 'sans-serif'],
+      },
       colors: {
         'company': {
           'lightblue': '#3b82f6',  // Modern blue
