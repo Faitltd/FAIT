@@ -6,6 +6,8 @@ import { useAuth } from '../contexts/AuthContext';
 import ParallaxBackground from '../components/ParallaxBackground';
 import EnhancedServiceCard from '../components/services/EnhancedServiceCard';
 import ServiceCategoryNav from '../components/services/ServiceCategoryNav';
+import AdvancedSearchBar from '../components/search/AdvancedSearchBar';
+import CategoryBubbles from '../components/services/CategoryBubbles';
 import {
   Search,
   ArrowRight,
@@ -216,33 +218,20 @@ const EnhancedHomePage: React.FC = () => {
               From plumbing to painting, we've got you covered.
             </motion.p>
 
-            {/* Search Bar */}
-            <motion.form
-              className="mt-8 sm:flex"
-              onSubmit={handleSearch}
+            {/* Advanced Search Bar */}
+            <motion.div
+              className="mt-8 w-full max-w-2xl"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <div className="relative flex-grow">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="What service do you need?"
-                  className="block w-full pl-10 pr-3 py-4 border border-transparent rounded-l-md text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-company-lightpink focus:border-company-lightpink sm:text-sm"
-                />
-              </div>
-              <button
-                type="submit"
-                className="mt-3 sm:mt-0 w-full sm:w-auto flex items-center justify-center px-6 py-4 border border-transparent rounded-r-md shadow-sm text-base font-medium text-white bg-company-lightpink hover:bg-company-lighterpink focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-company-lightpink"
-              >
-                Search
-              </button>
-            </motion.form>
+              <AdvancedSearchBar
+                fullWidth
+                autoFocus
+                showAgentSearch
+                className="bg-white/10 backdrop-blur-sm p-4 rounded-lg shadow-lg"
+              />
+            </motion.div>
 
             {/* Trust Badges */}
             <motion.div

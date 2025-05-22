@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import EnhancedServiceCard from '../components/services/EnhancedServiceCard';
 import ServiceCategoryNav from '../components/services/ServiceCategoryNav';
+import AdvancedSearchBar from '../components/search/AdvancedSearchBar';
+import CategoryBubbles from '../components/services/CategoryBubbles';
 import {
   Search,
   Filter,
@@ -57,6 +60,14 @@ interface Category {
 const EnhancedServicesPage: React.FC = () => {
   const { user } = useAuth();
   const { scrollY } = useScroll();
+  const location = useLocation();
+
+  // Parse URL parameters
+  const queryParams = new URLSearchParams(location.search);
+  const searchParam = queryParams.get('search') || '';
+  const zipParam = queryParams.get('zip') || '';
+  const categoryParam = queryParams.get('category') || '';
+  const agentParam = queryParams.get('agent') === 'true';
 
   // Parallax effects
   const heroParallax = useTransform(scrollY, [0, 500], [0, 150]);
@@ -67,14 +78,15 @@ const EnhancedServicesPage: React.FC = () => {
   const [filteredServices, setFilteredServices] = useState<ServicePackage[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [zipCode, setZipCode] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParam);
+  const [zipCode, setZipCode] = useState(zipParam);
+  const [selectedCategory, setSelectedCategory] = useState(categoryParam);
   const [selectedSubcategory, setSelectedSubcategory] = useState('');
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 1000]);
   const [sortBy, setSortBy] = useState<'price_asc' | 'price_desc' | 'rating' | 'distance'>('rating');
   const [showFilters, setShowFilters] = useState(false);
   const [userZipCode, setUserZipCode] = useState<string | null>(null);
+  const [searchByAgent, setSearchByAgent] = useState(agentParam);
 
   // Categories with icons
   const categories: Category[] = [
@@ -228,23 +240,48 @@ const EnhancedServicesPage: React.FC = () => {
   const applyFilters = () => {
     let filtered = [...services];
 
-    // Apply search term filter
+    // Apply search term filter with enhanced keyword search
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(service =>
-        service.title.toLowerCase().includes(term) ||
-        service.description.toLowerCase().includes(term) ||
-        service.category.toLowerCase().includes(term) ||
-        (service.subcategory && service.subcategory.toLowerCase().includes(term))
-      );
+      const terms = searchTerm.toLowerCase().split(' ').filter(term => term.length > 1);
+
+      if (terms.length > 0) {
+        filtered = filtered.filter(service => {
+          // Create a combined text of all searchable fields
+          const searchableText = [
+            service.title,
+            service.description,
+            service.category,
+            service.subcategory,
+            service.service_agent.full_name,
+            // Add any other fields that should be searchable
+          ].filter(Boolean).join(' ').toLowerCase();
+
+          // Check if all terms are found in the searchable text
+          return terms.every(term => searchableText.includes(term));
+        });
+      }
     }
 
-    // Apply zip code filter
+    // Apply zip code filter with agent search
     if (zipCode) {
-      filtered = filtered.filter(service =>
-        service.service_agent.zip_code &&
-        service.service_agent.zip_code.substring(0, 3) === zipCode.substring(0, 3)
-      );
+      if (searchByAgent) {
+        // Search for agents near the user's location
+        filtered = filtered.filter(service => {
+          if (!service.service_agent.zip_code) return false;
+
+          // Check if first 3 digits match (same general area)
+          const agentZipPrefix = service.service_agent.zip_code.substring(0, 3);
+          const userZipPrefix = zipCode.substring(0, 3);
+
+          return agentZipPrefix === userZipPrefix;
+        });
+      } else {
+        // Standard zip code filter
+        filtered = filtered.filter(service =>
+          service.service_agent.zip_code &&
+          service.service_agent.zip_code.substring(0, 3) === zipCode.substring(0, 3)
+        );
+      }
     }
 
     // Apply category filter
@@ -346,39 +383,25 @@ const EnhancedServicesPage: React.FC = () => {
             Browse our wide selection of professional home services
           </motion.p>
 
-          {/* Search Bar */}
+          {/* Advanced Search Bar */}
           <motion.div
-            className="mt-8 w-full max-w-2xl"
+            className="mt-8 w-full max-w-3xl"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <div className="flex flex-col sm:flex-row gap-4">
-              <div className="relative flex-grow">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Search className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search services..."
-                  className="block w-full pl-10 pr-3 py-4 border border-transparent rounded-md shadow-lg focus:ring-2 focus:ring-company-lightpink focus:border-company-lightpink sm:text-sm"
-                />
-              </div>
-              <div className="relative sm:w-1/3">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <MapPin className="h-5 w-5 text-gray-400" />
-                </div>
-                <input
-                  type="text"
-                  value={zipCode}
-                  onChange={(e) => setZipCode(e.target.value)}
-                  placeholder="ZIP Code"
-                  className="block w-full pl-10 pr-3 py-4 border border-transparent rounded-md shadow-lg focus:ring-2 focus:ring-company-lightpink focus:border-company-lightpink sm:text-sm"
-                />
-              </div>
-            </div>
+            <AdvancedSearchBar
+              initialSearchTerm={searchTerm}
+              initialZipCode={zipCode}
+              onSearch={(term, zip, byAgent) => {
+                setSearchTerm(term);
+                setZipCode(zip);
+                setSearchByAgent(byAgent);
+              }}
+              fullWidth
+              showAgentSearch
+              className="bg-white/10 backdrop-blur-sm p-4 rounded-lg shadow-lg"
+            />
           </motion.div>
         </div>
       </div>

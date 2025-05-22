@@ -113,6 +113,40 @@ const ServiceCategoryNav: React.FC = () => {
 
   return (
     <div className="service-category-nav w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      {/* Category Bubbles at the top */}
+      <div className="mb-6">
+        <h3 className="text-lg font-medium text-gray-900 mb-4 font-ivy">Popular Categories</h3>
+        <div className="overflow-x-auto pb-4">
+          <div className="flex space-x-4">
+            {categories.map((category) => (
+              <motion.div
+                key={category.id}
+                className="flex-shrink-0 cursor-pointer"
+                whileHover={{ y: -5 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => handleCategoryClick(category.id)}
+              >
+                <div className="flex flex-col items-center">
+                  <div
+                    className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 ${
+                      activeCategory === category.id
+                        ? 'ring-4 ring-company-lightpink ring-offset-2'
+                        : ''
+                    } bg-gradient-to-br from-pink-100 to-blue-100`}
+                  >
+                    <span className="text-2xl">{category.icon}</span>
+                  </div>
+                  <span className="text-sm font-medium text-center whitespace-nowrap font-inter">
+                    {category.name}
+                  </span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {/* Category Buttons */}
       <div className="overflow-x-auto pb-4">
         <div className="flex space-x-2 md:space-x-4">
           {categories.map((category) => (
@@ -126,15 +160,15 @@ const ServiceCategoryNav: React.FC = () => {
               }`}
             >
               <div className="h-12 w-12 flex items-center justify-center relative">
-                <svg 
-                  fill="none" 
-                  height="50" 
-                  viewBox="0 0 60 50" 
+                <svg
+                  fill="none"
+                  height="50"
+                  viewBox="0 0 60 50"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  <path 
-                    d="M18.8962 5.27305C25.849 -1.46104 32.1704 -0.338692 34.462 1.06424C39.9101 1.06424 51.4547 1.90601 54.049 5.27305C57.2919 9.48186 55.3461 21.0561 58.589 25.8662C61.8319 30.6762 56.2542 38.4926 44.4501 46.4593C32.646 54.4259 13.8374 46.4593 9.81618 46.4593C5.79502 46.4593 1.51443 40.146 0.606422 32.1794C-0.301583 24.2127 4.7573 22.1083 9.81618 21.0561C14.8751 20.0039 10.2053 13.6907 18.8962 5.27305Z" 
-                    fill={activeCategory === category.id ? "rgba(186, 231, 255, 0.5)" : "none"} 
+                  <path
+                    d="M18.8962 5.27305C25.849 -1.46104 32.1704 -0.338692 34.462 1.06424C39.9101 1.06424 51.4547 1.90601 54.049 5.27305C57.2919 9.48186 55.3461 21.0561 58.589 25.8662C61.8319 30.6762 56.2542 38.4926 44.4501 46.4593C32.646 54.4259 13.8374 46.4593 9.81618 46.4593C5.79502 46.4593 1.51443 40.146 0.606422 32.1794C-0.301583 24.2127 4.7573 22.1083 9.81618 21.0561C14.8751 20.0039 10.2053 13.6907 18.8962 5.27305Z"
+                    fill={activeCategory === category.id ? "rgba(186, 231, 255, 0.5)" : "none"}
                   />
                 </svg>
                 <span className="absolute text-2xl">{category.icon}</span>
@@ -147,7 +181,7 @@ const ServiceCategoryNav: React.FC = () => {
         </div>
       </div>
 
-      <motion.div 
+      <motion.div
         className="mt-6 bg-gray-50 rounded-lg p-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -158,8 +192,8 @@ const ServiceCategoryNav: React.FC = () => {
           {activeSubcategories.map((subcategory) => (
             <div key={subcategory.id} className="p-4">
               <div className="hover:bg-gray-100 rounded-md transition-colors duration-200">
-                <Link 
-                  to={subcategory.url} 
+                <Link
+                  to={subcategory.url}
                   className="block p-3 text-gray-800 hover:text-company-lightpink font-inter"
                 >
                   {subcategory.name}
