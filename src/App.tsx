@@ -16,6 +16,12 @@ import EnhancedHomeWithAnimations from './pages/EnhancedHomeWithAnimations';
 import EnhancedAboutWithParallax from './pages/EnhancedAboutWithParallax';
 import EnhancedServicesWithParallax from './pages/EnhancedServicesWithParallax';
 import FAITLocal from './pages/FAITLocal';
+import EnhancedHomePage from './pages/EnhancedHomePage';
+import EnhancedServicesPage from './pages/EnhancedServicesPage';
+import HelpPage from './pages/HelpPage';
+import EnhancedLoginForm from './components/auth/EnhancedLoginForm';
+import ServiceDetailPage from './pages/ServiceDetailPage';
+import ServiceRequestWizard from './pages/ServiceRequestWizard';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import DirectBypass from './pages/DirectBypass';
@@ -266,12 +272,13 @@ const Layout = () => (
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route element={<Layout />} errorElement={<CommonErrorBoundary />}>
-      <Route path="/" element={<MainLayout currentPage="home"><EnhancedHomeWithAnimations /></MainLayout>} />
-      <Route path="/home/original" element={<MainLayout currentPage="home"><EnhancedHome /></MainLayout>} />
+      <Route path="/" element={<MainLayout currentPage="home"><EnhancedHomePage /></MainLayout>} />
+      <Route path="/home/original" element={<MainLayout currentPage="home"><EnhancedHomeWithAnimations /></MainLayout>} />
       <Route path="/enhanced-about" element={<MainLayout currentPage="about"><EnhancedAboutWithParallax /></MainLayout>} />
-      <Route path="/enhanced-services" element={<MainLayout currentPage="services"><EnhancedServicesWithParallax /></MainLayout>} />
+      <Route path="/enhanced-services" element={<MainLayout currentPage="services"><EnhancedServicesPage /></MainLayout>} />
       <Route path="/local" element={<MainLayout currentPage="local"><FAITLocal /></MainLayout>} />
-      <Route path="/login" element={<MainLayout currentPage="login"><React.Suspense fallback={<LoadingSpinner />}><UnifiedLoginPage /></React.Suspense></MainLayout>} />
+      <Route path="/login" element={<MainLayout currentPage="login"><React.Suspense fallback={<LoadingSpinner />}><EnhancedLoginForm /></React.Suspense></MainLayout>} />
+      <Route path="/help" element={<MainLayout currentPage="help"><HelpPage /></MainLayout>} />
       <Route path="/direct-bypass" element={<DirectBypass />} />
       <Route path="/standalone-service-agent" element={<StandaloneServiceAgent />} />
       <Route path="/bypass-login" element={<BypassLoginPage />} />
@@ -287,6 +294,8 @@ const router = createBrowserRouter(
       <Route path="/services/search" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><EnhancedServiceSearchPage /></MainLayout></Suspense>} />
       <Route path="/services/:serviceId/reviews" element={<Suspense fallback={<LoadingSpinner />}><ServiceReviews /></Suspense>} />
       <Route path="/service-agent/:serviceAgentId/reviews" element={<Suspense fallback={<LoadingSpinner />}><ServiceAgentReviewsPage /></Suspense>} />
+      <Route path="/services/:serviceId" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><ServiceDetailPage /></MainLayout></Suspense>} />
+      <Route path="/service-request/:serviceId" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><ServiceRequestWizard /></MainLayout></Suspense>} />
       <Route path="/unauthorized" element={<UnauthorizedPage />} />
       {/* Test routes */}
       <Route path="/test/booking/:serviceId?" element={<BookingTest />} />

@@ -5,24 +5,24 @@ module.exports = {
     extend: {
       colors: {
         'company': {
-          'lightblue': '#c0e2ff',
-          'lightpink': '#fd67a3',
-          'lighterpink': '#fe86ec',
-          'lightorange': '#ff9d7d',
+          'lightblue': '#3b82f6',  // Modern blue
+          'lightpink': '#ec4899',  // Modern pink
+          'lighterpink': '#f472b6', // Lighter pink
+          'lightorange': '#f97316', // Modern orange
         },
         // Override blue colors with company light blue
         'blue': {
           '50': '#f0f9ff',
           '100': '#e0f2fe',
-          '200': '#c0e2ff', // Company light blue
-          '300': '#a5d3fc',
-          '400': '#8bc5f9',
-          '500': '#fd67a3', // Company light pink
-          '600': '#fe86ec', // Company lighter pink
-          '700': '#ff9d7d', // Company light orange
-          '800': '#1e40af',
-          '900': '#1e3a8a',
-          '950': '#172554',
+          '200': '#bae6fd',
+          '300': '#7dd3fc',
+          '400': '#38bdf8',
+          '500': '#0ea5e9',
+          '600': '#0284c7',
+          '700': '#0369a1',
+          '800': '#075985',
+          '900': '#0c4a6e',
+          '950': '#082f49',
         },
       },
     },
