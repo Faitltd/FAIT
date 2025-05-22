@@ -1,16 +1,12 @@
-name: Deploy FAIT Coop Main Site
+name: Deploy FAIT Coop Enhanced Site
 
 on:
   push:
     branches:
       - main
     paths-ignore:
-      - 'geargrab/**'
-      - 'tools/**'
-      - 'scrapers/**'
-      - '.github/workflows/deploy-geargrab.yml'
-      - '.github/workflows/deploy-scrapers.yml'
-      - '.github/workflows/deploy-utilities.yml'
+      - '**.md'
+      - 'docs/**'
 
 jobs:
   deploy:

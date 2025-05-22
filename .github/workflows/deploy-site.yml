@@ -1,4 +1,4 @@
-name: Deploy FAIT Coop Site
+name: Deploy FAIT Coop Enhanced Site
 
 on:
   push:

@@ -21,15 +21,15 @@ ARG BUILD_ENV=production
 
 # Create a default .env file with the appropriate configuration
 RUN if [ "$BUILD_ENV" = "production" ]; then \
-      echo "# Production Environment Configuration\nVITE_APP_VERSION=full\nVITE_API_URL=https://api.fait-coop.com\nVITE_SITE_URL=https://fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
+      echo "# Production Environment Configuration\nVITE_APP_VERSION=enhanced\nVITE_API_URL=https://api.fait-coop.com\nVITE_SITE_URL=https://fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
     elif [ "$BUILD_ENV" = "staging" ]; then \
-      echo "# Staging Environment Configuration\nVITE_APP_VERSION=full\nVITE_API_URL=https://staging-api.fait-coop.com\nVITE_SITE_URL=https://staging.fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
+      echo "# Staging Environment Configuration\nVITE_APP_VERSION=enhanced\nVITE_API_URL=https://staging-api.fait-coop.com\nVITE_SITE_URL=https://staging.fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
     else \
-      echo "# Development Environment Configuration\nVITE_APP_VERSION=full\nVITE_API_URL=http://localhost:8000\nVITE_SITE_URL=http://localhost:5173\nVITE_ENABLE_ANALYTICS=false\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=false" > .env; \
+      echo "# Development Environment Configuration\nVITE_APP_VERSION=enhanced\nVITE_API_URL=http://localhost:8000\nVITE_SITE_URL=http://localhost:5173\nVITE_ENABLE_ANALYTICS=false\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=false" > .env; \
     fi
 
-# Build the full version of the application
-RUN npm run build:full
+# Build the enhanced version of the application
+RUN npm run build:enhanced
 
 # Production stage - create the final image
 FROM --platform=linux/amd64 node:20.12.1-alpine3.19 AS runner

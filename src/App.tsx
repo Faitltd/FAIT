@@ -288,7 +288,7 @@ const router = createBrowserRouter(
       <Route path="/register" element={<MainLayout currentPage="register"><Register /></MainLayout>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      <Route path="/services" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><ImprovedServicePackages /></MainLayout></Suspense>} />
+      <Route path="/services" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><EnhancedServicesPage /></MainLayout></Suspense>} />
       <Route path="/services/debug" element={<Suspense fallback={<LoadingSpinner />}><DebugServicePackages /></Suspense>} />
       <Route path="/services/debug-test" element={<TestDebugPage />} />
       <Route path="/services/search" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><EnhancedServiceSearchPage /></MainLayout></Suspense>} />
