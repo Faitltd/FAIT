@@ -1,7 +1,7 @@
 # Multi-stage build for optimized production image
 
 # Base stage for shared settings
-FROM node:20.12.1-alpine3.19 AS base
+FROM --platform=linux/amd64 node:20.12.1-alpine3.19 AS base
 WORKDIR /app
 
 # Dependencies stage - install all dependencies including dev dependencies
@@ -19,40 +19,29 @@ RUN rm -rf geargrab tools scrapers
 # Set build arguments with defaults
 ARG BUILD_ENV=production
 
-# Copy the appropriate .env file based on the build environment
-COPY .env.${BUILD_ENV} .env
+# Create a default .env file with the appropriate configuration
+RUN if [ "$BUILD_ENV" = "production" ]; then \
+      echo "# Production Environment Configuration\nVITE_APP_VERSION=full\nVITE_API_URL=https://api.fait-coop.com\nVITE_SITE_URL=https://fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
+    elif [ "$BUILD_ENV" = "staging" ]; then \
+      echo "# Staging Environment Configuration\nVITE_APP_VERSION=full\nVITE_API_URL=https://staging-api.fait-coop.com\nVITE_SITE_URL=https://staging.fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
+    else \
+      echo "# Development Environment Configuration\nVITE_APP_VERSION=full\nVITE_API_URL=http://localhost:8000\nVITE_SITE_URL=http://localhost:5173\nVITE_ENABLE_ANALYTICS=false\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=false" > .env; \
+    fi
 
 # Build the full version of the application
 RUN npm run build:full
 
 # Production stage - create the final image
-FROM node:20.12.1-alpine3.19 AS runner
+FROM --platform=linux/amd64 node:20.12.1-alpine3.19 AS runner
 WORKDIR /app
 
 # Set to production environment
 ENV NODE_ENV=production
 
-# Copy only the built files and package.json from the builder stage
+# Copy only the built files, package.json, and server.js from the builder stage
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/package.json ./
-
-# Install express and compression for a more reliable server
-RUN npm install express compression
-
-# Create the server file
-RUN echo 'const express = require("express");' > server.js && \
-    echo 'const path = require("path");' >> server.js && \
-    echo 'const compression = require("compression");' >> server.js && \
-    echo 'const app = express();' >> server.js && \
-    echo 'const PORT = process.env.PORT || 8080;' >> server.js && \
-    echo 'app.use(compression());' >> server.js && \
-    echo 'app.use(express.static(path.join(__dirname, "dist")));' >> server.js && \
-    echo 'app.get("*", (req, res) => {' >> server.js && \
-    echo '  res.sendFile(path.join(__dirname, "dist", "index.html"));' >> server.js && \
-    echo '});' >> server.js && \
-    echo 'app.listen(PORT, () => {' >> server.js && \
-    echo '  console.log(`Server is running on port ${PORT}`);' >> server.js && \
-    echo '});' >> server.js
+COPY server.js ./
 
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs

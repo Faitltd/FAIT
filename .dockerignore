@@ -74,3 +74,8 @@ backups/
 *.tar
 *.zip
 *.rar
+
+# Geargrab components (as per project requirements)
+**/geargrab*
+**/tools
+**/scrapers
