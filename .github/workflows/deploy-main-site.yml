@@ -47,9 +47,9 @@ jobs:
           fi
 
           # Build and push the Docker image with the appropriate environment
-          docker build --build-arg BUILD_ENV=$BUILD_ENV -t gcr.io/fait-444705/fait-coop-main:$IMAGE_TAG -t gcr.io/fait-444705/fait-coop-main:latest .
-          docker push gcr.io/fait-444705/fait-coop-main:$IMAGE_TAG
-          docker push gcr.io/fait-444705/fait-coop-main:latest
+          docker build --build-arg BUILD_ENV=$BUILD_ENV -t gcr.io/fait-444705/fait-coop-enhanced:$IMAGE_TAG -t gcr.io/fait-444705/fait-coop-enhanced:latest .
+          docker push gcr.io/fait-444705/fait-coop-enhanced:$IMAGE_TAG
+          docker push gcr.io/fait-444705/fait-coop-enhanced:latest
 
       - name: Deploy to Cloud Run
         run: |
@@ -57,7 +57,7 @@ jobs:
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
             BUILD_ENV=production
             IMAGE_TAG=prod-${{ github.sha }}
-            SERVICE_NAME=fait-coop-main
+            SERVICE_NAME=fait-coop-enhanced
             MIN_INSTANCES=1
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             BUILD_ENV=staging
@@ -73,7 +73,7 @@ jobs:
 
           # Deploy to Cloud Run
           gcloud run deploy $SERVICE_NAME \
-            --image gcr.io/fait-444705/fait-coop-main:$IMAGE_TAG \
+            --image gcr.io/fait-444705/fait-coop-enhanced:$IMAGE_TAG \
             --platform managed \
             --region us-central1 \
             --allow-unauthenticated \
@@ -94,7 +94,7 @@ jobs:
         run: |
           # Determine service name based on branch
           if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-            SERVICE_NAME=fait-coop-main
+            SERVICE_NAME=fait-coop-enhanced
             TARGET=fait-coop-react
           elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
             SERVICE_NAME=fait-coop-staging

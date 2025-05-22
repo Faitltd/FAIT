@@ -40,7 +40,7 @@ jobs:
 
       - name: Deploy to Cloud Run
         run: |
-          gcloud run deploy fait-coop-site \
+          gcloud run deploy fait-coop-enhanced \
             --image us-central1-docker.pkg.dev/fait-coop-site/fait-coop-site-repo/site:${{ github.sha }} \
             --platform managed \
             --region us-central1 \
