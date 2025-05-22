@@ -113,11 +113,11 @@ const ServiceCategoryNav: React.FC = () => {
 
   return (
     <div className="service-category-nav w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-      {/* Category Bubbles at the top */}
+      {/* Category Bubbles at the top - FAIT Style */}
       <div className="mb-6">
-        <h3 className="text-lg font-medium text-gray-900 mb-4 font-ivy">Popular Categories</h3>
+        <h3 className="text-lg font-medium text-[#2B4C32] mb-4 font-ivy">Popular Categories</h3>
         <div className="overflow-x-auto pb-4">
-          <div className="flex space-x-4">
+          <div className="flex space-x-6 py-2">
             {categories.map((category) => (
               <motion.div
                 key={category.id}
@@ -128,17 +128,20 @@ const ServiceCategoryNav: React.FC = () => {
               >
                 <div className="flex flex-col items-center">
                   <div
-                    className={`w-16 h-16 rounded-full flex items-center justify-center mb-2 ${
+                    className={`w-16 h-16 md:w-20 md:h-20 rounded-full flex items-center justify-center mb-2 ${
                       activeCategory === category.id
-                        ? 'ring-4 ring-company-lightpink ring-offset-2'
+                        ? 'ring-4 ring-[#0D7A5F] ring-offset-2'
                         : ''
-                    } bg-gradient-to-br from-pink-100 to-blue-100`}
+                    } bg-gradient-to-br from-[#BAE7FF]/50 to-[#F0F9FF]/50`}
                   >
-                    <span className="text-2xl">{category.icon}</span>
+                    <span className="text-2xl text-[#066599]">{category.icon}</span>
                   </div>
-                  <span className="text-sm font-medium text-center whitespace-nowrap font-inter">
+                  <span className="text-sm font-medium text-center whitespace-nowrap text-[#1A1E1D]">
                     {category.name}
                   </span>
+                  {activeCategory === category.id && (
+                    <div className="h-[2px] w-10 bg-[#066599] mt-1.5 rounded-full"></div>
+                  )}
                 </div>
               </motion.div>
             ))}
@@ -146,17 +149,17 @@ const ServiceCategoryNav: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Buttons */}
+      {/* Category Buttons - FAIT Style */}
       <div className="overflow-x-auto pb-4">
-        <div className="flex space-x-2 md:space-x-4">
+        <div className="flex space-x-3 md:space-x-5">
           {categories.map((category) => (
             <button
               key={category.id}
               onClick={() => handleCategoryClick(category.id)}
               className={`flex flex-col items-center justify-center min-w-[120px] md:min-w-[150px] px-4 py-3 rounded-full border-2 transition-all duration-300 ${
                 activeCategory === category.id
-                  ? 'border-company-lightpink bg-pink-50'
-                  : 'border-gray-300 hover:border-gray-400'
+                  ? 'border-[#0D7A5F] bg-[#F0F9FF]'
+                  : 'border-[#E5E7EB] hover:border-[#D1D5DB]'
               }`}
             >
               <div className="h-12 w-12 flex items-center justify-center relative">
@@ -173,7 +176,7 @@ const ServiceCategoryNav: React.FC = () => {
                 </svg>
                 <span className="absolute text-2xl">{category.icon}</span>
               </div>
-              <label className="mt-2 text-sm font-medium font-inter text-gray-800">
+              <label className="mt-2 text-sm font-medium font-inter text-[#1A1E1D]">
                 {category.name}
               </label>
             </button>
@@ -182,7 +185,7 @@ const ServiceCategoryNav: React.FC = () => {
       </div>
 
       <motion.div
-        className="mt-6 bg-gray-50 rounded-lg p-4"
+        className="mt-6 bg-[#F9FAFB] rounded-lg p-4 border border-[#E5E7EB]"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
@@ -190,11 +193,11 @@ const ServiceCategoryNav: React.FC = () => {
       >
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {activeSubcategories.map((subcategory) => (
-            <div key={subcategory.id} className="p-4">
-              <div className="hover:bg-gray-100 rounded-md transition-colors duration-200">
+            <div key={subcategory.id} className="p-2">
+              <div className="hover:bg-[#F0F9FF] rounded-md transition-colors duration-200">
                 <Link
                   to={subcategory.url}
-                  className="block p-3 text-gray-800 hover:text-company-lightpink font-inter"
+                  className="block p-3 text-[#1A1E1D] hover:text-[#0D7A5F] font-inter"
                 >
                   {subcategory.name}
                 </Link>

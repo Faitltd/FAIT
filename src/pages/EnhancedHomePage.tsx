@@ -188,28 +188,47 @@ const EnhancedHomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section with Parallax */}
-      <ParallaxBackground
-        imageUrl="/images/hero-background.jpg"
-        overlayColor="linear-gradient(to right, rgba(59, 130, 246, 0.8), rgba(236, 72, 153, 0.8), rgba(249, 115, 22, 0.8))"
-        height="90vh"
-        className="flex items-center"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-white">
-          <div className="max-w-3xl">
-            <motion.h1
-              className="text-5xl sm:text-6xl font-extrabold leading-tight"
+      {/* Hero Section with Parallax - FAIT Style */}
+      <div className="relative min-h-[90vh] bg-[#F9FAFB] overflow-hidden">
+        <ParallaxBackground
+          imageUrl="/images/hero-background.jpg"
+          overlayColor="linear-gradient(to right, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.9))"
+          height="90vh"
+          className="flex items-center"
+        />
+
+        {/* Decorative Images with Parallax */}
+        <motion.img
+          src="/images/decoration-1.png"
+          alt=""
+          className="absolute bottom-[80%] right-[10%] h-[262px] w-[446px] z-0 hidden md:block"
+          style={{ y: useTransform(scrollY, [0, 500], [0, 100]) }}
+        />
+
+        <motion.img
+          src="/images/decoration-2.png"
+          alt=""
+          className="absolute top-[10%] left-[5%] h-[462px] w-[146px] z-0 hidden md:block"
+          style={{ y: useTransform(scrollY, [0, 500], [0, -50]) }}
+        />
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+          <div className="flex flex-col items-center text-center">
+            <motion.div
+              className="mb-12"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
             >
-              Home Services,
-              <br />
-              <span className="text-white/90">Done Right</span>
-            </motion.h1>
+              <h1 className="text-5xl sm:text-6xl font-extrabold leading-tight text-[#2B4C32] font-ivy">
+                Home Services,
+                <br />
+                <span className="text-[#2B4C32]">Done Right</span>
+              </h1>
+            </motion.div>
 
             <motion.p
-              className="mt-6 text-xl text-white/90 max-w-2xl"
+              className="mt-6 text-xl text-[#1A1E1D] max-w-2xl mb-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.2 }}
@@ -218,44 +237,48 @@ const EnhancedHomePage: React.FC = () => {
               From plumbing to painting, we've got you covered.
             </motion.p>
 
-            {/* Advanced Search Bar */}
+            {/* Advanced Search Bar - FAIT Style */}
             <motion.div
-              className="mt-8 w-full max-w-2xl"
+              className="h-[64px] max-w-[646px] w-full px-2 mt-8"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
             >
-              <AdvancedSearchBar
-                fullWidth
-                autoFocus
-                showAgentSearch
-                className="bg-white/10 backdrop-blur-sm p-4 rounded-lg shadow-lg"
-              />
+              <div className="flex flex-col h-full w-full relative">
+                <div className="flex h-[64px] w-full">
+                  <AdvancedSearchBar
+                    fullWidth
+                    autoFocus
+                    showAgentSearch
+                    className="rounded-full border-2 border-[#595C5B] shadow-lg"
+                  />
+                </div>
+              </div>
             </motion.div>
 
-            {/* Trust Badges */}
+            {/* Trust Badges - FAIT Style */}
             <motion.div
-              className="mt-10 flex flex-wrap gap-6"
+              className="mt-10 flex flex-wrap gap-6 justify-center"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.6 }}
             >
               <div className="flex items-center">
-                <CheckCircle className="h-6 w-6 mr-2" />
-                <span className="text-sm font-medium">Verified Professionals</span>
+                <CheckCircle className="h-6 w-6 mr-2 text-[#0D7A5F]" />
+                <span className="text-sm font-medium text-[#2B4C32]">Verified Professionals</span>
               </div>
               <div className="flex items-center">
-                <Shield className="h-6 w-6 mr-2" />
-                <span className="text-sm font-medium">Satisfaction Guaranteed</span>
+                <Shield className="h-6 w-6 mr-2 text-[#0D7A5F]" />
+                <span className="text-sm font-medium text-[#2B4C32]">Satisfaction Guaranteed</span>
               </div>
               <div className="flex items-center">
-                <Star className="h-6 w-6 mr-2" />
-                <span className="text-sm font-medium">Highly Rated Services</span>
+                <Star className="h-6 w-6 mr-2 text-[#0D7A5F]" />
+                <span className="text-sm font-medium text-[#2B4C32]">Highly Rated Services</span>
               </div>
             </motion.div>
           </div>
         </div>
-      </ParallaxBackground>
+      </div>
 
       {/* Service Categories */}
       <div className="py-20 bg-white">

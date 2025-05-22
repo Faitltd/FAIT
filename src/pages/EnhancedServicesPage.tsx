@@ -349,8 +349,8 @@ const EnhancedServicesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen pt-16 bg-gray-50">
-      {/* Hero Section with Parallax */}
-      <div className="relative h-80 overflow-hidden">
+      {/* Hero Section with Parallax - FAIT Style */}
+      <div className="relative h-80 overflow-hidden bg-[#F9FAFB]">
         {/* Parallax Background */}
         <motion.div
           className="absolute inset-0 bg-cover bg-center z-0"
@@ -358,16 +358,30 @@ const EnhancedServicesPage: React.FC = () => {
             backgroundImage: 'url(/images/services-hero.jpg)',
             y: heroParallax,
             height: '120%',
-            top: '-10%'
+            top: '-10%',
+            opacity: 0.1
           }}
-        >
-          <div className="absolute inset-0 bg-gradient-to-r from-company-lightblue/80 via-company-lightpink/80 to-company-lightorange/80"></div>
-        </motion.div>
+        />
+
+        {/* Decorative Images with Parallax */}
+        <motion.img
+          src="/images/decoration-1.png"
+          alt=""
+          className="absolute bottom-[80%] right-[10%] h-[262px] w-[446px] z-0 hidden md:block"
+          style={{ y: useTransform(scrollY, [0, 500], [0, 100]) }}
+        />
+
+        <motion.img
+          src="/images/decoration-2.png"
+          alt=""
+          className="absolute top-[10%] left-[5%] h-[462px] w-[146px] z-0 hidden md:block"
+          style={{ y: useTransform(scrollY, [0, 500], [0, -50]) }}
+        />
 
         {/* Content */}
-        <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8 text-white">
+        <div className="relative z-10 h-full flex flex-col items-center justify-center px-4 sm:px-6 lg:px-8">
           <motion.h1
-            className="text-4xl font-extrabold sm:text-5xl text-center"
+            className="text-4xl font-extrabold sm:text-5xl text-center text-[#2B4C32] font-ivy"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
@@ -375,7 +389,7 @@ const EnhancedServicesPage: React.FC = () => {
             Find the Perfect Service
           </motion.h1>
           <motion.p
-            className="mt-4 text-xl max-w-2xl text-center"
+            className="mt-4 text-xl max-w-2xl text-center text-[#1A1E1D]"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 0.2 }}
@@ -383,25 +397,29 @@ const EnhancedServicesPage: React.FC = () => {
             Browse our wide selection of professional home services
           </motion.p>
 
-          {/* Advanced Search Bar */}
+          {/* Advanced Search Bar - FAIT Style */}
           <motion.div
-            className="mt-8 w-full max-w-3xl"
+            className="h-[64px] max-w-[646px] w-full px-2 mt-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.4 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
           >
-            <AdvancedSearchBar
-              initialSearchTerm={searchTerm}
-              initialZipCode={zipCode}
-              onSearch={(term, zip, byAgent) => {
-                setSearchTerm(term);
-                setZipCode(zip);
-                setSearchByAgent(byAgent);
-              }}
-              fullWidth
-              showAgentSearch
-              className="bg-white/10 backdrop-blur-sm p-4 rounded-lg shadow-lg"
-            />
+            <div className="flex flex-col h-full w-full relative">
+              <div className="flex h-[64px] w-full">
+                <AdvancedSearchBar
+                  initialSearchTerm={searchTerm}
+                  initialZipCode={zipCode}
+                  onSearch={(term, zip, byAgent) => {
+                    setSearchTerm(term);
+                    setZipCode(zip);
+                    setSearchByAgent(byAgent);
+                  }}
+                  fullWidth
+                  showAgentSearch
+                  className="rounded-full border-2 border-[#595C5B] shadow-lg"
+                />
+              </div>
+            </div>
           </motion.div>
         </div>
       </div>
