@@ -288,6 +288,7 @@ const router = createBrowserRouter(
       <Route path="/register" element={<MainLayout currentPage="register"><Register /></MainLayout>} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      {/* Updated route to fix white screen issue */}
       <Route path="/services" element={<Suspense fallback={<LoadingSpinner />}><MainLayout currentPage="services"><EnhancedServicesPage /></MainLayout></Suspense>} />
       <Route path="/services/debug" element={<Suspense fallback={<LoadingSpinner />}><DebugServicePackages /></Suspense>} />
       <Route path="/services/debug-test" element={<TestDebugPage />} />
