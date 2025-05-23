@@ -1,15 +1,6 @@
-@import 'tailwindcss';
-
-@plugin '@tailwindcss/forms';
-@plugin '@tailwindcss/typography';
-@plugin '@tailwindcss/container-queries';
-
-@theme {
-	--font-sans: 'Inter Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-		'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
-	--breakpoint-xs: 475px;
-	--breakpoint-3xl: 1920px;
-}
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 @layer base {
 	/* inter-latin-wght-normal */
@@ -66,7 +57,7 @@
 	}
 
 	.container-xl {
-		@apply w-full max-w-7xl mx-auto px-4;
+		@apply w-full max-w-6xl mx-auto px-4;
 	}
 }
 

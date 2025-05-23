@@ -1,6 +1,4 @@
 <script lang="ts">
-	import * as m from '$lib/paraglide/messages.js';
-	import LocaleSwitcher from '$components/locale-switcher.svelte';
 	import { onMount } from 'svelte';
 
 	let scrolled = false;
@@ -56,7 +54,11 @@
 
 		<!-- Language Switcher -->
 		<div class="hidden md:block">
-			<LocaleSwitcher />
+			<div class="flex space-x-2">
+				<button class="text-sm text-gray-600 hover:text-blue-600">EN</button>
+				<span class="text-gray-400">|</span>
+				<button class="text-sm text-gray-600 hover:text-blue-600">ES</button>
+			</div>
 		</div>
 	</div>
 
@@ -72,7 +74,11 @@
 					<a href="/signup" class="btn btn-primary w-full">Sign Up</a>
 				</div>
 				<div class="pt-2">
-					<LocaleSwitcher />
+					<div class="flex space-x-2">
+						<button class="text-sm text-gray-600 hover:text-blue-600">EN</button>
+						<span class="text-gray-400">|</span>
+						<button class="text-sm text-gray-600 hover:text-blue-600">ES</button>
+					</div>
 				</div>
 			</div>
 		</div>

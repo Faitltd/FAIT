@@ -73,11 +73,12 @@
     const handleScroll = () => {
       const scrolled = window.pageYOffset;
       const parallaxElements = document.querySelectorAll('.parallax');
-      
+
       parallaxElements.forEach((element) => {
-        const speed = element.dataset.speed || 0.5;
+        const htmlElement = element as HTMLElement;
+        const speed = parseFloat(htmlElement.dataset.speed || '0.5');
         const yPos = -(scrolled * speed);
-        element.style.transform = `translateY(${yPos}px)`;
+        htmlElement.style.transform = `translateY(${yPos}px)`;
       });
 
       // Fade in animations
@@ -85,7 +86,7 @@
       fadeElements.forEach((element) => {
         const elementTop = element.getBoundingClientRect().top;
         const elementVisible = 150;
-        
+
         if (elementTop < window.innerHeight - elementVisible) {
           element.classList.add('active');
         }
@@ -104,7 +105,7 @@
     <div class="absolute top-20 left-10 w-72 h-72 bg-fait-green/5 rounded-full blur-3xl"></div>
     <div class="absolute bottom-20 right-10 w-96 h-96 bg-fait-green/3 rounded-full blur-3xl"></div>
   </div>
-  
+
   <div class="section-container relative z-10">
     <div class="flex flex-col md:flex-row items-center gap-16">
       <div class="flex-1 fade-in">
@@ -117,7 +118,7 @@
         <h2 class="text-4xl md:text-6xl font-ivy font-bold text-fait-green-dark mb-10 leading-tight">
           for home tasks
         </h2>
-        
+
         <form class="flex w-full max-w-2xl mb-8 shadow-lg">
           <input
             type="text"
@@ -131,11 +132,11 @@
             Search
           </button>
         </form>
-        
+
         <div class="flex flex-wrap gap-3">
           {#each categories as cat}
-            <a 
-              href={cat.href} 
+            <a
+              href={cat.href}
               class="px-6 py-3 rounded-full border-2 border-fait-green/20 text-fait-green-dark font-medium bg-white/80 backdrop-blur-sm hover:bg-fait-green hover:text-white hover:border-fait-green transition-all duration-300 transform hover:scale-105"
             >
               {cat.label}
@@ -143,7 +144,7 @@
           {/each}
         </div>
       </div>
-      
+
       <div class="flex-1 flex justify-center fade-in">
         <div class="relative">
           <img
@@ -179,18 +180,18 @@
         Discover the services our community loves most
       </p>
     </div>
-    
+
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
       {#each popularProjects as project, i}
-        <a 
-          href={project.link} 
+        <a
+          href={project.link}
           class="group block rounded-3xl overflow-hidden shadow-lg bg-white hover:shadow-2xl transition-all duration-500 transform hover:-translate-y-2 fade-in"
           style="animation-delay: {i * 100}ms"
         >
           <div class="relative overflow-hidden">
-            <img 
-              src={project.image} 
-              alt={project.alt} 
+            <img
+              src={project.image}
+              alt={project.alt}
               class="w-full h-56 object-cover group-hover:scale-110 transition-transform duration-500"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
@@ -228,7 +229,7 @@
     <div class="absolute top-0 left-1/4 w-64 h-64 bg-fait-green/5 rounded-full blur-3xl"></div>
     <div class="absolute bottom-0 right-1/4 w-80 h-80 bg-fait-green/3 rounded-full blur-3xl"></div>
   </div>
-  
+
   <div class="section-container relative z-10">
     <div class="grid grid-cols-2 md:grid-cols-5 gap-8 text-center fade-in">
       {#each stats as stat, i}
@@ -247,7 +248,7 @@
     <div class="absolute top-1/4 -left-20 w-96 h-96 bg-fait-green/3 rounded-full blur-3xl"></div>
     <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-fait-green/5 rounded-full blur-3xl"></div>
   </div>
-  
+
   <div class="section-container relative z-10">
     <div class="text-center mb-20 max-w-4xl mx-auto fade-in">
       <div class="inline-block px-4 py-2 rounded-full bg-fait-green/10 text-fait-green text-sm font-semibold mb-6">
@@ -258,7 +259,7 @@
         Hear from our satisfied clients and service providers about their experiences with FAIT.
       </p>
     </div>
-    
+
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
       {#each testimonials as t, i}
         <div class="bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-10 flex flex-col transform hover:scale-105 transition-all duration-500 fade-in" style="animation-delay: {i * 200}ms">
@@ -290,7 +291,7 @@
         Get help in three simple steps
       </p>
     </div>
-    
+
     <div class="flex flex-col lg:flex-row justify-center gap-16 max-w-6xl mx-auto">
       {#each [
         { step: '1', title: 'Choose a Pro', desc: 'Browse by price, skills, and reviews to find the right person for your task.' },
@@ -320,7 +321,7 @@
     <div class="absolute top-20 left-20 w-96 h-96 bg-white/5 rounded-full blur-3xl"></div>
     <div class="absolute bottom-20 right-20 w-80 h-80 bg-white/3 rounded-full blur-3xl"></div>
   </div>
-  
+
   <div class="section-container text-center relative z-10">
     <div class="max-w-4xl mx-auto fade-in">
       <h2 class="text-4xl md:text-6xl font-ivy font-bold mb-8">Ready to get started?</h2>
@@ -328,14 +329,14 @@
         Join FAIT today and experience a better way to get things done. Whether you need help or want to offer your skills, we're here for you.
       </p>
       <div class="flex flex-col sm:flex-row justify-center gap-6">
-        <a 
-          href="/register" 
+        <a
+          href="/register"
           class="px-10 py-5 rounded-full bg-white text-fait-green font-bold text-lg shadow-lg hover:bg-fait-green-light hover:text-fait-green-dark transition-all duration-300 transform hover:scale-105"
         >
           Sign Up
         </a>
-        <a 
-          href="/services" 
+        <a
+          href="/services"
           class="px-10 py-5 rounded-full border-2 border-white text-white font-bold text-lg shadow-lg hover:bg-white hover:text-fait-green transition-all duration-300 transform hover:scale-105"
         >
           Browse Services
@@ -368,7 +369,7 @@
           </a>
         </div>
       </div>
-      
+
       <!-- Quick Links -->
       <div>
         <h4 class="text-xl font-bold mb-6">Quick Links</h4>
@@ -381,7 +382,7 @@
           <li><a href="/terms" class="text-gray-300 hover:text-white transition-colors text-lg">Terms of Service</a></li>
         </ul>
       </div>
-      
+
       <!-- Contact Info -->
       <div>
         <h4 class="text-xl font-bold mb-6">Contact</h4>
@@ -401,48 +402,11 @@
         </ul>
       </div>
     </div>
-    
+
     <div class="mt-12 pt-8 border-t border-gray-700 text-center text-gray-400">
       <p class="text-lg">&copy; {new Date().getFullYear()} FAIT Cooperative. All rights reserved.</p>
     </div>
   </div>
 </footer>
 
-<style>
-  .section-container {
-    @apply max-w-7xl mx-auto px-6;
-  }
-  .container-custom {
-    @apply max-w-6xl mx-auto px-6;
-  }
 
-  .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: all 0.8s ease-out;
-  }
-
-  .fade-in.active {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  .parallax {
-    will-change: transform;
-  }
-
-  /* Smooth scrolling */
-  html {
-    scroll-behavior: smooth;
-  }
-
-  /* Custom animations */
-  @keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-  }
-
-  .float {
-    animation: float 6s ease-in-out infinite;
-  }
-</style>

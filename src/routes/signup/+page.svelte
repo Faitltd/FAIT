@@ -3,7 +3,7 @@
 
 	let currentStep = 1;
 	let accountType = 'customer'; // 'customer' or 'professional'
-	
+
 	let formData = {
 		// Basic Info
 		firstName: '',
@@ -12,20 +12,20 @@
 		password: '',
 		confirmPassword: '',
 		phone: '',
-		
+
 		// Location
 		address: '',
 		city: '',
 		state: '',
 		zipCode: '',
-		
+
 		// Professional Info (if applicable)
 		businessName: '',
-		services: [],
+		services: [] as string[],
 		experience: '',
 		license: '',
 		insurance: false,
-		
+
 		// Terms
 		agreeToTerms: false,
 		agreeToMarketing: false
@@ -54,7 +54,7 @@
 
 	function validateCurrentStep() {
 		errorMessage = '';
-		
+
 		if (currentStep === 1) {
 			if (!formData.firstName || !formData.lastName || !formData.email || !formData.password) {
 				errorMessage = 'Please fill in all required fields.';
@@ -69,21 +69,21 @@
 				return false;
 			}
 		}
-		
+
 		if (currentStep === 2) {
 			if (!formData.phone || !formData.address || !formData.city || !formData.state || !formData.zipCode) {
 				errorMessage = 'Please fill in all required fields.';
 				return false;
 			}
 		}
-		
+
 		if (currentStep === 3 && accountType === 'professional') {
 			if (!formData.businessName || formData.services.length === 0) {
 				errorMessage = 'Please fill in all required fields.';
 				return false;
 			}
 		}
-		
+
 		return true;
 	}
 
@@ -92,12 +92,12 @@
 			errorMessage = 'Please agree to the Terms of Service.';
 			return;
 		}
-		
+
 		isSubmitting = true;
-		
+
 		// Simulate registration process
 		await new Promise(resolve => setTimeout(resolve, 2000));
-		
+
 		// For demo purposes, show success message
 		alert('Registration successful! Welcome to FAIT!');
 		isSubmitting = false;
@@ -163,7 +163,7 @@
 							<h3 class="text-xl font-bold text-gray-900 mb-2">I'm a Customer</h3>
 							<p class="text-gray-600">I need to hire professionals for services</p>
 						</button>
-						
+
 						<button
 							class="p-6 border-2 rounded-xl transition-all hover-scale {accountType === 'professional' ? 'border-blue-600 bg-blue-50' : 'border-gray-300 hover:border-blue-600'}"
 							on:click={() => accountType = 'professional'}
@@ -184,7 +184,7 @@
 				<!-- Basic Information -->
 				<div class="space-y-6">
 					<h3 class="text-xl font-bold text-gray-900">Basic Information</h3>
-					
+
 					<div class="grid md:grid-cols-2 gap-6">
 						<div>
 							<label for="firstName" class="block text-sm font-medium text-gray-700 mb-2">First Name *</label>
@@ -418,8 +418,8 @@
 						/>
 					</div>
 
-					<div>
-						<label class="block text-sm font-medium text-gray-700 mb-2">Services Offered * (Select all that apply)</label>
+					<fieldset>
+						<legend class="block text-sm font-medium text-gray-700 mb-2">Services Offered * (Select all that apply)</legend>
 						<div class="grid md:grid-cols-3 gap-3">
 							{#each serviceOptions as service}
 								<label class="flex items-center space-x-2 cursor-pointer">
@@ -433,7 +433,7 @@
 								</label>
 							{/each}
 						</div>
-					</div>
+					</fieldset>
 
 					<div>
 						<label for="experience" class="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
@@ -518,7 +518,7 @@
 							class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded mt-1"
 						/>
 						<label for="agreeToTerms" class="ml-2 block text-sm text-gray-700">
-							I agree to the <a href="/terms" class="text-blue-600 hover:text-blue-500">Terms of Service</a> 
+							I agree to the <a href="/terms" class="text-blue-600 hover:text-blue-500">Terms of Service</a>
 							and <a href="/privacy" class="text-blue-600 hover:text-blue-500">Privacy Policy</a> *
 						</label>
 					</div>
