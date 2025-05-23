@@ -5,7 +5,6 @@ import { UserRole } from '../modules/core/types/common';
 import { Button } from '../modules/core/components/ui/Button';
 import { Navigation } from '../modules/core/components/layout/Navigation';
 import HomeRemodellingGallery from '../components/HomeRemodellingGallery';
-import HomeRemodellingGallery from '../components/HomeRemodellingGallery';
 
 const serviceImages = [
   {
@@ -81,7 +80,7 @@ const HomePage: React.FC = () => {
     };
 
     const observer = new IntersectionObserver(handleIntersect, observerOptions);
-    
+
     // Observe all section refs
     [heroRef, featuresRef, servicesRef, testimonialsRef, ctaRef].forEach((ref) => {
       if (ref.current) {
@@ -365,8 +364,8 @@ const HomePage: React.FC = () => {
 
       {/* Add the gallery component */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <HomeRemodellingGallery 
-          title="Our Stunning Remodelling Projects" 
+        <HomeRemodellingGallery
+          title="Our Stunning Remodelling Projects"
           description="Browse through our portfolio of completed home renovation projects. Each image showcases our commitment to quality craftsmanship and attention to detail."
         />
       </div>
