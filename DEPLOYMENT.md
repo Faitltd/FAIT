@@ -1,201 +1,223 @@
-# FAIT Coop Deployment Guide
+# FAIT Deployment Guide
 
-This guide provides instructions for deploying the FAIT Coop platform to Google Cloud Run.
+This guide will help you deploy the FAIT professional services platform to GitHub and Google Cloud Run.
 
 ## Prerequisites
 
-- Google Cloud account with billing enabled
-- Google Cloud CLI installed and configured
-- Firebase CLI installed and configured
-- Node.js and npm installed
-- Docker installed
+Before deploying, ensure you have:
 
-## Project Structure
+- [Git](https://git-scm.com/) installed
+- [Node.js](https://nodejs.org/) (version 18 or higher)
+- [Docker](https://www.docker.com/) installed (for Cloud Run deployment)
+- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed (for Cloud Run deployment)
+- A Google Cloud Project with billing enabled
+- A GitHub account
 
-The FAIT Coop platform is organized as follows:
+## Quick Deployment
 
-- **Main Site**: The main FAIT Coop website, deployed to the `fait-444705` Google Cloud project
-- **GearGrab**: A separate component, deployed to the `fait-geargrab` Google Cloud project
-- **Scrapers**: Various scrapers, deployed to the `fait-scrapers` Google Cloud project
-- **Utilities**: Utility functions, deployed to the `fait-utilities` Google Cloud project
+### Option 1: Using the Deployment Script (Recommended)
 
-Each component is deployed as a separate Google Cloud project to ensure clean separation.
-
-## Multi-Environment Support
-
-The deployment is configured to support multiple environments:
-
-- **Production**: Deployed from the `main` branch
-- **Staging**: Deployed from the `staging` branch
-- **Development**: Deployed from any other branch
-
-Each environment has its own configuration file:
-
-- `.env.production`: Production environment configuration
-- `.env.staging`: Staging environment configuration
-
-## Deployment Steps
-
-### 1. Deploy the Main Site
-
-The main site is deployed using GitHub Actions. When you push to the appropriate branch, the workflow in `.github/workflows/deploy-main-site.yml` will automatically deploy the site to Google Cloud Run.
-
-- Pushing to `main` deploys to the production environment
-- Pushing to `staging` deploys to the staging environment
-- Pushing to any other branch deploys to the development environment
-
-If you want to deploy manually, follow these steps:
-
+1. Run the deployment script:
 ```bash
-# Set the environment
-BUILD_ENV=production  # or staging or development
+./deploy.sh
+```
 
-# Build the Docker image
-docker build --build-arg BUILD_ENV=$BUILD_ENV -t gcr.io/fait-444705/fait-coop-main:latest .
+2. Follow the interactive prompts to:
+   - Choose deployment target (GitHub, Cloud Run, or both)
+   - Enter repository details
+   - Configure Google Cloud settings
 
-# Push the Docker image to Google Container Registry
-docker push gcr.io/fait-444705/fait-coop-main:latest
+### Option 2: Manual Deployment
+
+#### Deploy to GitHub
+
+1. Create a new repository on GitHub:
+   - Go to https://github.com/new
+   - Repository name: `fait-site`
+   - Description: `FAIT - Professional Services Platform`
+   - Choose public or private
+   - Do NOT initialize with README
+
+2. Add the remote and push:
+```bash
+git remote add origin https://github.com/YOUR_USERNAME/fait-site.git
+git push -u origin master
+```
+
+#### Deploy to Google Cloud Run
+
+1. Set up Google Cloud:
+```bash
+# Login to Google Cloud
+gcloud auth login
+
+# Set your project ID
+gcloud config set project YOUR_PROJECT_ID
+
+# Enable required APIs
+gcloud services enable cloudbuild.googleapis.com
+gcloud services enable run.googleapis.com
+gcloud services enable containerregistry.googleapis.com
+```
+
+2. Build and deploy:
+```bash
+# Build the application
+npm run build
+
+# Submit build to Cloud Build
+gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/fait-site
 
 # Deploy to Cloud Run
-gcloud run deploy fait-coop-main \
-  --image gcr.io/fait-444705/fait-coop-main:latest \
-  --platform managed \
+gcloud run deploy fait-site \
+  --image gcr.io/YOUR_PROJECT_ID/fait-site \
   --region us-central1 \
+  --platform managed \
   --allow-unauthenticated \
-  --memory=512Mi \
-  --cpu=1 \
-  --min-instances=1 \
-  --max-instances=10 \
-  --concurrency=80 \
-  --timeout=300s \
-  --set-env-vars="NODE_ENV=production" \
-  --project fait-444705
-```
-
-### 2. Set Up Custom Domain
-
-To set up a custom domain for your Cloud Run service, run the following script:
-
-```bash
-./scripts/setup-domain.sh
-```
-
-This script will create a domain mapping for your Cloud Run service and provide you with the DNS records that need to be created with your domain registrar.
-
-### 3. Update Firebase Hosting
-
-Firebase Hosting is configured to proxy requests to the Cloud Run service. To update the Firebase configuration:
-
-```bash
-# Deploy to Firebase Hosting
-firebase use fait-444705
-firebase deploy --only hosting:fait-coop-react
+  --port 3000 \
+  --memory 1Gi \
+  --cpu 1 \
+  --min-instances 0 \
+  --max-instances 10 \
+  --set-env-vars NODE_ENV=production
 ```
 
 ## Environment Variables
 
-The application requires the following environment variables:
-
-- `NODE_ENV`: Set to `production` for production deployments
-- `SUPABASE_URL`: The URL of your Supabase instance
-- `SUPABASE_KEY`: The API key for your Supabase instance
-
-These can be set in the Cloud Run service configuration.
-
-## Monitoring and Logging
-
-You can monitor your Cloud Run service in the Google Cloud Console:
-
-- **Logs**: https://console.cloud.google.com/logs/query?project=fait-444705
-- **Monitoring**: https://console.cloud.google.com/monitoring?project=fait-444705
-- **Cloud Run**: https://console.cloud.google.com/run?project=fait-444705
-
-## Cleaning Up the Simple Site
-
-After deploying the complex site, you can clean up the simple site using the provided script:
+For production deployment, you may want to set these environment variables:
 
 ```bash
-./scripts/cleanup-simple-site.sh
+NODE_ENV=production
+PORT=3000
+HOST=0.0.0.0
 ```
 
-This script will:
-1. Delete the simple site service from Cloud Run
-2. Delete the old container images from Google Container Registry
+## Custom Domain Setup
+
+To use a custom domain with Cloud Run:
+
+1. Map your domain:
+```bash
+gcloud run domain-mappings create \
+  --service fait-site \
+  --domain your-domain.com \
+  --region us-central1
+```
+
+2. Update your DNS records as instructed by the command output.
+
+## GitHub Actions CI/CD
+
+The repository includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) for automated deployment.
+
+### Required Secrets
+
+Add these secrets to your GitHub repository:
+
+1. Go to your repository → Settings → Secrets and variables → Actions
+2. Add the following secrets:
+
+- `GCP_PROJECT_ID`: Your Google Cloud Project ID
+- `GCP_SA_KEY`: Service Account JSON key with the following roles:
+  - Cloud Build Editor
+  - Cloud Run Admin
+  - Storage Admin
+
+### Creating a Service Account
+
+```bash
+# Create service account
+gcloud iam service-accounts create github-actions \
+  --description="Service account for GitHub Actions" \
+  --display-name="GitHub Actions"
+
+# Grant necessary roles
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/cloudbuild.builds.editor"
+
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/run.admin"
+
+gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+  --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+  --role="roles/storage.admin"
+
+# Create and download key
+gcloud iam service-accounts keys create key.json \
+  --iam-account=github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com
+```
+
+## Monitoring and Maintenance
+
+### Health Checks
+
+The application includes a health check endpoint at `/health` that returns:
+
+```json
+{
+  "status": "healthy",
+  "timestamp": "2024-01-01T00:00:00.000Z",
+  "service": "FAIT",
+  "version": "1.0.0"
+}
+```
+
+### Logs
+
+View application logs:
+
+```bash
+# Cloud Run logs
+gcloud logs read --service=fait-site --region=us-central1
+
+# Follow logs in real-time
+gcloud logs tail --service=fait-site --region=us-central1
+```
+
+### Scaling
+
+Cloud Run automatically scales based on traffic. You can adjust scaling settings:
+
+```bash
+gcloud run services update fait-site \
+  --region us-central1 \
+  --min-instances 1 \
+  --max-instances 20 \
+  --concurrency 100
+```
 
 ## Troubleshooting
 
-If you encounter issues with the deployment, check the following:
+### Common Issues
 
-1. **Build Failures**: Check the build logs in GitHub Actions or Cloud Build
-2. **Runtime Errors**: Check the Cloud Run logs
-3. **Domain Issues**: Verify that the DNS records are correctly set up
-4. **Environment Configuration**: Ensure the correct environment configuration is being used
+1. **Build failures**: Check that all dependencies are properly installed
+2. **Permission errors**: Ensure service account has proper IAM roles
+3. **Memory issues**: Increase memory allocation in Cloud Run
+4. **Cold starts**: Set minimum instances to 1 for better performance
 
-## Advanced Deployment Features
+### Getting Help
 
-### Continuous Integration
+- Check the [Cloud Run documentation](https://cloud.google.com/run/docs)
+- Review [SvelteKit deployment guide](https://kit.svelte.dev/docs/adapters)
+- Open an issue in the GitHub repository
 
-The project includes a CI workflow that runs tests and builds the application for different environments. The workflow is defined in `.github/workflows/ci.yml`.
+## Security Considerations
 
-### Canary Deployments
+- Always use HTTPS in production
+- Regularly update dependencies
+- Monitor for security vulnerabilities
+- Use environment variables for sensitive data
+- Enable Cloud Run security features
 
-To perform a canary deployment (gradually rolling out changes), use the provided script:
+## Cost Optimization
 
-```bash
-./scripts/canary-deploy.sh <image-tag>
-```
+- Use minimum instances = 0 for development
+- Set appropriate CPU and memory limits
+- Monitor usage with Cloud Monitoring
+- Consider using Cloud Run jobs for batch processing
 
-This script will:
-1. Deploy a new version without sending any traffic to it
-2. Gradually increase traffic to the new version (5%, 20%, 50%, 100%)
-3. Monitor the deployment and allow you to control the rollout
+---
 
-### Rollback
-
-If you need to rollback to a previous version, use the provided script:
-
-```bash
-./scripts/rollback.sh
-```
-
-This script will:
-1. List all available revisions
-2. Allow you to select a revision to rollback to
-3. Update the traffic to direct 100% to the selected revision
-
-### Security Scanning
-
-To scan for security vulnerabilities, use the provided script:
-
-```bash
-./scripts/security-scan.sh
-```
-
-This script will:
-1. Scan for npm vulnerabilities
-2. Scan the Docker image for vulnerabilities
-3. Display a summary of vulnerabilities
-4. Save detailed results to a JSON file
-
-### Monitoring
-
-To monitor the deployed application, use the provided script:
-
-```bash
-./scripts/monitor-deployment.sh
-```
-
-This script will:
-1. Check the health endpoint
-2. Check the version endpoint
-3. Get service metrics
-4. Get recent logs
-5. Check the domain mapping
-
-## Additional Resources
-
-- [Google Cloud Run Documentation](https://cloud.google.com/run/docs)
-- [Firebase Hosting Documentation](https://firebase.google.com/docs/hosting)
-- [Supabase Documentation](https://supabase.io/docs)
-- [Docker Documentation](https://docs.docker.com/)
-- [GitHub Actions Documentation](https://docs.github.com/en/actions)
+For more detailed information, refer to the main [README.md](README.md) file.

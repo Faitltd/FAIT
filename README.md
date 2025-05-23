@@ -1,136 +1,108 @@
-# FAIT Coop Platform
+# FAIT - Professional Services Platform
 
-The FAIT Coop Platform is a comprehensive web application that provides various tools and services for the FAIT Cooperative.
+A modern, professional services platform built with SvelteKit and Tailwind CSS that connects customers with trusted professionals.
 
-## Project Structure
+<div align="center">
 
-The FAIT Coop platform is organized as follows:
+[![Svelte badge](https://img.shields.io/badge/Svelte-5.2.2-orange)](https://svelte.dev/)
+[![SvelteKit badge](https://img.shields.io/badge/SvelteKit-2.8.1-orange)](https://kit.svelte.dev/)
+[![TailwindCSS badge](https://img.shields.io/badge/TailwindCSS-4.0-teal)](https://tailwindcss.com/)
+[![TypeScript badge](https://img.shields.io/badge/TypeScript-5.6.3-blue)](https://www.typescriptlang.org/)
+[![Cloud Run badge](https://img.shields.io/badge/Google%20Cloud%20Run-Deployed-blue)](https://cloud.google.com/run)
 
-- **Main Site**: The main FAIT Coop website, deployed to the `fait-444705` Google Cloud project
-- **GearGrab**: A separate component, deployed to the `fait-geargrab` Google Cloud project
-- **Scrapers**: Various scrapers, deployed to the `fait-scrapers` Google Cloud project
-- **Utilities**: Utility functions, deployed to the `fait-utilities` Google Cloud project
+</div>
 
-Each component is deployed as a separate Google Cloud project to ensure clean separation.
+## 🧰 What's inside
 
-## Application Versions
+This minimal starter template comes with:
 
-The application supports multiple versions:
+### JavaScript frameworks
 
-- **Simple**: A basic version with minimal features
-- **Minimal**: A lightweight version with essential features
-- **Enhanced**: An enhanced version with additional features
-- **Full**: The complete version with all features
-- **Modular**: A modular version with dynamically loaded components
+- [Svelte 5](https://svelte.dev): Web development for the rest of us.
+- [SvelteKit](https://svelte.dev/docs/kit): Web development, streamlined.
 
-## Development
+### Components
 
-### Prerequisites
+TODO
 
-- Node.js 20.x
-- npm 9.x
-- Docker
+### Type checking
 
-### Installation
+- [TypeScript](https://www.typescriptlang.org): JavaScript with syntax for types.
 
-1. Clone the repository:
+### CSS frameworks
+
+- [TailwindCSS 4](https://tailwindcss.com): Rapidly build modern websites without ever leaving your HTML.
+- [@tailwindcss/forms](https://github.com/tailwindlabs/tailwindcss-forms): A plugin that provides a basic reset for form styles that makes form elements easy to override with utilities.
+- Sensible defaults in the `tailwind.config.js`.
+
+### Formatting & Linting
+
+- [Prettier](https://prettier.io): An opinionated code formatter.
+- [prettier-plugin-tailwindcss](https://github.com/tailwindlabs/prettier-plugin-tailwindcss): Prettier plugin for Tailwind CSS that automatically sorts classes based on the official recommended class order.
+- [Eslint](https://eslint.org): Find and fix problems in your JavaScript code.
+
+### i18n
+
+- [@inlang/paraglide-sveltekit](https://github.com/opral/inlang-paraglide-js): Tree-shakable i18n library build on the inlang ecosystem.
+
+### Testing
+
+- [Playwright](https://playwright.dev): Fast and reliable end-to-end testing for modern web apps.
+- [Vitest](https://vitest.dev/): Blazing Fast Unit Test Framework.
+
+### Fonts
+
+- [Inter variable](https://fontsource.org/fonts/inter/): A typeface carefully crafted & designed for computer screens.
+
+### Utils
+
+- [mode-watcher](https://github.com/svecosystem/mode-watcher/): Simple light/dark mode management for SvelteKit apps.
+
+### Icons
+
+- [@poppanator/sveltekit-svg](https://github.com/poppa/sveltekit-svg): SvelteKit plugin that makes it possible to import SVG files as Svelte components, inline SVG code or urls.
+- [unplugin-icons](https://github.com/unplugin/unplugin-icons): Access thousands of icons as components on-demand universally.
+
+## 📦 Installation
+
+Download the repository, open the folder and install the dependencies:
 
 ```bash
-git clone https://github.com/your-username/fait-coop.git
-cd fait-coop
+# download the project
+npx degit buhodev/sveltekit-tailwind-starter my-project
+cd my-project
+npm install # or pnpm install
 ```
 
-2. Install dependencies:
+## 🛠️ Developing
 
-```bash
-npm ci
-```
-
-3. Start the development server:
+Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
 
 ```bash
 npm run dev
+
+# or start the server and open the app in a new browser tab
+npm run dev -- --open
 ```
 
-### Available Scripts
+## 🚀 Building
 
-- `npm run dev`: Start the development server
-- `npm run build`: Build the application for production
-- `npm run build:full`: Build the full version of the application
-- `npm run preview`: Preview the production build
-- `npm run lint`: Lint the code
-- `npm test`: Run tests
+To create a production version of your app:
 
-## Deployment
+```bash
+npm run build
+```
 
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
+You can preview the production build with `npm run preview`.
 
-## Environment Configuration
+> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.
 
-The application supports multiple environments:
+## 🤝 Contributing
 
-- **Production**: Configuration in `.env.production`
-- **Staging**: Configuration in `.env.staging`
-- **Development**: Default configuration
-
-## Project Components
-
-### Main Site
-
-The main site includes:
-
-- User authentication and authorization
-- Dashboard for different user types
-- Service search and booking
-- Project management
-- Estimate calculators
-- Warranty management
-
-### GearGrab
-
-GearGrab is a separate component that provides:
-
-- Gear inventory management
-- Gear rental and tracking
-- Gear maintenance scheduling
-
-### Scrapers
-
-The scrapers component includes:
-
-- Home Depot scraper
-- Other retail store scrapers
-- Price comparison tools
-
-### Utilities
-
-The utilities component includes:
-
-- Data processing tools
-- Reporting tools
-- Administrative utilities
-
-## Contributing
-
-1. Create a feature branch from the appropriate base branch:
-   - For production features: `git checkout -b feature/your-feature main`
-   - For staging features: `git checkout -b feature/your-feature staging`
-   - For development features: `git checkout -b feature/your-feature development`
-
-2. Make your changes and commit them:
-   ```bash
-   git commit -m "Add your feature"
-   ```
-
-3. Push to your branch:
-   ```bash
-   git push origin feature/your-feature
-   ```
-
-4. Create a pull request to the appropriate base branch.
+Contributions, issues and feature requests are welcome!
+<br />
+Feel free to check the [issues page](https://github.com/buhodev/sveltekit-tailwind-starter/issues).
 
 ## License
 
-This project is proprietary and confidential. Unauthorized copying, distribution, or use is strictly prohibited.
-
-This project uses Sweep AI.
+MIT

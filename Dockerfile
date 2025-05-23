@@ -1,61 +1,50 @@
-# Multi-stage build for optimized production image
+# Multi-stage build for production
+FROM node:20-alpine AS builder
 
-# Base stage for shared settings
-FROM --platform=linux/amd64 node:20.12.1-alpine3.19 AS base
+# Set working directory
 WORKDIR /app
 
-# Dependencies stage - install all dependencies including dev dependencies
-FROM base AS deps
-COPY package.json package-lock.json ./
-RUN npm ci
+# Copy package files
+COPY package*.json ./
 
-# Build stage - build the application
-FROM deps AS builder
+# Install dependencies
+RUN npm ci --only=production --legacy-peer-deps
+
+# Copy source code
 COPY . .
-# Remove any geargrab components, tools, or scrapers before building
-# as per project requirements for cloud deployment
-RUN rm -rf geargrab tools scrapers
 
-# Set build arguments with defaults
-ARG BUILD_ENV=production
+# Build the application
+RUN npm run build
 
-# Create a default .env file with the appropriate configuration
-RUN if [ "$BUILD_ENV" = "production" ]; then \
-      echo "# Production Environment Configuration\nVITE_APP_VERSION=enhanced\nVITE_API_URL=https://api.fait-coop.com\nVITE_SITE_URL=https://fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
-    elif [ "$BUILD_ENV" = "staging" ]; then \
-      echo "# Staging Environment Configuration\nVITE_APP_VERSION=enhanced\nVITE_API_URL=https://staging-api.fait-coop.com\nVITE_SITE_URL=https://staging.fait-coop.com\nVITE_ENABLE_ANALYTICS=true\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=true" > .env; \
-    else \
-      echo "# Development Environment Configuration\nVITE_APP_VERSION=enhanced\nVITE_API_URL=http://localhost:8000\nVITE_SITE_URL=http://localhost:5173\nVITE_ENABLE_ANALYTICS=false\nVITE_ENABLE_ADVANCED_FEATURES=true\nVITE_ENABLE_PERFORMANCE_MONITORING=false" > .env; \
-    fi
+# Production stage
+FROM node:20-alpine AS runner
 
-# Build the enhanced version of the application
-RUN npm run build:enhanced
-
-# Production stage - create the final image
-FROM --platform=linux/amd64 node:20.12.1-alpine3.19 AS runner
+# Set working directory
 WORKDIR /app
 
-# Set to production environment
-ENV NODE_ENV=production
-
-# Copy only the built files, package.json, and server.js from the builder stage
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/package.json ./
-COPY server.js ./
-
-# Don't run production as root
+# Create non-root user for security
 RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 appuser
-# Set ownership of the application files
-RUN chown -R appuser:nodejs /app
-USER appuser
+RUN adduser --system --uid 1001 sveltekit
 
-# Expose the port
-EXPOSE 8080
+# Copy built application from builder stage
+COPY --from=builder --chown=sveltekit:nodejs /app/build ./build
+COPY --from=builder --chown=sveltekit:nodejs /app/package*.json ./
+COPY --from=builder --chown=sveltekit:nodejs /app/node_modules ./node_modules
 
-# Add health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=10s --retries=3 \
-  CMD wget -q -O - http://localhost:8080/health || exit 1
+# Switch to non-root user
+USER sveltekit
 
-# Start the server
-CMD ["node", "server.js"]
+# Expose port
+EXPOSE 3000
+
+# Set environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV HOST=0.0.0.0
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+
+# Start the application
+CMD ["node", "build"]
