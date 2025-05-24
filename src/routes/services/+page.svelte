@@ -69,7 +69,7 @@
 
 <!-- Hero Section -->
 <section class="py-20 bg-gradient-to-br from-blue-50 to-indigo-100">
-	<div class="container mx-auto px-4">
+	<div class="container mx-auto px-6 sm:px-8 lg:px-4">
 		<div class="text-center mb-12">
 			<h1 class="text-5xl font-bold text-gray-900 mb-6">Find Professional Services</h1>
 			<p class="text-xl text-gray-600 max-w-3xl mx-auto mb-8">
@@ -126,7 +126,7 @@
 
 <!-- Categories Section -->
 <section class="py-16 bg-white">
-	<div class="container mx-auto px-4">
+	<div class="container mx-auto px-6 sm:px-8 lg:px-4">
 		<div>
 			<h2 class="text-3xl font-bold text-gray-900 mb-8 text-center">Service Categories</h2>
 			<div class="flex flex-wrap justify-center gap-4 mb-12">
@@ -146,7 +146,7 @@
 
 <!-- Services Grid -->
 <section class="py-16 bg-gray-50">
-	<div class="container mx-auto px-4">
+	<div class="container mx-auto px-6 sm:px-8 lg:px-4">
 		<!-- Results Summary -->
 		<div class="mb-8 text-center">
 			<p class="text-lg text-gray-600">
@@ -161,7 +161,7 @@
 		</div>
 
 		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-			{#each filteredServices as service, index}
+			{#each filteredServices as service}
 				<div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
 					<div class="p-6">
 						<div class="text-center mb-4">
@@ -207,7 +207,7 @@
 
 <!-- CTA Section -->
 <section class="py-20 bg-blue-600">
-	<div class="container mx-auto px-4 text-center">
+	<div class="container mx-auto px-6 sm:px-8 lg:px-4 text-center">
 		<div>
 			<h2 class="text-4xl font-bold text-white mb-4">Ready to Get Started?</h2>
 			<p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">

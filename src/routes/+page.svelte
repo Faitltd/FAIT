@@ -79,7 +79,7 @@
     ></div>
 
     <!-- Hero Content -->
-    <div class="relative z-10 text-center text-white px-4 max-w-4xl mx-auto">
+    <div class="relative z-10 text-center text-white px-6 sm:px-8 lg:px-4 max-w-4xl mx-auto">
         <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             Find Trusted Local
             <span class="text-yellow-400">Service Providers</span>
@@ -127,7 +127,7 @@
 
 <!-- Service Categories Section -->
 <section class="py-20 bg-white">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-6 sm:px-8 lg:px-4">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">Popular Services</h2>
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -159,7 +159,7 @@
 
 <!-- How It Works Section -->
 <section class="py-20 bg-gray-50">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-6 sm:px-8 lg:px-4">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">How FAIT Works</h2>
             <p class="text-xl text-gray-600">Simple steps to get the help you need</p>
@@ -187,7 +187,7 @@
 
 <!-- Testimonials Section -->
 <section class="py-20 bg-white">
-    <div class="container mx-auto px-4">
+    <div class="container mx-auto px-6 sm:px-8 lg:px-4">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
             <p class="text-xl text-gray-600">Real reviews from real customers</p>
@@ -216,7 +216,7 @@
 
 <!-- Call to Action Section -->
 <section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-700">
-    <div class="container mx-auto px-4 text-center">
+    <div class="container mx-auto px-6 sm:px-8 lg:px-4 text-center">
         <h2 class="text-4xl font-bold text-white mb-6">Ready to Get Started?</h2>
         <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             Join thousands of satisfied customers who trust FAIT for their service needs

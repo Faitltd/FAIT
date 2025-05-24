@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Button from './ui/Button.svelte';
 
   let mobileMenuOpen = false;
@@ -17,7 +17,7 @@
 </script>
 
 <header class="bg-white shadow-sm border-b border-gray-200">
-  <nav class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+  <nav class="mx-auto max-w-7xl px-6 sm:px-8 lg:px-8">
     <div class="flex h-16 justify-between items-center">
       <!-- Logo -->
       <div class="flex items-center">
