@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 
-# Install dependencies
-RUN npm ci --only=production --legacy-peer-deps
+# Install all dependencies (including dev dependencies for build)
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -28,6 +28,7 @@ RUN adduser --system --uid 1001 sveltekit
 
 # Copy built application from builder stage
 COPY --from=builder --chown=sveltekit:nodejs /app/build ./build
+COPY --from=builder --chown=sveltekit:nodejs /app/server.js ./
 COPY --from=builder --chown=sveltekit:nodejs /app/package*.json ./
 COPY --from=builder --chown=sveltekit:nodejs /app/node_modules ./node_modules
 
@@ -47,4 +48,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
 
 # Start the application
-CMD ["node", "build"]
+CMD ["node", "server.js"]
