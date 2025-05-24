@@ -1,5 +1,7 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { auth } from '$lib/stores/auth';
 
 	let formData = {
 		email: '',
@@ -10,24 +12,99 @@
 	let isSubmitting = false;
 	let errorMessage = '';
 	let showPassword = false;
+	let successMessage = '';
 
 	async function handleSubmit() {
+		console.log('handleSubmit called');
 		isSubmitting = true;
 		errorMessage = '';
+		successMessage = '';
+
+		console.log('Form data:', formData);
+		console.log('Email value:', `"${formData.email}"`);
+		console.log('Password value:', `"${formData.password}"`);
+		console.log('Email length:', formData.email.length);
+		console.log('Password length:', formData.password.length);
 
 		// Basic validation
 		if (!formData.email || !formData.password) {
 			errorMessage = 'Please fill in all required fields.';
 			isSubmitting = false;
+			console.log('Validation failed - missing fields');
 			return;
 		}
 
-		// Simulate login process
-		await new Promise(resolve => setTimeout(resolve, 2000));
+		// Check all valid credentials
+		console.log('Checking credentials...');
 
-		// For demo purposes, show success message
-		// In a real app, this would redirect to dashboard
-		alert('Login successful! (This is a demo)');
+		const validCredentials = [
+			{
+				email: 'admin@fait.com',
+				password: 'admin123',
+				user: { id: '1', email: 'admin@fait.com', name: 'Admin User', role: 'admin' as const },
+				redirectPath: '/admin'
+			},
+			{
+				email: 'admin@itsfait.com',
+				password: 'admin123',
+				user: { id: '1', email: 'admin@itsfait.com', name: 'Admin User', role: 'admin' as const },
+				redirectPath: '/admin'
+			},
+			{
+				email: 'provider@fait.com',
+				password: 'provider123',
+				user: { id: '2', email: 'provider@fait.com', name: 'Service Provider', role: 'provider' as const },
+				redirectPath: '/provider/dashboard'
+			},
+			{
+				email: 'client@fait.com',
+				password: 'client123',
+				user: { id: '3', email: 'client@fait.com', name: 'Demo Client', role: 'client' as const },
+				redirectPath: '/bookings'
+			},
+			{
+				email: 'client@itsfait.com',
+				password: 'client123',
+				user: { id: '4', email: 'client@itsfait.com', name: 'Demo Client', role: 'client' as const },
+				redirectPath: '/bookings'
+			},
+			{
+				email: 'demo@fait.com',
+				password: 'demo123',
+				user: { id: '5', email: 'demo@fait.com', name: 'Demo User', role: 'client' as const },
+				redirectPath: '/bookings'
+			}
+		];
+
+		const matchedCredential = validCredentials.find(
+			cred => cred.email === formData.email && cred.password === formData.password
+		);
+
+		console.log('Matched credential:', matchedCredential);
+
+		if (matchedCredential) {
+			console.log('Credentials matched!');
+
+			// Update auth store
+			auth.update(state => ({
+				...state,
+				user: matchedCredential.user,
+				isAuthenticated: true,
+				isLoading: false
+			}));
+
+			successMessage = 'Login successful! Redirecting...';
+			console.log('Auth store updated, redirecting to:', matchedCredential.redirectPath);
+
+			setTimeout(() => {
+				console.log('Attempting redirect to:', matchedCredential.redirectPath);
+				goto(matchedCredential.redirectPath);
+			}, 1500);
+		} else {
+			console.log('No matching credentials found');
+			errorMessage = 'Invalid email or password. Please check your credentials and try again.';
+		}
+
 		isSubmitting = false;
 	}
 
@@ -71,6 +148,17 @@
 			</a>
 			<h2 class="text-3xl font-bold text-gray-900">Welcome back</h2>
 			<p class="mt-2 text-gray-600">Sign in to your account to continue</p>
+
+			<!-- Demo Credentials Info -->
+			<div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
+				<p class="font-semibold text-blue-800 mb-2">Demo Credentials:</p>
+				<div class="space-y-1 text-blue-700">
+					<p><strong>Admin:</strong> admin@fait.com / admin123</p>
+					<p><strong>Provider:</strong> provider@fait.com / provider123</p>
+					<p><strong>Client:</strong> client@fait.com / client123</p>
+					<p><strong>Client (alt):</strong> client@itsfait.com / client123</p>
+				</div>
+			</div>
 		</div>
 
 		<!-- Login Form -->
@@ -78,6 +166,12 @@
 			{#if errorMessage}
 				<div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
 					{errorMessage}
+				</div>
+			{/if}
+
+			{#if successMessage}
+				<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
+					{successMessage}
 				</div>
 			{/if}
 
@@ -154,6 +248,46 @@
 					class="w-full bg-blue-600 text-white text-lg py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold transform hover:scale-105 {isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}"
 				>
 					{isSubmitting ? 'Signing in...' : 'Sign in'}
+				</button>
+
+				<!-- Debug buttons -->
+				<button
+					type="button"
+					on:click={() => {
+						console.log('Debug button clicked');
+						formData.email = 'admin@fait.com';
+						formData.password = 'admin123';
+						handleSubmit();
+					}}
+					class="w-full bg-green-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium mt-2"
+				>
+					Debug: Auto-fill Admin Credentials
+				</button>
+
+				<button
+					type="button"
+					on:click={() => {
+						console.log('Force auth test clicked');
+						auth.update(state => {
+							console.log('Current auth state:', state);
+							const newState = {
+								...state,
+								user: { id: '1', email: 'test@test.com', name: 'Test User', role: 'admin' as const },
+								isAuthenticated: true,
+								isLoading: false
+							};
+							console.log('New auth state:', newState);
+							return newState;
+						});
+						console.log('Auth updated, attempting redirect...');
+						setTimeout(() => {
+							console.log('Redirecting to /bookings');
+							goto('/bookings');
+						}, 1000);
+					}}
+					class="w-full bg-red-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium mt-2"
+				>
+					Force Auth Test
 				</button>
 			</form>
 
