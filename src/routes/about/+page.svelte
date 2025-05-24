@@ -8,30 +8,18 @@
 		{ number: '24/7', label: 'Customer Support' }
 	];
 
-	const team = [
+	const founders = [
 		{
-			name: 'Sarah Johnson',
-			role: 'CEO & Founder',
-			image: '👩‍💼',
-			bio: 'Former tech executive with 15+ years experience building marketplace platforms.'
+			name: 'Ray Kinne',
+			role: 'Co-Founder',
+			image: '/Ray.jpeg',
+			bio: 'Visionary leader passionate about connecting communities with trusted service providers.'
 		},
 		{
-			name: 'Michael Chen',
-			role: 'CTO',
-			image: '👨‍💻',
-			bio: 'Software architect passionate about connecting people through technology.'
-		},
-		{
-			name: 'Emily Rodriguez',
-			role: 'Head of Operations',
-			image: '👩‍🔧',
-			bio: 'Operations expert ensuring quality and reliability across our platform.'
-		},
-		{
-			name: 'David Kim',
-			role: 'Head of Design',
-			image: '👨‍🎨',
-			bio: 'Design leader focused on creating intuitive user experiences.'
+			name: 'Kelli Trainer',
+			role: 'Co-Founder',
+			image: '/Kelli.jpeg',
+			bio: 'Strategic innovator focused on building meaningful relationships between customers and professionals.'
 		}
 	];
 
@@ -82,20 +70,20 @@
 </svelte:head>
 
 <!-- Hero Section -->
-<section class="section bg-gradient-to-br from-blue-50 to-indigo-100 pt-32">
-	<div class="container-xl">
+<section class="py-20 bg-gradient-to-br from-blue-50 to-indigo-100 pt-32">
+	<div class="container mx-auto px-8 sm:px-12 lg:px-6">
 		<div class="grid lg:grid-cols-2 gap-12 items-center">
 			<div class="animate-on-scroll">
 				<h1 class="text-5xl font-bold text-gray-900 mb-6">About FAIT</h1>
 				<p class="text-xl text-gray-600 mb-8 leading-relaxed">
-					We're on a mission to make finding and hiring trusted professionals as easy as possible. 
+					We're on a mission to make finding and hiring trusted professionals as easy as possible.
 					FAIT connects homeowners and businesses with verified experts who deliver exceptional results.
 				</p>
 				<div class="flex flex-col sm:flex-row gap-4">
-					<a href="/services" class="btn btn-primary text-lg px-8 py-4 hover-scale">
+					<a href="/services" class="bg-blue-600 text-white text-lg px-8 py-4 rounded-lg hover:bg-blue-700 transition-colors font-semibold transform hover:scale-105">
 						Browse Services
 					</a>
-					<a href="/contact" class="btn btn-secondary text-lg px-8 py-4 hover-scale">
+					<a href="/contact" class="border-2 border-blue-600 text-blue-600 text-lg px-8 py-4 rounded-lg hover:bg-blue-50 transition-colors font-semibold transform hover:scale-105">
 						Contact Us
 					</a>
 				</div>
@@ -104,8 +92,8 @@
 				<div class="bg-white rounded-2xl shadow-2xl p-8 hover-lift">
 					<h3 class="text-2xl font-bold text-gray-900 mb-6">Our Mission</h3>
 					<p class="text-gray-600 leading-relaxed mb-6">
-						To create a world where finding the right professional for any job is simple, 
-						transparent, and reliable. We believe everyone deserves access to quality services 
+						To create a world where finding the right professional for any job is simple,
+						transparent, and reliable. We believe everyone deserves access to quality services
 						at fair prices.
 					</p>
 					<div class="flex items-center space-x-4">
@@ -148,7 +136,7 @@
 				These core principles guide everything we do and shape how we serve our community.
 			</p>
 		</div>
-		
+
 		<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
 			{#each values as value, index}
 				<div class="card text-center animate-on-scroll" style="animation-delay: {index * 0.1}s">
@@ -161,23 +149,31 @@
 	</div>
 </section>
 
-<!-- Team Section -->
-<section class="section bg-white">
-	<div class="container-xl">
-		<div class="text-center mb-16 animate-on-scroll">
-			<h2 class="text-4xl font-bold text-gray-900 mb-4">Meet Our Team</h2>
+<!-- Founders Section -->
+<section class="py-20 bg-white">
+	<div class="container mx-auto px-8 sm:px-12 lg:px-6">
+		<div class="text-center mb-16">
+			<h2 class="text-4xl font-bold text-gray-900 mb-4">🎉 Meet Our Founders</h2>
 			<p class="text-xl text-gray-600 max-w-3xl mx-auto">
-				We're a passionate team of professionals dedicated to revolutionizing how people find and hire services.
+				The visionary leaders who created FAIT to revolutionize how people connect with trusted service providers.
 			</p>
 		</div>
-		
-		<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-			{#each team as member, index}
-				<div class="card text-center animate-on-scroll" style="animation-delay: {index * 0.1}s">
-					<div class="text-6xl mb-4">{member.image}</div>
-					<h3 class="text-xl font-bold text-gray-900 mb-2">{member.name}</h3>
-					<div class="text-blue-600 font-medium mb-4">{member.role}</div>
-					<p class="text-gray-600 text-sm leading-relaxed">{member.bio}</p>
+
+		<div class="grid md:grid-cols-2 gap-12 max-w-4xl mx-auto">
+			{#each founders as founder}
+				<div class="bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 overflow-hidden">
+					<div class="aspect-w-1 aspect-h-1">
+						<img
+							src={founder.image}
+							alt={founder.name}
+							class="w-full h-80 object-cover object-center"
+						/>
+					</div>
+					<div class="p-8 text-center">
+						<h3 class="text-2xl font-bold text-gray-900 mb-2">{founder.name}</h3>
+						<div class="text-blue-600 font-semibold text-lg mb-4">{founder.role}</div>
+						<p class="text-gray-600 leading-relaxed">{founder.bio}</p>
+					</div>
 				</div>
 			{/each}
 		</div>
@@ -192,15 +188,15 @@
 				<h2 class="text-4xl font-bold text-white mb-6">Our Story</h2>
 				<div class="space-y-4 text-blue-100 leading-relaxed">
 					<p>
-						FAIT was born from a simple frustration: finding reliable professionals shouldn't be so difficult. 
+						FAIT was born from a simple frustration: finding reliable professionals shouldn't be so difficult.
 						Our founders experienced firsthand the challenges of hiring contractors, cleaners, and service providers.
 					</p>
 					<p>
-						After countless hours of research, phone calls, and disappointing experiences, we knew there had to be a better way. 
+						After countless hours of research, phone calls, and disappointing experiences, we knew there had to be a better way.
 						We envisioned a platform where quality professionals and customers could connect seamlessly.
 					</p>
 					<p>
-						Today, FAIT serves thousands of customers and professionals across the country, making quality services 
+						Today, FAIT serves thousands of customers and professionals across the country, making quality services
 						accessible to everyone while helping skilled professionals grow their businesses.
 					</p>
 				</div>
@@ -209,7 +205,7 @@
 				<div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 hover-lift">
 					<h3 class="text-2xl font-bold text-white mb-6">Join Our Community</h3>
 					<p class="text-blue-100 mb-6">
-						Whether you're looking for services or want to offer your expertise, 
+						Whether you're looking for services or want to offer your expertise,
 						FAIT is the platform that brings quality and trust together.
 					</p>
 					<div class="flex flex-col sm:flex-row gap-4">

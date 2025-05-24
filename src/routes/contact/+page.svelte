@@ -12,30 +12,27 @@
 	let isSubmitting = false;
 	let submitMessage = '';
 
+	// Function to trigger chat widget (will be handled by the global chat widget)
+	function openChat() {
+		// Dispatch a custom event to open the chat widget
+		window.dispatchEvent(new CustomEvent('openChat'));
+	}
+
 	const contactInfo = [
 		{
 			title: 'Email Us',
-			value: 'hello@fait.com',
-			icon: '📧',
+			value: 'Admin@itsfait.com',
 			description: 'Send us an email and we\'ll respond within 24 hours'
 		},
 		{
 			title: 'Call Us',
-			value: '1-800-FAIT-HELP',
-			icon: '📞',
+			value: '720-926-7341',
 			description: 'Speak with our support team Monday-Friday, 9AM-6PM EST'
-		},
-		{
-			title: 'Visit Us',
-			value: '123 Innovation Drive, Tech City, TC 12345',
-			icon: '📍',
-			description: 'Stop by our headquarters for in-person assistance'
 		},
 		{
 			title: 'Live Chat',
 			value: 'Available 24/7',
-			icon: '💬',
-			description: 'Get instant help through our live chat support'
+			description: 'Get instant help through our LLM powered chat support'
 		}
 	];
 
@@ -60,14 +57,14 @@
 
 	async function handleSubmit() {
 		isSubmitting = true;
-		
+
 		// Simulate form submission
 		await new Promise(resolve => setTimeout(resolve, 2000));
-		
+
 		submitMessage = 'Thank you for your message! We\'ll get back to you within 24 hours.';
 		formData = { name: '', email: '', subject: '', message: '', type: 'general' };
 		isSubmitting = false;
-		
+
 		// Clear message after 5 seconds
 		setTimeout(() => {
 			submitMessage = '';
@@ -103,7 +100,7 @@
 		<div class="text-center mb-12 animate-on-scroll">
 			<h1 class="text-5xl font-bold text-gray-900 mb-6">Contact Us</h1>
 			<p class="text-xl text-gray-600 max-w-3xl mx-auto">
-				Have questions? Need help? We're here for you. Reach out to our friendly support team 
+				Have questions? Need help? We're here for you. Reach out to our friendly support team
 				and we'll get back to you as soon as possible.
 			</p>
 		</div>
@@ -113,14 +110,26 @@
 <!-- Contact Info Section -->
 <section class="section bg-white">
 	<div class="container-xl">
-		<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+		<div class="grid md:grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
 			{#each contactInfo as info, index}
-				<div class="card text-center animate-on-scroll" style="animation-delay: {index * 0.1}s">
-					<div class="text-4xl mb-4">{info.icon}</div>
-					<h3 class="text-lg font-bold text-gray-900 mb-2">{info.title}</h3>
-					<div class="text-blue-600 font-medium mb-2">{info.value}</div>
-					<p class="text-gray-600 text-sm">{info.description}</p>
-				</div>
+				{#if info.title === 'Live Chat'}
+					<button
+						on:click={openChat}
+						class="card text-center animate-on-scroll hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
+						style="animation-delay: {index * 0.1}s"
+					>
+						<h3 class="text-lg font-bold text-gray-900 mb-2">{info.title}</h3>
+						<div class="text-blue-600 font-medium mb-2">{info.value}</div>
+						<p class="text-gray-600 text-sm">{info.description}</p>
+						<div class="mt-3 text-blue-600 text-sm font-medium">Click to start chatting →</div>
+					</button>
+				{:else}
+					<div class="card text-center animate-on-scroll" style="animation-delay: {index * 0.1}s">
+						<h3 class="text-lg font-bold text-gray-900 mb-2">{info.title}</h3>
+						<div class="text-blue-600 font-medium mb-2">{info.value}</div>
+						<p class="text-gray-600 text-sm">{info.description}</p>
+					</div>
+				{/if}
 			{/each}
 		</div>
 	</div>
@@ -134,13 +143,13 @@
 			<div class="animate-on-scroll">
 				<div class="bg-white rounded-2xl shadow-lg p-8">
 					<h2 class="text-3xl font-bold text-gray-900 mb-6">Send us a Message</h2>
-					
+
 					{#if submitMessage}
 						<div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
 							{submitMessage}
 						</div>
 					{/if}
-					
+
 					<form on:submit|preventDefault={handleSubmit} class="space-y-6">
 						<div class="grid md:grid-cols-2 gap-6">
 							<div>
@@ -166,7 +175,7 @@
 								/>
 							</div>
 						</div>
-						
+
 						<div>
 							<label for="type" class="block text-sm font-medium text-gray-700 mb-2">Inquiry Type</label>
 							<select
@@ -181,7 +190,7 @@
 								<option value="partnership">Partnership Inquiry</option>
 							</select>
 						</div>
-						
+
 						<div>
 							<label for="subject" class="block text-sm font-medium text-gray-700 mb-2">Subject *</label>
 							<input
@@ -193,7 +202,7 @@
 								placeholder="Brief description of your inquiry"
 							/>
 						</div>
-						
+
 						<div>
 							<label for="message" class="block text-sm font-medium text-gray-700 mb-2">Message *</label>
 							<textarea
@@ -205,7 +214,7 @@
 								placeholder="Please provide details about your inquiry..."
 							></textarea>
 						</div>
-						
+
 						<button
 							type="submit"
 							disabled={isSubmitting}
@@ -216,7 +225,7 @@
 					</form>
 				</div>
 			</div>
-			
+
 			<!-- FAQ Section -->
 			<div class="animate-on-scroll" style="animation-delay: 0.2s">
 				<h2 class="text-3xl font-bold text-gray-900 mb-8">Frequently Asked Questions</h2>
@@ -228,7 +237,7 @@
 						</div>
 					{/each}
 				</div>
-				
+
 				<div class="mt-8 bg-blue-50 rounded-lg p-6">
 					<h3 class="text-lg font-semibold text-gray-900 mb-3">Still have questions?</h3>
 					<p class="text-gray-600 mb-4">

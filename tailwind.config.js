@@ -24,6 +24,15 @@ module.exports = {
           'lighterpink': '#f472b6', // Lighter pink
           'lightorange': '#f97316', // Modern orange
         },
+        'fait': {
+          'green': '#10b981',
+          'green-light': '#d1fae5',
+          'green-dark': '#047857',
+          'blue': '#3b82f6',
+          'gray': '#6b7280',
+          'gray-light': '#f9fafb',
+          'dark': '#1f2937',
+        },
         // Override blue colors with company light blue
         'blue': {
           '50': '#f0f9ff',

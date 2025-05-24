@@ -1,8 +1,11 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    import { goto } from '$app/navigation';
 
     let heroSection: HTMLElement;
     let scrollY = 0;
+    let searchQuery = '';
+    let searchLocation = '';
 
     onMount(() => {
         const handleScroll = () => {
@@ -12,6 +15,32 @@
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
     });
+
+    // Handle search functionality
+    function handleSearch() {
+        if (!searchQuery.trim()) {
+            // If no search query, go to services page
+            goto('/services');
+            return;
+        }
+
+        // Create URL with search parameters
+        const params = new URLSearchParams();
+        params.set('search', searchQuery.trim());
+        if (searchLocation.trim()) {
+            params.set('location', searchLocation.trim());
+        }
+
+        // Navigate to services page with search parameters
+        goto(`/services?${params.toString()}`);
+    }
+
+    // Handle Enter key press
+    function handleKeyPress(event: KeyboardEvent) {
+        if (event.key === 'Enter') {
+            handleSearch();
+        }
+    }
 
     // Service categories data
     const serviceCategories = [
@@ -75,11 +104,11 @@
     <!-- Parallax Background -->
     <div
         class="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-20"
-        style="background-image: url('https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=1920&h=1080&fit=crop'); transform: translateY({scrollY * 0.5}px)"
+        style="background-image: url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?w=1920&h=1080&fit=crop'); transform: translateY({scrollY * 0.5}px)"
     ></div>
 
     <!-- Hero Content -->
-    <div class="relative z-10 text-center text-white px-6 sm:px-8 lg:px-4 max-w-4xl mx-auto">
+    <div class="relative z-10 text-center text-white px-8 sm:px-12 lg:px-6 max-w-4xl mx-auto">
         <h1 class="text-5xl md:text-7xl font-bold mb-6 leading-tight">
             Find Trusted Local
             <span class="text-yellow-400">Service Providers</span>
@@ -89,22 +118,42 @@
         </p>
 
         <!-- Search Bar -->
-        <div class="bg-white rounded-lg p-2 shadow-2xl max-w-2xl mx-auto mb-8">
+        <div class="bg-white rounded-lg p-2 shadow-2xl max-w-2xl mx-auto mb-6">
             <div class="flex flex-col md:flex-row gap-2">
                 <input
                     type="text"
                     placeholder="What service do you need?"
+                    bind:value={searchQuery}
+                    on:keypress={handleKeyPress}
                     class="flex-1 px-4 py-3 text-gray-900 rounded-md border-0 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
                 <input
                     type="text"
                     placeholder="Enter your location"
+                    bind:value={searchLocation}
+                    on:keypress={handleKeyPress}
                     class="flex-1 px-4 py-3 text-gray-900 rounded-md border-0 focus:ring-2 focus:ring-blue-500 outline-none"
                 />
-                <button class="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold">
+                <button
+                    on:click={handleSearch}
+                    class="bg-blue-600 text-white px-8 py-3 rounded-md hover:bg-blue-700 transition-colors font-semibold"
+                >
                     Search
                 </button>
             </div>
+        </div>
+
+        <!-- Quick Search Suggestions -->
+        <div class="flex flex-wrap justify-center gap-2 mb-8 max-w-2xl mx-auto">
+            <span class="text-blue-100 text-sm mr-2">Popular:</span>
+            {#each ['House Cleaning', 'Handyman', 'Plumbing', 'Lawn Care'] as suggestion}
+                <button
+                    class="text-sm bg-white/20 text-white px-3 py-1 rounded-full hover:bg-white/30 transition-colors backdrop-blur-sm"
+                    on:click={() => {searchQuery = suggestion; handleSearch();}}
+                >
+                    {suggestion}
+                </button>
+            {/each}
         </div>
 
         <div class="flex flex-col sm:flex-row gap-4 justify-center">
@@ -127,7 +176,7 @@
 
 <!-- Service Categories Section -->
 <section class="py-20 bg-white">
-    <div class="container mx-auto px-6 sm:px-8 lg:px-4">
+    <div class="container mx-auto px-8 sm:px-12 lg:px-6">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">Popular Services</h2>
             <p class="text-xl text-gray-600 max-w-2xl mx-auto">
@@ -137,7 +186,10 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {#each serviceCategories as category}
-                <div class="group cursor-pointer">
+                <a
+                    href="/services?search={encodeURIComponent(category.title)}"
+                    class="group cursor-pointer block"
+                >
                     <div class="relative overflow-hidden rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2">
                         <img
                             src={category.image}
@@ -151,7 +203,7 @@
                             <p class="text-sm text-gray-200">{category.description}</p>
                         </div>
                     </div>
-                </div>
+                </a>
             {/each}
         </div>
     </div>
@@ -159,7 +211,7 @@
 
 <!-- How It Works Section -->
 <section class="py-20 bg-gray-50">
-    <div class="container mx-auto px-6 sm:px-8 lg:px-4">
+    <div class="container mx-auto px-8 sm:px-12 lg:px-6">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">How FAIT Works</h2>
             <p class="text-xl text-gray-600">Simple steps to get the help you need</p>
@@ -187,7 +239,7 @@
 
 <!-- Testimonials Section -->
 <section class="py-20 bg-white">
-    <div class="container mx-auto px-6 sm:px-8 lg:px-4">
+    <div class="container mx-auto px-8 sm:px-12 lg:px-6">
         <div class="text-center mb-16">
             <h2 class="text-4xl font-bold text-gray-900 mb-4">What Our Customers Say</h2>
             <p class="text-xl text-gray-600">Real reviews from real customers</p>
@@ -216,7 +268,7 @@
 
 <!-- Call to Action Section -->
 <section class="py-20 bg-gradient-to-r from-blue-600 to-indigo-700">
-    <div class="container mx-auto px-6 sm:px-8 lg:px-4 text-center">
+    <div class="container mx-auto px-8 sm:px-12 lg:px-6 text-center">
         <h2 class="text-4xl font-bold text-white mb-6">Ready to Get Started?</h2>
         <p class="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
             Join thousands of satisfied customers who trust FAIT for their service needs

@@ -133,7 +133,7 @@
           © {currentYear} FAIT. All rights reserved.
         </p>
         <p class="text-gray-400 text-sm mt-2 md:mt-0">
-          Made with ❤️ for local communities
+          Made for local communities
         </p>
       </div>
     </div>

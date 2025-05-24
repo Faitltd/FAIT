@@ -2,6 +2,7 @@
 	import '../app.css';
 	import Header from '$lib/components/header.svelte';
 	import Footer from '$lib/components/footer.svelte';
+	import ChatWidget from '$lib/components/chat/ChatWidget.svelte';
 	let { children } = $props();
 </script>
 
@@ -12,3 +13,6 @@
 </main>
 
 <Footer />
+
+<!-- Chat Widget -->
+<ChatWidget />

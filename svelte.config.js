@@ -14,7 +14,8 @@ const config = {
 		adapter: adapter({
 			out: 'build',
 			precompress: false,
-			envPrefix: ''
+			envPrefix: '',
+			polyfill: false
 		}),
 		alias: {
 			$actions: 'src/lib/actions',
