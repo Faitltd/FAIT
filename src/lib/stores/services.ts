@@ -1,4 +1,4 @@
-import { writable } from 'svelte/stores';
+import { writable } from 'svelte/store';
 
 export interface Service {
   id: string;
@@ -73,11 +73,11 @@ function createServicesStore() {
 
   return {
     subscribe,
-    
+
     // Load all services
     async loadServices() {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         // Mock data for demo
         const mockServices: Service[] = [
@@ -163,13 +163,13 @@ function createServicesStore() {
             updatedAt: new Date(Date.now() - 259200000).toISOString()
           }
         ];
-        
+
         update(state => ({
           ...state,
           services: mockServices,
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load services';
@@ -178,7 +178,7 @@ function createServicesStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -223,12 +223,12 @@ function createServicesStore() {
             serviceCount: 56
           }
         ];
-        
+
         update(state => ({
           ...state,
           categories: mockCategories
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load categories';
@@ -236,7 +236,7 @@ function createServicesStore() {
           ...state,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -244,12 +244,12 @@ function createServicesStore() {
     // Get service by ID
     async getService(id: string) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         // In a real app, this would make an API call
         // For now, find from existing services or create mock data
         const existingService = initialState.services.find(s => s.id === id);
-        
+
         const service = existingService || {
           id,
           title: 'Service Details',
@@ -277,13 +277,13 @@ function createServicesStore() {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
-        
+
         update(state => ({
           ...state,
           currentService: service,
           isLoading: false
         }));
-        
+
         return { success: true, service };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load service';
@@ -292,7 +292,7 @@ function createServicesStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },

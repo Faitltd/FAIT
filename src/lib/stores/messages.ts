@@ -1,4 +1,4 @@
-import { writable } from 'svelte/stores';
+import { writable } from 'svelte/store';
 
 export interface Message {
   id: string;
@@ -55,11 +55,11 @@ function createMessagesStore() {
 
   return {
     subscribe,
-    
+
     // Load user conversations
     async loadConversations(userId: string) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         // Mock data for demo
         const mockConversations: Conversation[] = [
@@ -129,13 +129,13 @@ function createMessagesStore() {
             updatedAt: new Date(Date.now() - 345600000).toISOString()
           }
         ];
-        
+
         update(state => ({
           ...state,
           conversations: mockConversations,
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load conversations';
@@ -144,7 +144,7 @@ function createMessagesStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -152,7 +152,7 @@ function createMessagesStore() {
     // Load messages for a conversation
     async loadMessages(conversationId: string) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         // Mock messages for demo
         const mockMessages: Message[] = [
@@ -197,7 +197,7 @@ function createMessagesStore() {
             isRead: false
           }
         ];
-        
+
         // Find and set current conversation
         const conversation = mockMessages.length > 0 ? {
           id: conversationId,
@@ -210,14 +210,14 @@ function createMessagesStore() {
           createdAt: new Date(Date.now() - 86400000).toISOString(),
           updatedAt: new Date(Date.now() - 3600000).toISOString()
         } : null;
-        
+
         update(state => ({
           ...state,
           messages: mockMessages,
           currentConversation: conversation,
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load messages';
@@ -226,7 +226,7 @@ function createMessagesStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -244,12 +244,12 @@ function createMessagesStore() {
           timestamp: new Date().toISOString(),
           isRead: true
         };
-        
+
         update(state => ({
           ...state,
           messages: [...state.messages, newMessage]
         }));
-        
+
         return { success: true, message: newMessage };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to send message';
@@ -257,7 +257,7 @@ function createMessagesStore() {
           ...state,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -267,8 +267,8 @@ function createMessagesStore() {
       try {
         update(state => ({
           ...state,
-          messages: state.messages.map(message => 
-            message.conversationId === conversationId 
+          messages: state.messages.map(message =>
+            message.conversationId === conversationId
               ? { ...message, isRead: true }
               : message
           ),
@@ -278,7 +278,7 @@ function createMessagesStore() {
               : conversation
           )
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to mark messages as read';

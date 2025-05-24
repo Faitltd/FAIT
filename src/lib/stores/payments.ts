@@ -1,4 +1,4 @@
-import { writable } from 'svelte/stores';
+import { writable } from 'svelte/store';
 
 export interface PaymentMethod {
   id: string;
@@ -6,13 +6,13 @@ export interface PaymentMethod {
   type: 'card' | 'bank';
   isDefault: boolean;
   createdAt: string;
-  
+
   // Card specific fields
   cardBrand?: string;
   last4?: string;
   expiryMonth?: string;
   expiryYear?: string;
-  
+
   // Bank specific fields
   bankName?: string;
   accountLast4?: string;
@@ -51,11 +51,11 @@ function createPaymentsStore() {
 
   return {
     subscribe,
-    
+
     // Load user payment methods
     async loadUserPaymentMethods(userId: string) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         // Mock data for demo
         const mockPaymentMethods: PaymentMethod[] = [
@@ -80,13 +80,13 @@ function createPaymentsStore() {
             createdAt: new Date().toISOString()
           }
         ];
-        
+
         update(state => ({
           ...state,
           paymentMethods: mockPaymentMethods,
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load payment methods';
@@ -95,7 +95,7 @@ function createPaymentsStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -145,12 +145,12 @@ function createPaymentsStore() {
             updatedAt: new Date(Date.now() - 259200000).toISOString()
           }
         ];
-        
+
         update(state => ({
           ...state,
           transactions: mockTransactions
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to load transactions';
@@ -158,7 +158,7 @@ function createPaymentsStore() {
           ...state,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -166,20 +166,20 @@ function createPaymentsStore() {
     // Add payment method
     async addPaymentMethod(paymentMethod: Omit<PaymentMethod, 'id' | 'createdAt'>) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         const newPaymentMethod: PaymentMethod = {
           ...paymentMethod,
           id: Math.random().toString(36).substr(2, 9),
           createdAt: new Date().toISOString()
         };
-        
+
         update(state => ({
           ...state,
           paymentMethods: [...state.paymentMethods, newPaymentMethod],
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to add payment method';
@@ -188,7 +188,7 @@ function createPaymentsStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -196,14 +196,14 @@ function createPaymentsStore() {
     // Remove payment method
     async removePaymentMethod(id: string) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         update(state => ({
           ...state,
           paymentMethods: state.paymentMethods.filter(method => method.id !== id),
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to remove payment method';
@@ -212,7 +212,7 @@ function createPaymentsStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
@@ -220,7 +220,7 @@ function createPaymentsStore() {
     // Set default payment method
     async setDefaultPaymentMethod(id: string) {
       update(state => ({ ...state, isLoading: true, error: null }));
-      
+
       try {
         update(state => ({
           ...state,
@@ -230,7 +230,7 @@ function createPaymentsStore() {
           })),
           isLoading: false
         }));
-        
+
         return { success: true };
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Failed to set default payment method';
@@ -239,7 +239,7 @@ function createPaymentsStore() {
           isLoading: false,
           error: errorMessage
         }));
-        
+
         return { success: false, error: errorMessage };
       }
     },
