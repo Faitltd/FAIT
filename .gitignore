@@ -20,3 +20,43 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Prevent duplicate files (backup copies)
+* 2.*
+*2.js
+*2.tsx
+*2.ts
+*2.sql
+*2.json
+*2.md
+*2.html
+*2.css
+*2.scss
+
+# Performance and analysis reports
+bundle-report.txt
+bundle-size-report.txt
+performance-report.json
+performance-test-report.json
+
+# Temporary and test files
+terminal
+simple-test.*
+test-app-*
+temp-*
+
+# Redundant project directories (prevent recreation)
+fait-coop-platform/
+fait-svelte/
+fait-new/
+fait-modern/
+fait-mono/
+
+# Cypress artifacts
+cypress/screenshots/
+cypress/videos/
+cypress/results/
+
+# Supabase
+.branches
+.temp
