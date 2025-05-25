@@ -1,0 +1,74 @@
+Bundle Size Report
+==================
+Generated on Tue May  6 08:49:35 MDT 2025
+
+Main chunks:
+  index-Yx3kpr74.js: 217.16KB
+
+Vendor chunks:
+  react-vendor-TK1kbwdn.js: 160.69KB
+  icons-vendor-BGI_58BJ.js: 86B
+  api-vendor-CKeWRTjQ.js: 106.84KB
+  calendar-vendor-BGI_58BJ.js: 89B
+  chart-vendor-l0sNRNKZ.js: 51B
+  maps-vendor-l0sNRNKZ.js: 50B
+  ui-vendor-BeM78qM_.js: 14.47KB
+  utils-vendor-5ojtMi-o.js: 24.96KB
+
+Other chunks:
+  AuditLogPage-BSKR--Wh.js: 19.07KB
+  SubscriptionPlansStripe-DRtA1oVB.js: 29.58KB
+  bookingApi-1D_WIeEM.js: 3.52KB
+  BookingConfirmationPage-daCk9R2K.js: 7.99KB
+  LoginPage-DPvSGNL5.js: 5.96KB
+  VerySimpleWarrantyClaimsPage-COblbW-v.js: 668B
+  calculator-CWT1Cdzz.js: 751B
+  WarrantyClaimNewPage-CH5aqjdU.js: 8.61KB
+  ServiceAgentMessages-Bvfio7qV.js: 3.96KB
+  BookingPage-cCFEndtP.js: 13.47KB
+  NotificationsPage-BVKHqrBr.js: 8.54KB
+  MessagingPage-BK9rcBgo.js: 17.98KB
+  MainLayout-D9a3BVOg.js: 21.90KB
+  SimpleClientMessages-2rPmkTwL.js: 1.03KB
+  SimpleHandymanCalculator-SWkNZ-0N.js: 11.21KB
+  ServiceAgentReferrals-y2_l0SOD.js: 6.04KB
+  SimpleServiceAgentMessages-C-5lpWxp.js: 1.05KB
+  trash-2-BW7ANNpg.js: 919B
+  WarrantyClaimDetailPage-DuaGCa2T.js: 11.17KB
+  ClientDashboard-KWCEW3LF.js: 24.97KB
+  ServiceAgentListings-Duuf_IK5.js: 6.23KB
+  GamificationPage-C_ghwnO1.js: 1.22KB
+  EstimateCalculators-B2T4MzEa.js: 2.57KB
+  arrow-left-CRoCFfmb.js: 386B
+  ServiceSearchPage-CPb1iD-5.js: 28.02KB
+  WarrantyPage-B_uYAagt.js: 9.62KB
+  ProjectsPage-CYuTTIVD.js: 49.92KB
+  EnhancedSubscriptionDashboard-BDBNkE7z.js: 19.60KB
+  dashboardStatsApi-Dod-nKJ-.js: 4.65KB
+  DashboardRouter-CCuYk31C.js: 1.72KB
+  ForumPage-BB5zYb7s.js: 6.42KB
+  SignupPage-Cw5iDjpG.js: 7.42KB
+  SimpleSMSMessagingPage-CbDHa-JC.js: 10.07KB
+  ServiceAgentDashboard-b-fJ7B7K.js: 30.81KB
+  BookingsListPage-HvcIHkjG.js: 8.03KB
+  AvailabilityPage-B51Y_p6Z.js: 11.06KB
+  browser-CPLWMrWQ.js: 392B
+  SubscriptionDashboard-CnWX9SD3.js: 1.24KB
+  circle-plus-BRzb-ns5.js: 424B
+  HandymanTaskEstimator-C7hyNTi9.js: 522B
+  ProjectList-Di6HeAna.js: 9.02KB
+  BookingDetailsPage-BHv5GOCP.js: 13.61KB
+  SimpleServiceSearchPage-Dr25IpnU.js: 3.80KB
+  users-xABI3RM7.js: 522B
+  servicesApi-DE38sIRK.js: 4.23KB
+  SimpleAdminMessages-2fcR4O6b.js: 1.02KB
+  ServicesPage-DydlvjuM.js: 1.21KB
+  RemodelingCalculator-Cu68x0Jk.js: 14.52KB
+  availabilityApi-t8LEcMYg.js: 2.47KB
+  SimpleRemodelingCalculator-BQVJhUrq.js: 8.30KB
+  ProfilePage-DQAIUskf.js: 1.98KB
+  EstimatesPage-CXqMq27J.js: 1.21KB
+  warrantyApi-aAasRYck.js: 7.55KB
+  AdminDashboard-DbekhU-f.js: 7.46KB
+
+Total JavaScript bundle size: 0B

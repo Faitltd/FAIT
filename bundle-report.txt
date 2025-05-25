@@ -1,0 +1,65 @@
+Bundle Size Report
+================
+
+Generated on Tue May  6 08:46:40 MDT 2025
+
+Main chunks:
+217K dist/assets/index-Yx3kpr74.js
+
+Vendor chunks:
+
+Other chunks:
+7.4K dist/assets/AdminDashboard-DbekhU-f.js
+338B dist/assets/arrow-left-CRoCFfmb.js
+19K dist/assets/AuditLogPage-BSKR--Wh.js
+2.4K dist/assets/availabilityApi-t8LEcMYg.js
+11K dist/assets/AvailabilityPage-B51Y_p6Z.js
+3.5K dist/assets/bookingApi-1D_WIeEM.js
+7.9K dist/assets/BookingConfirmationPage-daCk9R2K.js
+14K dist/assets/BookingDetailsPage-BHv5GOCP.js
+13K dist/assets/BookingPage-cCFEndtP.js
+8.0K dist/assets/BookingsListPage-HvcIHkjG.js
+347B dist/assets/browser-CPLWMrWQ.js
+703B dist/assets/calculator-CWT1Cdzz.js
+375B dist/assets/circle-plus-BRzb-ns5.js
+25K dist/assets/ClientDashboard-KWCEW3LF.js
+1.7K dist/assets/DashboardRouter-CCuYk31C.js
+4.6K dist/assets/dashboardStatsApi-Dod-nKJ-.js
+20K dist/assets/EnhancedSubscriptionDashboard-BDBNkE7z.js
+2.5K dist/assets/EstimateCalculators-B2T4MzEa.js
+1.2K dist/assets/EstimatesPage-CXqMq27J.js
+6.4K dist/assets/ForumPage-BB5zYb7s.js
+1.2K dist/assets/GamificationPage-C_ghwnO1.js
+463B dist/assets/HandymanTaskEstimator-C7hyNTi9.js
+5.9K dist/assets/LoginPage-DPvSGNL5.js
+22K dist/assets/MainLayout-D9a3BVOg.js
+18K dist/assets/MessagingPage-BK9rcBgo.js
+8.5K dist/assets/NotificationsPage-BVKHqrBr.js
+1.9K dist/assets/ProfilePage-DQAIUskf.js
+9.0K dist/assets/ProjectList-Di6HeAna.js
+50K dist/assets/ProjectsPage-CYuTTIVD.js
+14K dist/assets/RemodelingCalculator-Cu68x0Jk.js
+31K dist/assets/ServiceAgentDashboard-b-fJ7B7K.js
+6.2K dist/assets/ServiceAgentListings-Duuf_IK5.js
+3.9K dist/assets/ServiceAgentMessages-Bvfio7qV.js
+6.0K dist/assets/ServiceAgentReferrals-y2_l0SOD.js
+4.2K dist/assets/servicesApi-DE38sIRK.js
+28K dist/assets/ServiceSearchPage-CPb1iD-5.js
+1.2K dist/assets/ServicesPage-DydlvjuM.js
+7.4K dist/assets/SignupPage-Cw5iDjpG.js
+996B dist/assets/SimpleAdminMessages-2fcR4O6b.js
+1.0K dist/assets/SimpleClientMessages-2rPmkTwL.js
+11K dist/assets/SimpleHandymanCalculator-SWkNZ-0N.js
+8.2K dist/assets/SimpleRemodelingCalculator-BQVJhUrq.js
+1.0K dist/assets/SimpleServiceAgentMessages-C-5lpWxp.js
+3.7K dist/assets/SimpleServiceSearchPage-Dr25IpnU.js
+10K dist/assets/SimpleSMSMessagingPage-CbDHa-JC.js
+1.2K dist/assets/SubscriptionDashboard-CnWX9SD3.js
+30K dist/assets/SubscriptionPlansStripe-DRtA1oVB.js
+874B dist/assets/trash-2-BW7ANNpg.js
+479B dist/assets/users-xABI3RM7.js
+602B dist/assets/VerySimpleWarrantyClaimsPage-COblbW-v.js
+7.5K dist/assets/warrantyApi-aAasRYck.js
+11K dist/assets/WarrantyClaimDetailPage-DuaGCa2T.js
+8.6K dist/assets/WarrantyClaimNewPage-CH5aqjdU.js
+9.6K dist/assets/WarrantyPage-B_uYAagt.js

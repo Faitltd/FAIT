@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fait-scrapers",
+  "private_key_id": "3c03916f47c94ef07660c7c97f02d2bfb7f92e7b",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQDBBiFqKKJHQXEH\nkGXSaXmm+UzGyMgGK+3Rrgk/7AfiDc8d4XhJBPWbgHG+bLcJOTTM5f6lDxFGX5JH\nFjKXMND1vjHhlRcVma2miLA9H1Dp7IJocYvrAFv/38d3nD4hBkDVm0X0c85+qYXp\nIPQDqDZ8r82LS/1Gf8xH+gSonbADxwPfMC9X2elnLegQSOXvx9V6vZFsW8OomewG\ng34NkOTrtlvQVWWFpCJGRzvyMtG3h/U3RhenoPhr3lTdatDPyBLZD+yFaXxoFqX5\nr63nuDV6fVBDBoWLRigirarlsYvNt6GWzf6bZleLroYox/AXmlVRjRdlsZtofxUf\n0H/AswjBAgMBAAECggEAIM5MbpECZ67pKXpyu8y+ZtEXKe/lAxuDO3BjVRBmFJb5\nPSBdg7eKkMfHTTCH+VLWNP7gBSim7HmA0IEmzwh2c1XEf40J09t/Jn8zyOeiJmfS\nkDLAL4wrlrTvX1ZYPt+jtEpEHPRzw5ZHUqSNpHN58z4j5olfPhSpYRBOq2PFjxZ/\n8vcextmuomX0wemSGnOlTo2FjjcmVtQnFLNHqV8RQ3YZFrk/wH844R2kVj9QpeJn\nx38jVnAFvxFF4FGOCjzA/Y3G64fAgPzX3FyRCjjxNn5f4JXaCa4iMOqUnk7jHxfC\npc/2MjDcseEUwoFLXwgpPSspImuwXJIk25BW0spVEwKBgQDgJ/fM7FS3BMLP9/bP\n00qiOTWmKCoFEvGhxZermCgArdJHx6yss7QPak0qVGtnLigYuU2oITxd59d1fjkK\nTPEcrwrGoMTpziKBkoEB/y2osq7Tsq1BknY6eERJI6s+Z4zqzyXE2Ggi2CfNxZQq\nFtVnSBZQgD8RliMZUmgwKf1FCwKBgQDccfVWItYfHG6VgbQHj/OgoRCtza/9oN+Z\n/2kMz1Op0UNpen/S2sOUrEY/iiLeilyMRV1HZPGl7MXjcBPJEShFe+02IqLwp7xX\nlQ8Jhj3p127pzfwZhVzpQ2HvORQGZ2wSti0ADvl/NS4yW695AFTy4P4bfwDSX8mG\nHIL5Yv5w4wKBgF4srJFt4RGbcHWLiig6byrEumN6kFzdXqNGrrgrDvNqE+SQYV2V\nilrHoG/eU9lfrPzmLVgrzn7tfrogM7q+JLaWXAKjXNeWAS1K7eR23yn3GDhc4ymf\nbQiXqqjH0ZRAURX9vbJ78RRimCZ9kgg026euw6FCoDy1RT3IP3msynmNAoGATWQ0\nnWjdg06YBCTk70K6ZUomcN4lSwWPeqEQYE7pMFUnNYCsH3pt72QLxYLZewdYNmaj\nuMzXiUj2sEJIr+42FS7MuJSwX4yDsrvB67YVRmM7rRmDx/HqDHp7h2Cihx0H9AnB\nAqQ/M0mYTlWh5PkY2avjigOsZi76sPqRgLwgV8ECgYAGLtm281UOrDaK8V2GwXt0\nY8E8DZW7CHE9KP6ewEhDG/xOV7nI1Dp4eHIuEX4irR0ZzcICfUoG2ucM2Jh7WFRp\nddD/VBe1I84XD/s1J2hnPKMKD99+sOmPsiLkUATk+usj8RUFudCJ4TQMQbLZoqfG\nwtqlEC2CpPA1/QOm7rrJMg==\n-----END PRIVATE KEY-----\n",
+  "client_email": "fait-scrapers-sa@fait-scrapers.iam.gserviceaccount.com",
+  "client_id": "111897485800516800601",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fait-scrapers-sa%40fait-scrapers.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

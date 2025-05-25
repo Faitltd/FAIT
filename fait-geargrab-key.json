@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fait-geargrab",
+  "private_key_id": "ff2f76077b661d2e51410a7f83f0141d397ba4d2",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCzx7tl9s9NKf/r\nopsWuhDtq84Dn0fpO4+2QM6iVkLksuoX6L2SI0+v8uo8KPoE4Xha0KShzRpLYjNe\nZubmAlCgqszF1JmleAbF6GgecriYL9SoFuMXZyMT807WKnpqpwFNkDr9guxPU2dw\nQ4vXH3fD7/d66fk/Yil0mmN/8cYYk4GkUHEVDDFNqm/+Hwt262SCzcJQZWyg5Md3\ncVRTYthD103qbRzKvqRGvp17LvS8JmQNFeUqkGzDy/Flfob7+H+pzwmOlQ9Ism0h\n4V6fU4WpZE3f5opSSlCa0SIMvvJb9TLRBh+mjQeiVkoWBMPqrf3GwILPsR2IiI2n\n+s9yKvsvAgMBAAECggEAEHyOiOk7VX42g+tjgZAKoWESAW8H7zGRGkuTJ3v1ondt\n1Ed5qv8l/aKvLFktpGjw2pMrpdLjSGp2/388SXeI4VMIeFPoyy3YoSmQ8sned8Zb\nIBcJOEozA09auXUnyMQL8Ir7fegVt6iUYc0v88hk+Uj2TwVJ4DAmURUfbspDOlmU\nxKEoDTT3gZXbLTxajsl25d9Fw4ddVRGlc4cPnqvU/PLdtyccoCCun752Uj6UQ3lp\ntFEo7ydu/LqgqL2D1TLV6rVvogwxJXajjw3wHoW4GQ5aUd9N9h9x378JTSPlFUB5\nXE9K9OnN1hW/8T2+RhlPov2eEXg4F1aJOIkt1Mij0QKBgQD6r5opqM2lKmh71b2z\nRM4PZr+h5dChcCVlFqUPC42GUGb9dpWrBq292whKDQcvirYNcy/bwE6kRHxzb4gq\nnKnoKRsSUkUhzZXSapeBmhKLS6h/w+lKj7xTx35TDiuH8dNkpJ0PrqO1c9y/AM3+\n9S5n3hL/ThzTMI8ydxwqWeTu4wKBgQC3l1h0TZ4EO+e0Iez7X7DltSMDlmgd5It7\nCJpigzwpHGwGwt0pYrjHu9S8hry/kXaXnRlalsvfUliMYpLrCZN2zwV6tTTJND3e\n4dIIyg1++d7CmVJcv9qTIzG1r2HTJq3rRolLw5JPCMCtSZ65NZR3/m7wKf2FOs/Y\nHvZlzJqIRQKBgB2Gp0q21hnZB9tmDmTZ+sc3m+SOs+b/1Xe1lhVSkAW83JSH7hLp\nw3b0IGLQbAM+fDjTU1S3rsuMQXg7L7eNIjn09XpP9FKJ61aQNW4PXpXHgH4j7gtZ\nKJ5Zhdh0d84YPoTBGrqpICEUF3DrwFeCO0gCkQw/AAgj1Qnlm4ylb+BvAoGBAJgZ\nO8AG+c26L4jNvn63VV/JRHvZZOK3EFNa2kSZQwMwN9MWJ5H85ucalvGlksQG6EBN\nd87UNY0LtK6BkARHB7ObaYeyjkvPCx8W6SI8+xdiPYns6g5LJ/NUaf+CkEIVvmq4\nIlDxcsoljzNBVc1NNXaABTrVHuL8yWrco/fMnY4dAoGANuIxZ7iqslfR/X0LO7X+\nR8Dd+sz5sDtqtA16AlwZtBGMhENYA04vE5kdbM+Y16tOqDpwKWMmz/ubiRHESx1w\nv36J0AdkQTpnJ/souiqnvfSdalghxZEuNCk/Xiv/D4bUDEiSoROO8mqrYiHGvTAF\nsSEU2QJNUnWVODHQlsa7sbE=\n-----END PRIVATE KEY-----\n",
+  "client_email": "fait-geargrab-sa@fait-geargrab.iam.gserviceaccount.com",
+  "client_id": "116550960655430830476",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fait-geargrab-sa%40fait-geargrab.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

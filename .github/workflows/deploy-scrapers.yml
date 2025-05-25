@@ -1,0 +1,43 @@
+name: Deploy FAIT Scrapers
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'tools/**'
+      - '.github/workflows/deploy-scrapers.yml'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: fait-scrapers
+          service_account_key: ${{ secrets.FAIT_SCRAPERS_SA_KEY }}
+          export_default_credentials: true
+
+      - name: Authenticate Docker to Google Artifact Registry
+        run: |
+          gcloud auth configure-docker us-central1-docker.pkg.dev
+
+      - name: Build and push Docker image for Home Depot Scraper
+        run: |
+          cd tools/home-depot-scraper
+          docker build -t us-central1-docker.pkg.dev/fait-scrapers/fait-scrapers-repo/home-depot-scraper:${{ github.sha }} .
+          docker push us-central1-docker.pkg.dev/fait-scrapers/fait-scrapers-repo/home-depot-scraper:${{ github.sha }}
+
+      - name: Deploy Home Depot Scraper to Cloud Run
+        run: |
+          gcloud run deploy home-depot-scraper \
+            --image us-central1-docker.pkg.dev/fait-scrapers/fait-scrapers-repo/home-depot-scraper:${{ github.sha }} \
+            --platform managed \
+            --region us-central1 \
+            --no-allow-unauthenticated \
+            --set-env-vars="SUPABASE_URL=${{ secrets.SUPABASE_URL }},SUPABASE_KEY=${{ secrets.SUPABASE_KEY }}" \
+            --project fait-scrapers

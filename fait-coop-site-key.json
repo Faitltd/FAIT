@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "fait-coop-site",
+  "private_key_id": "18c2f228b9c156782dd5975d2e922ceb9ca4bfca",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCgnWbqqV1RQ/tg\ncaGMq8E0AvviZbVhxFNejzFtiRjUGudnXRWUKjcJX+O4qzxZ6Rs8CGqhh7rq86Jc\n8D27Rx55vrJYSlbRGlYgeIif0QdYPaH1kwP0lb/VWpeLNoHEA3vU2eOJS6Ut6E3k\nOS44r3UAG7kIlEvuXwgoq3TN+EwoteXrxKMFfAK95zO/dh46E89Gl+Cf6BkoeAMi\n3iLEufAjxp7klj9KVeZcz/oNOcxuqbtVHJ72Kj0zFcqGWtrLzr9pSX3jfqER7zui\ndsoHWIxlLD2H/MXu+QUW1mWF/rps9LIZhyJaA1aBVyuRz78PxpojdFJfnWBhqeQ0\n47FwaLwVAgMBAAECggEAOZrae5VM28WnFdsLVtmPDKl5T6Ss3ii8wfBXiPKfzgrs\nLb1L7P0LCjizAtufZJvfYbOfEtoMZxIEjJK5gT6rpnyHmHTpGEv60eCJF9Cvcq2A\nNgSJaaJ/z/SS36In/nZFZnzTR72yu3lS3mTHuBrtuqE2xuXxKcg5s+RymyDPp9Wr\npn1ta85eQzC+To7qkSbn2Q2SdTIVqjRHA1VgCFxBlapbCPnZkl0/cqPEDc6VlwkX\nfb/8qr2n+mYBKR+LZwQCmgNIG7tkqVaek70NFYkFKDkxd0g5gHSEwOmTeev14Nez\ndV6Kdr1SDd9r246OoR6aOXPSEtKO3pn8J1tFzpxFbQKBgQDYF0Xap/pHPPa9qm3t\npPvnX5HuxhuMnjwSCFfmNuRVRp/qlXYkjUecwmtLXE8A28fVyiHSkd0PhLd6Y6WU\n+EqxOmRRHfTMLxWDByuDpes+bC28LHlan/k1uXnQ1EZWghq5TI0zA9/SmQUa0dag\nx1Ze6BT/lXclJd+1p4vo/dyjiwKBgQC+Rzv3LGwGe/N2OzmwempaXtV2RQz2LrRM\nmEKbxMchiSAeTLKpptx+mfSPTpguLUUh53lqhopK5uIwj3BsUiT9SmAPYwKfaau6\nY45xiVIXL85m3VoWy6v3bdj0iwpfDRZfKtDVPOUh1ElKPAJ2BBI5jdc95KQYN16W\n4EwbEfOS3wKBgCjYnVerkN+OYoWPhZ/6I7OkmQ0tXV/DOU+fTB40Gg0UgH3zKpXW\nLscu6OEh3b0nzipXPvVypPqd96Cm3VG/bT767qN2qiM+cy6FWHBWGJWAFVUQgw/i\nVVUWbjRPK8yGY07LbZVLEi/YxOJA7/UMOQNPk0iMlCztb9ACj6vG8MHpAoGBAK9L\n/yG7KhZbMTO2YnKEhOCWx7+647MV2gNKrurEwdPSeeWQMXT8hdyYx2cTOD4qdKtE\njmYmZteUl8O3EhKpJuy3DYJ/a9YjSxNfTsaohRlZcKTxvmKL5vT/nUXFpptk+jxY\nvKYHAO1GnvKmEHpbS9L8KtUZhFfPAvSq1VKHGkgvAoGBAJqQIA5OzfQ0n4/JntNd\nEQR8LopiiK5QhCHZolsMP3UxShB/pK2fFbguV27tZ1enwvNnowfW8BfIan4ePGcd\nWC2CB1sInZSDCzYe4vTJpAAO8iOQ21UiK4MN06NjlfSL/jVOw3VUf5Rw++Pq2eY7\nvom6Qgq/LP3i1Y7gHuvfbTQU\n-----END PRIVATE KEY-----\n",
+  "client_email": "fait-coop-site-sa@fait-coop-site.iam.gserviceaccount.com",
+  "client_id": "113331123595330192678",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/fait-coop-site-sa%40fait-coop-site.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}

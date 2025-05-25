@@ -1,0 +1,49 @@
+# Exclude git and temporary files
+.git
+.gitignore
+.github
+.DS_Store
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+*.log
+
+# Exclude node modules and build artifacts
+node_modules/
+dist/
+build/
+coverage/
+.nyc_output/
+
+# Exclude test and development files
+__tests__/
+test/
+tests/
+cypress/
+*.test.js
+*.spec.js
+*.test.ts
+*.spec.ts
+
+# Exclude documentation
+docs/
+*.md
+LICENSE
+
+# Exclude geargrab components, tools, and scrapers
+**/geargrab/
+**/tools/
+**/scrapers/
+
+# Exclude webpack specific files
+webpack.*.js
+webpack.*.cjs
+
+# Exclude development configuration
+.eslintrc*
+.prettierrc*
+.babelrc*
+jest.config.*
+tsconfig.*

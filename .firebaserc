@@ -1,0 +1,19 @@
+{
+  "projects": {
+    "default": "fait-444705",
+    "production": "fait-444705"
+  },
+  "targets": {
+    "fait-444705": {
+      "hosting": {
+        "fait-coop-sveltekit": [
+          "fait-sveltekit"
+        ],
+        "fait-coop-react": [
+          "fait-coop-site"
+        ]
+      }
+    }
+  },
+  "etags": {}
+}
