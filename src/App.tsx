@@ -317,6 +317,14 @@ const router = createBrowserRouter(
         }
       />
       <Route
+        path="/provider/services/new"
+        element={
+          <ProtectedRoute>
+            <CreateService />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/services/edit/:id"
         element={
           <ProtectedRoute>
