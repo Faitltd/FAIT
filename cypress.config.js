@@ -1,7 +1,7 @@
-const { defineConfig } = require('cypress');
+import { defineConfig } from 'cypress';
 
 // Example of correct configuration
-module.exports = defineConfig({
+export default defineConfig({
   projectId: "ksq7ct",
 
   e2e: {

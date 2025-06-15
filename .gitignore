@@ -1,124 +1,30 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# SvelteKit
+.svelte-kit/
+build/
+.vercel/
+.netlify/
 
 # Environment variables
 .env
-.env.*
-!.env.example
+.env.local
+.env.production
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Dependencies
+node_modules/
+
+# Logs
+*.log
+
+# OS generated files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
-.qodo
+Thumbs.db
 
-# Large backup and duplicate directories
-FAIT_backup/
-FAIT_old/
-fait-coop-platform/
-fait-new/
-fait-svelte/
-test-app/
-geargrab/
-FAIT*/
-fait-*/
-**/FAIT*
-**/*2.0*
-**/*copy*
-**/*backup*
-**/*old*
-
-# GearGrab separation - prevent contamination
-*geargrab*
-*GearGrab*
-.env.geargrab
-fait-geargrab-*
-**/geargrab/**
-
-# Duplicate files
-*2.*
-*3.*
-*4.*
-* 2.*
-* 3.*
-* 4.*
-
-# Cypress artifacts
-cypress/videos/
-cypress/screenshots/
-cypress/downloads/
-
-# SvelteKit build artifacts
-.svelte-kit/
-
-# Firebase
-.firebase/
-
-# Assets that might be large
-Assets/
-public/fonts/
-public/images/icons/
-
-# Static files
-static/
-
-# Development tools
-.bolt/
-tabnine_root*
-
-# Scripts
-scripts/
-*.sh
-
-# Temporary files
-*.tmp
-*.temp
-*.bak
-*.swp
-*.swo
-
-# Build artifacts
-build/
-out/
-.next/
-.nuxt/
-.output/
+# IDE
+.vscode/
+.idea/
 
 # Testing
 coverage/
-.nyc_output/
-test-results/
-playwright-report/
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# OS generated files
-Thumbs.db
-ehthumbs.db
-Desktop.ini
-$RECYCLE.BIN/
-.Spotlight-V100
-.Trashes
-.fseventsd
-.TemporaryItems
-.DocumentRevisions-V100
+cypress/screenshots/
+cypress/videos/

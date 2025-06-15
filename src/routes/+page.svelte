@@ -1,8 +1,8 @@
 <script>
 	import { supabase } from '$lib/supabase.js';
-	
+
 	let showLoginForm = false;
-	let email = 'admin@geargrab.com';
+	let email = 'admin@fait.com';
 	let password = 'admin123';
 	let isLoading = false;
 	let error = '';
@@ -58,17 +58,19 @@
 </script>
 
 <svelte:head>
-	<title>GearGrab - Outdoor Gear Rental Marketplace</title>
+	<title>FAIT - Home Services Cooperative Platform</title>
 </svelte:head>
 
-<div style="min-height: 100vh; background: linear-gradient(135deg, #2d5a27, #40798c); color: white;">
+<div style="min-height: 100vh; background: linear-gradient(135deg, #1e3a8a, #3b82f6); color: white;">
 	<!-- Header -->
 	<header style="padding: 1rem 2rem; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);">
 		<div style="display: flex; justify-content: space-between; align-items: center; max-width: 1200px; margin: 0 auto;">
-			<h1 style="font-size: 2rem; font-weight: bold; margin: 0;">🏕️ GearGrab</h1>
+			<h1 style="font-size: 2rem; font-weight: bold; margin: 0;">🏠 FAIT</h1>
 			<nav style="display: flex; gap: 2rem; align-items: center;">
+				<a href="/services" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.1);">Services</a>
+				<a href="/about" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.1);">About</a>
 				<a href="/admin" style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.1);">Admin</a>
-				
+
 				{#if user}
 					<span style="color: white;">Welcome, {user.email}!</span>
 					<button on:click={handleLogout} style="color: white; text-decoration: none; padding: 0.5rem 1rem; border-radius: 8px; background: rgba(255,255,255,0.1); border: none; cursor: pointer;">Logout</button>
@@ -83,7 +85,7 @@
 	{#if showLoginForm}
 		<div style="background: rgba(0,0,0,0.8); position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 1000; display: flex; align-items: center; justify-content: center;">
 			<div style="background: white; padding: 2rem; border-radius: 12px; max-width: 400px; width: 90%;">
-				<h3 style="margin: 0 0 1rem 0; color: #333;">Sign In to GearGrab</h3>
+				<h3 style="margin: 0 0 1rem 0; color: #333;">Sign In to FAIT</h3>
 
 				{#if error}
 					<div style="background: #fee; border: 1px solid #fcc; color: #c33; padding: 0.5rem; border-radius: 4px; margin-bottom: 1rem; font-size: 0.9rem;">
@@ -93,18 +95,20 @@
 
 				<form on:submit|preventDefault={handleLogin}>
 					<div style="margin-bottom: 1rem;">
-						<label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">Email:</label>
+						<label for="email" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">Email:</label>
 						<input
+							id="email"
 							type="email"
 							bind:value={email}
 							style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;"
-							placeholder="admin@geargrab.com"
+							placeholder="admin@fait.com"
 						/>
 					</div>
 
 					<div style="margin-bottom: 1.5rem;">
-						<label style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">Password:</label>
+						<label for="password" style="display: block; margin-bottom: 0.5rem; color: #333; font-weight: 500;">Password:</label>
 						<input
+							id="password"
 							type="password"
 							bind:value={password}
 							style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 6px; font-size: 1rem;"
@@ -131,7 +135,7 @@
 				</form>
 
 				<p style="margin-top: 1rem; font-size: 0.9rem; color: #666; text-align: center;">
-					Demo: admin@geargrab.com / admin123
+					Demo: admin@fait.com / admin123
 				</p>
 			</div>
 		</div>
@@ -141,20 +145,20 @@
 	<main style="padding: 4rem 2rem; text-align: center; max-width: 1200px; margin: 0 auto;">
 		<div style="background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 24px; padding: 3rem; margin-bottom: 3rem; border: 1px solid rgba(255,255,255,0.3);">
 			<h2 style="font-size: 3rem; font-weight: bold; margin-bottom: 1rem; line-height: 1.2;">
-				Rent Outdoor Gear from
-				<span style="color: #70a9a1;">Fellow Adventurers</span>
+				Professional Home Services
+				<span style="color: #60a5fa;">Cooperative Platform</span>
 			</h2>
 			<p style="font-size: 1.5rem; margin-bottom: 2rem; opacity: 0.9;">
-				Grab Your Gear and Get Out There! Peer-to-peer outdoor equipment sharing.
+				Connecting homeowners with trusted service professionals through our cooperative network.
 			</p>
 
 			<!-- Action Buttons -->
 			<div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-				<a href="/browse" style="background: #70a9a1; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.2rem; display: inline-block; transition: all 0.3s;">
-					Browse Gear
+				<a href="/services" style="background: #3b82f6; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.2rem; display: inline-block; transition: all 0.3s;">
+					Find Services
 				</a>
-				<a href="/list" style="border: 2px solid white; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.2rem; display: inline-block; transition: all 0.3s;">
-					List Your Gear
+				<a href="/provider" style="border: 2px solid white; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 12px; font-weight: bold; font-size: 1.2rem; display: inline-block; transition: all 0.3s;">
+					Become a Provider
 				</a>
 			</div>
 		</div>
@@ -168,25 +172,25 @@
 			</div>
 		{/if}
 
-		<!-- Popular Categories -->
+		<!-- Service Categories -->
 		<div style="background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border-radius: 24px; padding: 3rem; border: 1px solid rgba(255,255,255,0.2);">
-			<h3 style="font-size: 2rem; font-weight: bold; margin-bottom: 2rem;">Popular Categories</h3>
+			<h3 style="font-size: 2rem; font-weight: bold; margin-bottom: 2rem;">Service Categories</h3>
 			<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
 				<div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);">
-					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🏕️ Camping & Shelter</h4>
-					<p style="opacity: 0.8;">Tents, sleeping bags, camping stoves</p>
+					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🔧 Handyman Services</h4>
+					<p style="opacity: 0.8;">General repairs, installations, maintenance</p>
 				</div>
 				<div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);">
-					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🥾 Hiking & Backpacking</h4>
-					<p style="opacity: 0.8;">Backpacks, boots, trekking poles</p>
+					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🏠 Home Improvement</h4>
+					<p style="opacity: 0.8;">Remodeling, renovations, upgrades</p>
 				</div>
 				<div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);">
-					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🧗 Climbing & Mountaineering</h4>
-					<p style="opacity: 0.8;">Harnesses, ropes, carabiners</p>
+					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🔌 Electrical & Plumbing</h4>
+					<p style="opacity: 0.8;">Licensed electrical and plumbing work</p>
 				</div>
 				<div style="background: rgba(255,255,255,0.15); padding: 1.5rem; border-radius: 16px; border: 1px solid rgba(255,255,255,0.2);">
-					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🚣 Water Sports</h4>
-					<p style="opacity: 0.8;">Kayaks, SUPs, wetsuits</p>
+					<h4 style="font-size: 1.3rem; font-weight: bold; margin-bottom: 0.5rem;">🧹 Cleaning Services</h4>
+					<p style="opacity: 0.8;">House cleaning, deep cleaning, maintenance</p>
 				</div>
 			</div>
 		</div>
