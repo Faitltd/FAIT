@@ -1,22 +1,28 @@
 /**
  * Supabase Client Singleton
- * 
+ *
  * This module provides a centralized Supabase client to be used throughout the application,
  * preventing the "Multiple GoTrueClient instances" warning.
  */
 
-import supabase from './/utils/supabaseClientSimple';;
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import type { Database } from '../lib/database.types';
 
-// Environment variables
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'http://127.0.0.1:54321';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0';
+// Environment variables with fallbacks
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://ydisdyadjupyswcpbxzu.supabase.co';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlkaXNkeWFkanVweXN3Y3BieHp1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDM0MzM1ODcsImV4cCI6MjA1OTAwOTU4N30.Iy_qqNtTzVi-XVKzBqDWOUGJdFV9ckLynR_bRLUvdnY';
 
 // Client options
 const SUPABASE_OPTIONS = {
   auth: {
     persistSession: true,
     autoRefreshToken: true,
-    detectSessionInUrl: true
+    detectSessionInUrl: true,
+    flowType: 'pkce' as const,
+    storageKey: 'supabase.auth.token'
+  },
+  db: {
+    schema: 'public'
   }
 };
 
@@ -50,7 +56,7 @@ class SupabaseClientSingleton {
         console.log('Initializing Supabase client with URL:', SUPABASE_URL);
         
         // Create the client
-        // Using singleton Supabase client;
+        const client = createClient<Database>(SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_OPTIONS);
         
         // Store the instance
         SupabaseClientSingleton.instance = client;

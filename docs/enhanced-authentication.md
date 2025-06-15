@@ -78,10 +78,14 @@ Multi-Factor Authentication adds an extra layer of security by requiring a secon
 
 ### Features
 
-- Time-based One-Time Password (TOTP) support
+- Time-based One-Time Password (TOTP) support via authenticator apps
 - QR code generation for authenticator apps
-- SMS verification (requires Twilio configuration)
+- ~~SMS verification~~ (disabled to reduce costs)
 - MFA enrollment and verification flows
+
+### Cost Optimization
+
+**Phone/SMS MFA has been disabled** to reduce Supabase costs. The previous configuration was causing high Auth MFA Phone Hours charges (~$76/month).
 
 ### Implementation Details
 
@@ -91,17 +95,28 @@ MFA is implemented using Supabase's MFA features. The configuration is in `supab
 [auth.mfa]
 max_enrolled_factors = 10
 
+# Primary MFA method - TOTP via authenticator apps
 [auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
 
+# Phone MFA - DISABLED to reduce costs
 [auth.mfa.phone]
-enroll_enabled = true
-verify_enabled = true
+enroll_enabled = false
+verify_enabled = false
 otp_length = 6
 template = "Your FAIT Co-op verification code is {{ .Code }}"
 max_frequency = "5s"
 ```
+
+### Supported Authenticator Apps
+
+Users can use any TOTP-compatible authenticator app:
+- Google Authenticator
+- Microsoft Authenticator
+- Authy
+- 1Password
+- Bitwarden
 
 The MFA flow is handled by:
 

@@ -102,22 +102,22 @@ export const useSessionManager = (options: UseSessionManagerOptions = {}) => {
       // Update time remaining
       setTimeRemaining(Math.max(0, timeToExpiry));
       
-      // Set up interval to update time remaining
+      // Set up interval to update time remaining - OPTIMIZED: Reduced frequency to save costs
       const interval = setInterval(() => {
         const newExpiryTime = getSessionExpiry();
         if (!newExpiryTime) {
           clearInterval(interval);
           return;
         }
-        
+
         const newTimeToExpiry = newExpiryTime - Date.now();
         setTimeRemaining(Math.max(0, newTimeToExpiry));
-        
+
         if (newTimeToExpiry <= 0) {
           clearInterval(interval);
           signOut();
         }
-      }, 1000);
+      }, 30000); // Check every 30 seconds instead of 1 second
       
       return () => {
         clearTimers();

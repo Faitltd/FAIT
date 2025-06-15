@@ -1,0 +1,151 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+
+env:
+  PROJECT_ID: fait-444705
+  STAGING_SERVICE: fait-platform-staging
+  PROD_SERVICE: fait-platform
+  REGION: us-central1
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Install dependencies
+      run: npm ci
+
+    - name: Run linting
+      run: npm run lint
+
+    - name: Run type checking
+      run: npm run type-check
+
+    - name: Run unit tests
+      run: npm run test:ci
+
+    - name: Run E2E tests
+      run: npm run test:e2e:ci
+      
+    - name: Upload test coverage
+      uses: codecov/codecov-action@v3
+
+  security-scan:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Run SAST
+      uses: github/codeql-action/analyze@v2
+      with:
+        languages: javascript
+
+    - name: Run dependency scan
+      run: npm audit
+
+    - name: Run container scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'Dockerfile'
+        format: 'table'
+        exit-code: '1'
+        ignore-unfixed: true
+        severity: 'CRITICAL,HIGH'
+
+  build:
+    needs: [test, security-scan]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+        cache: 'npm'
+
+    - name: Build application
+      run: |
+        npm ci
+        npm run build
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: build
+        path: build/
+
+  deploy-staging:
+    needs: build
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: staging
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: build
+        path: build/
+
+    - name: Auth to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Deploy to Cloud Run Staging
+      run: |
+        gcloud run deploy $STAGING_SERVICE \
+          --source . \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated \
+          --set-env-vars NODE_ENV=staging
+
+    - name: Run smoke tests
+      run: npm run test:smoke
+
+  deploy-production:
+    needs: [deploy-staging]
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment: production
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Download artifact
+      uses: actions/download-artifact@v3
+      with:
+        name: build
+        path: build/
+
+    - name: Auth to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Deploy to Cloud Run Production
+      run: |
+        gcloud run deploy $PROD_SERVICE \
+          --source . \
+          --platform managed \
+          --region $REGION \
+          --allow-unauthenticated \
+          --set-env-vars NODE_ENV=production
+
+    - name: Run post-deployment checks
+      run: npm run test:post-deploy

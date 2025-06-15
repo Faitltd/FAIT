@@ -9,7 +9,7 @@ import { workerRegistry, WorkerType } from './utils/webWorkerRegistrySimple';
 import SimpleTestApp from './SimpleTestApp';
 import MinimalApp from './MinimalApp';
 import EnhancedMinimalApp from './EnhancedMinimalApp';
-import App from './App';
+import App from './App.tsx';
 import ModularApp from './ModularApp';
 
 // Initialize performance optimizations

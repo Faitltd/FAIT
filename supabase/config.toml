@@ -184,7 +184,7 @@ content_path = "./supabase/templates/password-reset.html"
 # content_path = "./supabase/templates/invite.html"
 
 [auth.sms]
-# Allow/disallow new user signups via SMS to your project.
+# Allow/disallow new user signups via SMS to your project. - DISABLED to reduce costs
 enable_signup = false
 # If enabled, users need to confirm their phone number before signing in.
 enable_confirmations = false
@@ -229,17 +229,17 @@ max_enrolled_factors = 10
 enroll_enabled = true
 verify_enabled = true
 
-# Configure MFA via Phone Messaging
+# Configure MFA via Phone Messaging - DISABLED to reduce costs
 [auth.mfa.phone]
-enroll_enabled = true
-verify_enabled = true
+enroll_enabled = false
+verify_enabled = false
 otp_length = 6
 template = "Your FAIT Co-op verification code is {{ .Code }}"
 max_frequency = "5s"
 
-# Configure Twilio for SMS-based MFA
+# Configure Twilio for SMS-based MFA - DISABLED to reduce costs
 [auth.sms.twilio]
-enabled = true
+enabled = false
 account_sid = "env(TWILIO_ACCOUNT_SID)"
 message_service_sid = "env(TWILIO_MESSAGE_SERVICE_SID)"
 # DO NOT commit your Twilio auth token to git. Use environment variable substitution instead:

@@ -74,3 +74,46 @@ backups/
 *.tar
 *.zip
 *.rar
+
+# Large backup and duplicate directories
+FAIT_backup/
+FAIT_old/
+fait-coop-platform/
+fait-new/
+fait-svelte/
+test-app/
+geargrab/
+FAIT*/
+fait-*/
+**/FAIT*
+**/*2.0*
+**/*copy*
+**/*backup*
+**/*old*
+
+# Cypress artifacts
+cypress/videos/
+cypress/screenshots/
+cypress/downloads/
+
+# SvelteKit build artifacts
+.svelte-kit/
+
+# Firebase
+.firebase/
+
+# Assets that might be large
+Assets/
+public/fonts/
+public/images/icons/
+
+# Static files
+static/
+
+# Development tools
+.bolt/
+tabnine_root*
+
+# Scripts
+scripts/
+*.sh

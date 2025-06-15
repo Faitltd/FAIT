@@ -1,0 +1,57 @@
+import { MonitoringService } from './services/monitoring/MonitoringService';
+import { AnalyticsService } from './services/analytics/AnalyticsService';
+import { CacheService } from './services/cache/CacheService';
+
+// Initialize services
+const monitoringService = MonitoringService.getInstance();
+const analyticsService = AnalyticsService.getInstance();
+const cacheService = CacheService.getInstance({ ttl: 5 * 60 * 1000, maxSize: 100 });
+
+function App() {
+  useEffect(() => {
+    // Track page view
+    analyticsService.trackEvent('page', 'view', window.location.pathname);
+    
+    // Monitor route changes
+    const unsubscribe = router.subscribe((state) => {
+      analyticsService.trackEvent('navigation', 'route_change', state.location.pathname);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  return (
+    <Sentry.ErrorBoundary fallback={<ErrorFallback />}>
+      <A11yProvider>
+        <GlobalErrorBoundary>
+          <PerformanceMonitor>
+            <AuthProvider>
+              <SubscriptionProvider>
+                <SystemMessageProvider>
+                  <ServiceWorkerProvider>
+                    <SessionManager
+                      warningTime={5 * 60 * 1000}
+                      autoRefreshTime={10 * 60 * 1000}
+                    >
+                      <Suspense fallback={<LoadingSpinner />}>
+                        <ErrorBoundary fallback={<MapErrorFallback />}>
+                          <GoogleMapsLoader />
+                        </ErrorBoundary>
+                        <main id="main-content">
+                          <ErrorBoundary fallback={<RouterErrorFallback />}>
+                            <RouterProvider router={router} />
+                          </ErrorBoundary>
+                        </main>
+                      </Suspense>
+                      <ToastContainer />
+                    </SessionManager>
+                  </ServiceWorkerProvider>
+                </SystemMessageProvider>
+              </SubscriptionProvider>
+            </AuthProvider>
+          </PerformanceMonitor>
+        </GlobalErrorBoundary>
+      </A11yProvider>
+    </Sentry.ErrorBoundary>
+  );
+}

@@ -15,6 +15,10 @@ export class SupabaseAuthProvider implements AuthProvider {
   private user: User | null = null;
   private session: Session | null = null;
 
+  // Rate limiting to prevent excessive API calls and reduce costs
+  private lastRefreshTime: number = 0;
+  private readonly REFRESH_COOLDOWN = 60000; // 1 minute cooldown between refreshes
+
   constructor() {
     // Initialize user and session
     this.initializeAuth();
@@ -167,41 +171,122 @@ export class SupabaseAuthProvider implements AuthProvider {
   }
 
   /**
-   * Set up multi-factor authentication
+   * Set up multi-factor authentication (TOTP only - phone MFA disabled to reduce costs)
    */
   async setupMFA(): Promise<AuthResponse> {
-    // Supabase MFA implementation
-    return { data: null, error: new Error('MFA not implemented yet') };
+    try {
+      const { data, error } = await supabase.auth.mfa.enroll({
+        factorType: 'totp'
+      });
+
+      if (error) {
+        console.error('[SupabaseAuth] MFA setup error:', error);
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('[SupabaseAuth] MFA setup error:', error);
+      return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
+    }
   }
 
   /**
-   * Verify MFA code
+   * Verify MFA code (TOTP only)
    */
   async verifyMFA(code: string): Promise<AuthResponse> {
-    // Supabase MFA implementation
-    return { data: null, error: new Error('MFA not implemented yet') };
+    try {
+      // Get the user's enrolled factors
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+
+      if (factorsError || !factors?.totp?.length) {
+        return { data: null, error: new Error('No TOTP factors enrolled') };
+      }
+
+      const factorId = factors.totp[0].id;
+
+      // Create a challenge
+      const { data: challengeData, error: challengeError } = await supabase.auth.mfa.challenge({
+        factorId
+      });
+
+      if (challengeError) {
+        console.error('[SupabaseAuth] MFA challenge error:', challengeError);
+        return { data: null, error: challengeError };
+      }
+
+      // Verify the code
+      const { data, error } = await supabase.auth.mfa.verify({
+        factorId,
+        challengeId: challengeData.id,
+        code
+      });
+
+      if (error) {
+        console.error('[SupabaseAuth] MFA verification error:', error);
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('[SupabaseAuth] MFA verification error:', error);
+      return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
+    }
   }
 
   /**
-   * Disable MFA
+   * Disable MFA (TOTP only)
    */
   async disableMFA(): Promise<AuthResponse> {
-    // Supabase MFA implementation
-    return { data: null, error: new Error('MFA not implemented yet') };
+    try {
+      // Get the user's enrolled factors
+      const { data: factors, error: factorsError } = await supabase.auth.mfa.listFactors();
+
+      if (factorsError || !factors?.totp?.length) {
+        return { data: null, error: new Error('No TOTP factors enrolled') };
+      }
+
+      const factorId = factors.totp[0].id;
+
+      const { data, error } = await supabase.auth.mfa.unenroll({
+        factorId
+      });
+
+      if (error) {
+        console.error('[SupabaseAuth] MFA disable error:', error);
+        return { data: null, error };
+      }
+
+      return { data, error: null };
+    } catch (error) {
+      console.error('[SupabaseAuth] MFA disable error:', error);
+      return { data: null, error: error instanceof Error ? error : new Error('Unknown error') };
+    }
   }
 
   /**
-   * Refresh session
+   * Refresh session with rate limiting to reduce costs
    */
   async refreshSession(): Promise<AuthResponse> {
     try {
+      // Rate limiting: prevent excessive refresh calls
+      const now = Date.now();
+      if (now - this.lastRefreshTime < this.REFRESH_COOLDOWN) {
+        console.log('[SupabaseAuth] Refresh session skipped due to rate limiting');
+        return {
+          data: this.session ? { session: this.session, user: this.user } : null,
+          error: null
+        };
+      }
+
       const { data, error } = await supabase.auth.refreshSession();
-      
+
       if (data.session) {
         this.session = data.session;
         this.user = data.session.user;
+        this.lastRefreshTime = now;
       }
-      
+
       return { data, error };
     } catch (error) {
       console.error('[SupabaseAuth] Refresh session error:', error);

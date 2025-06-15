@@ -78,29 +78,34 @@ scopes = "email,public_profile"
 
 ### MFA Configuration
 
-MFA is configured in the Supabase configuration file:
+MFA is configured in the Supabase configuration file. **Note: Phone MFA is disabled to reduce costs.**
 
 ```toml
-# Control MFA via App Authenticator (TOTP)
+# Control MFA via App Authenticator (TOTP) - Primary MFA method
 [auth.mfa.totp]
 enroll_enabled = true
 verify_enabled = true
 
-# Configure MFA via Phone Messaging
+# Configure MFA via Phone Messaging - DISABLED to reduce costs
 [auth.mfa.phone]
-enroll_enabled = true
-verify_enabled = true
+enroll_enabled = false
+verify_enabled = false
 otp_length = 6
 template = "Your FAIT Co-op verification code is {{ .Code }}"
 max_frequency = "5s"
 
-# Configure Twilio for SMS-based MFA
+# Configure Twilio for SMS-based MFA - DISABLED to reduce costs
 [auth.sms.twilio]
-enabled = true
+enabled = false
 account_sid = "env(TWILIO_ACCOUNT_SID)"
 message_service_sid = "env(TWILIO_MESSAGE_SERVICE_SID)"
 auth_token = "env(SUPABASE_AUTH_SMS_TWILIO_AUTH_TOKEN)"
 ```
+
+**Cost Optimization:**
+- Phone/SMS MFA is disabled to avoid high Supabase Auth MFA Phone Hours charges
+- TOTP (Time-based One-Time Password) via authenticator apps is the primary MFA method
+- This reduces costs from ~$76/month to $0 for MFA phone usage
 
 ### Session Configuration
 

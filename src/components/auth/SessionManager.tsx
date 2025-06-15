@@ -83,8 +83,8 @@ const SessionManager: React.FC<SessionManagerProps> = ({
     // Check immediately
     checkSession();
     
-    // Set up interval to check session status
-    const intervalId = setInterval(checkSession, 60000); // Check every minute
+    // Set up interval to check session status - OPTIMIZED: Reduced frequency to save costs
+    const intervalId = setInterval(checkSession, 300000); // Check every 5 minutes instead of 1 minute
     
     return () => {
       clearInterval(intervalId);
