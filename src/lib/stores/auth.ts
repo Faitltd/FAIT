@@ -30,9 +30,6 @@ export interface AuthState {
 
 // Load initial state from localStorage if available
 const getInitialState = (): AuthState => {
-  // For debugging, let's start with a clean state
-  // Comment out localStorage loading temporarily
-  /*
   if (browser) {
     try {
       const stored = localStorage.getItem('auth');
@@ -43,7 +40,6 @@ const getInitialState = (): AuthState => {
       console.error('Failed to parse stored auth state:', e);
     }
   }
-  */
 
   return {
     user: null,

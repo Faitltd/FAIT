@@ -171,16 +171,6 @@
 			<h2 class="text-3xl font-bold text-gray-900">Welcome back</h2>
 			<p class="mt-2 text-gray-600">Sign in to your account to continue</p>
 
-			<!-- Demo Credentials Info -->
-			<div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm">
-				<p class="font-semibold text-blue-800 mb-2">Demo Credentials:</p>
-				<div class="space-y-1 text-blue-700">
-					<p><strong>Admin:</strong> admin@fait.com / admin123</p>
-					<p><strong>Provider:</strong> provider@fait.com / provider123</p>
-					<p><strong>Client:</strong> client@fait.com / client123</p>
-					<p><strong>Client (alt):</strong> client@itsfait.com / client123</p>
-				</div>
-			</div>
 		</div>
 
 		<!-- Login Form -->
@@ -270,46 +260,6 @@
 					class="w-full bg-blue-600 text-white text-lg py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors font-semibold transform hover:scale-105 {isSubmitting ? 'opacity-50 cursor-not-allowed' : ''}"
 				>
 					{isSubmitting ? 'Signing in...' : 'Sign in'}
-				</button>
-
-				<!-- Debug buttons -->
-				<button
-					type="button"
-					on:click={() => {
-						console.log('Debug button clicked');
-						formData.email = 'admin@fait.com';
-						formData.password = 'admin123';
-						handleSubmit();
-					}}
-					class="w-full bg-green-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-green-700 transition-colors font-medium mt-2"
-				>
-					Debug: Auto-fill Admin Credentials
-				</button>
-
-				<button
-					type="button"
-					on:click={() => {
-						console.log('Force auth test clicked');
-						auth.update(state => {
-							console.log('Current auth state:', state);
-							const newState = {
-								...state,
-								user: { id: '1', email: 'test@test.com', name: 'Test User', role: 'admin' as const },
-								isAuthenticated: true,
-								isLoading: false
-							};
-							console.log('New auth state:', newState);
-							return newState;
-						});
-						console.log('Auth updated, attempting redirect...');
-						setTimeout(() => {
-							console.log('Redirecting to /bookings');
-							goto('/bookings');
-						}, 1000);
-					}}
-					class="w-full bg-red-600 text-white text-sm py-2 px-4 rounded-lg hover:bg-red-700 transition-colors font-medium mt-2"
-				>
-					Force Auth Test
 				</button>
 			</form>
 
