@@ -1,223 +1,223 @@
-# FAIT Deployment Guide
+# Automatic Deployment with Cloud Build
 
-This guide will help you deploy the FAIT professional services platform to GitHub and Google Cloud Run.
+This document explains how to set up automatic deployment to Cloud Run using Cloud Build triggers.
 
 ## Prerequisites
 
-Before deploying, ensure you have:
+1. A Google Cloud Platform account with billing enabled
+2. A GitHub repository connected to Cloud Build
+3. The `gcloud` CLI installed and configured
 
-- [Git](https://git-scm.com/) installed
-- [Node.js](https://nodejs.org/) (version 18 or higher)
-- [Docker](https://www.docker.com/) installed (for Cloud Run deployment)
-- [Google Cloud CLI](https://cloud.google.com/sdk/docs/install) installed (for Cloud Run deployment)
-- A Google Cloud Project with billing enabled
-- A GitHub account
+## Deployment Lifecycle
 
-## Quick Deployment
-
-### Option 1: Using the Deployment Script (Recommended)
-
-1. Run the deployment script:
-```bash
-./deploy.sh
+```
+DEV → git push main
+    ↓
+Cloud Build → Docker Build & Push
+    ↓
+Cloud Run → Auto Deploy → Live App
 ```
 
-2. Follow the interactive prompts to:
-   - Choose deployment target (GitHub, Cloud Run, or both)
-   - Enter repository details
-   - Configure Google Cloud settings
+## Setup Instructions
 
-### Option 2: Manual Deployment
+### 1. Connect your GitHub Repository to Cloud Build
 
-#### Deploy to GitHub
+If you haven't already connected your GitHub repository to Cloud Build:
 
-1. Create a new repository on GitHub:
-   - Go to https://github.com/new
-   - Repository name: `fait-site`
-   - Description: `FAIT - Professional Services Platform`
-   - Choose public or private
-   - Do NOT initialize with README
+1. Go to the [Cloud Build Triggers page](https://console.cloud.google.com/cloud-build/triggers)
+2. Click "Connect Repository"
+3. Select "GitHub (Cloud Build GitHub App)"
+4. Follow the prompts to authenticate and select your repository
 
-2. Add the remote and push:
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/fait-site.git
-git push -u origin master
+### 2. Configure Environment Variables
+
+Make sure your `.env` file contains all the required environment variables:
+
+```
+VITE_SUPABASE_URL=...
+VITE_SUPABASE_ANON_KEY=...
+VITE_GOOGLE_CLIENT_ID=...
+VITE_STRIPE_PUBLIC_KEY=...
+SUPABASE_SERVICE_KEY=...
+SUPABASE_SERVICE_ROLE_KEY=...
+JWT_SECRET=...
 ```
 
-#### Deploy to Google Cloud Run
+**Important**: Ensure your `.env` file is valid:
+- No spaces around = signs
+- No quotes unless required
+- No trailing whitespace
 
-1. Set up Google Cloud:
-```bash
-# Login to Google Cloud
-gcloud auth login
+### 3. Run the Setup Script
 
-# Set your project ID
-gcloud config set project YOUR_PROJECT_ID
+Edit the `setup-cloud-build-trigger.sh` script to set your:
+- `PROJECT_ID`: Your Google Cloud project ID
+- `REPO_NAME`: Your GitHub repository name
+- `BRANCH`: The branch to trigger builds from (usually "main")
 
-# Enable required APIs
-gcloud services enable cloudbuild.googleapis.com
-gcloud services enable run.googleapis.com
-gcloud services enable containerregistry.googleapis.com
-```
-
-2. Build and deploy:
-```bash
-# Build the application
-npm run build
-
-# Submit build to Cloud Build
-gcloud builds submit --tag gcr.io/YOUR_PROJECT_ID/fait-site
-
-# Deploy to Cloud Run
-gcloud run deploy fait-site \
-  --image gcr.io/YOUR_PROJECT_ID/fait-site \
-  --region us-central1 \
-  --platform managed \
-  --allow-unauthenticated \
-  --port 3000 \
-  --memory 1Gi \
-  --cpu 1 \
-  --min-instances 0 \
-  --max-instances 10 \
-  --set-env-vars NODE_ENV=production
-```
-
-## Environment Variables
-
-For production deployment, you may want to set these environment variables:
+Then run the script:
 
 ```bash
-NODE_ENV=production
-PORT=3000
-HOST=0.0.0.0
+chmod +x setup-cloud-build-trigger.sh
+./setup-cloud-build-trigger.sh
 ```
 
-## Custom Domain Setup
+This script will:
+1. Enable Cloud Build and Artifact Registry APIs
+2. Create your trigger
+3. Inject all needed env vars from your .env
 
-To use a custom domain with Cloud Run:
+### 4. Test the Trigger
 
-1. Map your domain:
-```bash
-gcloud run domain-mappings create \
-  --service fait-site \
-  --domain your-domain.com \
-  --region us-central1
-```
-
-2. Update your DNS records as instructed by the command output.
-
-## GitHub Actions CI/CD
-
-The repository includes a GitHub Actions workflow (`.github/workflows/deploy.yml`) for automated deployment.
-
-### Required Secrets
-
-Add these secrets to your GitHub repository:
-
-1. Go to your repository → Settings → Secrets and variables → Actions
-2. Add the following secrets:
-
-- `GCP_PROJECT_ID`: Your Google Cloud Project ID
-- `GCP_SA_KEY`: Service Account JSON key with the following roles:
-  - Cloud Build Editor
-  - Cloud Run Admin
-  - Storage Admin
-
-### Creating a Service Account
+Make a change to your code, commit it, and push to your branch:
 
 ```bash
-# Create service account
-gcloud iam service-accounts create github-actions \
-  --description="Service account for GitHub Actions" \
-  --display-name="GitHub Actions"
-
-# Grant necessary roles
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-  --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/cloudbuild.builds.editor"
-
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-  --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/run.admin"
-
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-  --member="serviceAccount:github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
-  --role="roles/storage.admin"
-
-# Create and download key
-gcloud iam service-accounts keys create key.json \
-  --iam-account=github-actions@YOUR_PROJECT_ID.iam.gserviceaccount.com
+git add .
+git commit -m "Activate Cloud Build deployment"
+git push origin main
 ```
 
-## Monitoring and Maintenance
+Then:
+1. Watch Cloud Build pipeline run (Cloud Console > Cloud Build > Builds)
+2. Cloud Run will deploy latest image
+3. Your app will go live
 
-### Health Checks
+## Testing Locally
 
-The application includes a health check endpoint at `/health` that returns:
+To test your build locally before pushing:
 
-```json
-{
-  "status": "healthy",
-  "timestamp": "2024-01-01T00:00:00.000Z",
-  "service": "FAIT",
-  "version": "1.0.0"
-}
-```
+### For M1/M2 Macs (Apple Silicon)
 
-### Logs
-
-View application logs:
+When building on Apple Silicon (M1/M2) Macs, you must specify the target platform for Cloud Run compatibility:
 
 ```bash
-# Cloud Run logs
-gcloud logs read --service=fait-site --region=us-central1
+# Build the Docker image for amd64 architecture (required for Cloud Run)
+docker build --platform=linux/amd64 -t gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME] .
 
-# Follow logs in real-time
-gcloud logs tail --service=fait-site --region=us-central1
+# Run the container locally
+docker run -p 8080:8080 --env-file .env gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME]
 ```
 
-### Scaling
-
-Cloud Run automatically scales based on traffic. You can adjust scaling settings:
+You can also use the provided build script:
 
 ```bash
-gcloud run services update fait-site \
-  --region us-central1 \
-  --min-instances 1 \
-  --max-instances 20 \
-  --concurrency 100
+./build-docker.sh --tag=your-tag
 ```
+
+### For Intel Macs or Linux
+
+```bash
+# Build the Docker image
+docker build -t gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME] .
+
+# Run the container locally
+docker run -p 8080:8080 --env-file .env gcr.io/[YOUR_PROJECT_ID]/[SERVICE_NAME]
+```
+
+## Monitoring Builds
+
+You can monitor your builds in the [Cloud Build History page](https://console.cloud.google.com/cloud-build/builds).
 
 ## Troubleshooting
 
-### Common Issues
+If your build fails, check:
 
-1. **Build failures**: Check that all dependencies are properly installed
-2. **Permission errors**: Ensure service account has proper IAM roles
-3. **Memory issues**: Increase memory allocation in Cloud Run
-4. **Cold starts**: Set minimum instances to 1 for better performance
+1. The Cloud Build logs for error messages
+2. That all environment variables are correctly set in the trigger
+3. That your `cloudbuild.yaml` file is correctly formatted
+4. That your Dockerfile builds successfully
 
-### Getting Help
+### Architecture Issues for M1/M2 Mac Users
 
-- Check the [Cloud Run documentation](https://cloud.google.com/run/docs)
-- Review [SvelteKit deployment guide](https://kit.svelte.dev/docs/adapters)
-- Open an issue in the GitHub repository
+If you see an error like:
+
+```
+ERROR: (gcloud.run.deploy) Revision is not ready and cannot serve traffic. Cloud Run does not support image: Container manifest type 'application/vnd.oci.image.index.v1+json' must support amd64/linux.
+```
+
+This means your Docker image was built for ARM architecture (default on M1/M2 Macs) but Cloud Run requires x86/amd64 architecture. To fix this:
+
+1. Rebuild your image with the platform flag:
+   ```bash
+   docker build --platform=linux/amd64 -t gcr.io/fait-444705/fait-coop:v1 .
+   ```
+
+2. Or use the provided build script:
+   ```bash
+   ./build-docker.sh
+   ```
+
+3. Push the rebuilt image:
+   ```bash
+   docker push gcr.io/fait-444705/fait-coop:v1
+   ```
+
+4. Deploy again:
+   ```bash
+   gcloud run deploy fait-coop --image=gcr.io/fait-444705/fait-coop:v1 --platform=managed --region=us-central1
+   ```
+
+To verify the architecture of your image:
+```bash
+docker inspect gcr.io/fait-444705/fait-coop:v1 | grep -i architecture
+```
 
 ## Security Considerations
 
-- Always use HTTPS in production
-- Regularly update dependencies
-- Monitor for security vulnerabilities
-- Use environment variables for sensitive data
-- Enable Cloud Run security features
+**Important**: Don't expose Service Role Key or JWT_SECRET in front-end code.
 
-## Cost Optimization
+The environment variables are stored as substitution variables in your Cloud Build trigger. These are encrypted at rest in Google Cloud, but be aware that:
 
-- Use minimum instances = 0 for development
-- Set appropriate CPU and memory limits
-- Monitor usage with Cloud Monitoring
-- Consider using Cloud Run jobs for batch processing
+1. Anyone with access to your Google Cloud project can view these values
+2. The values may appear in build logs
 
----
+### Secrets Management
 
-For more detailed information, refer to the main [README.md](README.md) file.
+We now use Google Secret Manager for SUPABASE_SERVICE_KEY, JWT_SECRET, and STRIPE_SECRET_KEY.
+
+To set up the secrets:
+
+```bash
+# Run the setup script
+./scripts/setup-gcp-secrets.sh
+```
+
+Cloud Build now uses:
+
+```yaml
+--set-secrets=SUPABASE_SERVICE_KEY=projects/$PROJECT_ID/secrets/supabase-service-key:latest,JWT_SECRET=projects/$PROJECT_ID/secrets/jwt-secret:latest,STRIPE_SECRET_KEY=projects/$PROJECT_ID/secrets/stripe-secret-key:latest
+```
+
+This keeps secrets out of source control and scripts.
+
+## Supabase Connection Pooling
+
+The application now uses Supabase's connection pooler (port 6543) for efficient database connections. This is important for Cloud Run, which can scale up and down quickly, potentially creating many new connections.
+
+Key benefits:
+- Prevents exhausting Postgres connection limits
+- Efficiently shares connections among Cloud Run instances
+- Improves performance and reliability
+
+## Optimized Cloud Run Configuration
+
+The service is now configured with optimized scaling parameters:
+
+- `min-instances=0`: Scales to zero when not in use to minimize costs
+- `max-instances=10`: Limits the maximum number of instances to control costs
+- `concurrency=80`: Allows each instance to handle multiple requests
+- `cpu=1`: Allocates 1 CPU to each instance
+- `memory=1Gi`: Allocates 1GB of memory to each instance
+- `timeout=300s`: Sets a 5-minute timeout for requests
+
+To deploy with these optimized settings:
+
+```bash
+./scripts/deploy-to-cloudrun-optimized.sh
+```
+
+For continuous deployment, use the provided Cloud Build configuration:
+
+```bash
+gcloud builds submit --config=cloudbuild.optimized.yaml
+```
