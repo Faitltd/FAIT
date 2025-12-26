@@ -16,7 +16,7 @@ import GlobalErrorBoundary from './components/GlobalErrorBoundary';
 import { ToastContainer } from './components/common';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-import EnhancedHomeWithAnimations from './pages/EnhancedHomeWithAnimations';
+import EnhancedHome from './pages/EnhancedHome';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import DirectLogin from './pages/DirectLogin';
@@ -51,6 +51,12 @@ const GovernancePage = lazy(() => import('./pages/governance/GovernancePage.jsx'
 const ProfilePage = lazy(() => import('./pages/profile/ProfilePage.jsx'));
 const SettingsProfilePage = lazy(() => import('./pages/settings/ProfilePage.jsx'));
 const SubscriptionDashboard = lazy(() => import('./pages/subscription/SubscriptionDashboard.jsx'));
+const PortalHomesList = lazy(() => import('./pages/portal/HomesListPage'));
+const PortalHomeDashboard = lazy(() => import('./pages/portal/HomeDashboardPage'));
+const PortalAssetCreate = lazy(() => import('./pages/portal/AssetCreatePage'));
+const PortalAssetDetail = lazy(() => import('./pages/portal/AssetDetailPage'));
+const PortalServiceHistory = lazy(() => import('./pages/portal/ServiceHistoryPage'));
+const PortalReminders = lazy(() => import('./pages/portal/HomeRemindersPage'));
 
 // Lazy load dashboard pages
 const ServiceAgentDashboard = lazy(() => import('./pages/dashboard/ServiceAgentDashboard.jsx'));
@@ -105,7 +111,7 @@ function EnhancedMinimalApp() {
       <Route element={<Layout />} errorElement={<PageErrorBoundary />}>
         <Route
           path="/"
-          element={<EnhancedHomeWithAnimations />}
+          element={<EnhancedHome />}
         />
         <Route
           path="/login"
@@ -190,6 +196,68 @@ function EnhancedMinimalApp() {
             </Suspense>
           }
           errorElement={<PageErrorBoundary />}
+        />
+
+        {/* Home Asset Portal Routes */}
+        <Route
+          path="/portal/homes"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading homes...</div>}>
+                <PortalHomesList />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portal/homes/:homeId"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading home dashboard...</div>}>
+                <PortalHomeDashboard />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portal/homes/:homeId/assets/new"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading asset form...</div>}>
+                <PortalAssetCreate />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portal/assets/:assetId"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading asset...</div>}>
+                <PortalAssetDetail />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portal/homes/:homeId/service"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading service history...</div>}>
+                <PortalServiceHistory />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/portal/homes/:homeId/reminders"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading reminders...</div>}>
+                <PortalReminders />
+              </Suspense>
+            </ProtectedRoute>
+          }
         />
 
         {/* Services Route */}
