@@ -34,6 +34,7 @@
     "libphonenumber-js": "^1.12.7",
     "lucide-svelte": "^0.507.0",
     "mode-watcher": "^1.0.7",
+    "resend": "^3.5.0",
     "stripe": "^18.0.0",
     "svelte": "^5.0.0",
     "tailwind-merge": "^2.2.1",
