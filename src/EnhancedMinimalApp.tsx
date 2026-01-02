@@ -28,8 +28,8 @@ import AppVersionIndicator from './components/AppVersionIndicator';
 import NavigationTestPage from './pages/NavigationTestPage';
 import UnifiedLoginPage from './pages/auth/UnifiedLoginPage';
 import AuthToggle from './components/AuthToggle';
-import { isAdmin } from './lib/admin';
 import UserManagementPage from './pages/admin/UserManagementPage';
+import AdminHomeAssetsManagementPage from './pages/admin/HomeAssetsManagementPage';
 
 // Lazy load calculator pages
 const EstimateCalculators = lazy(() => import('./pages/calculator/EstimateCalculators.jsx'));
@@ -377,6 +377,13 @@ function EnhancedMinimalApp() {
                       </Link>
                     </div>
                     <div className="bg-white p-6 rounded-lg shadow-md">
+                      <h2 className="text-xl font-semibold mb-3">Homes & Assets</h2>
+                      <p>Manage home profiles and asset inventories</p>
+                      <Link to="/dashboard/admin/homes" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                        Manage Homes
+                      </Link>
+                    </div>
+                    <div className="bg-white p-6 rounded-lg shadow-md">
                       <h2 className="text-xl font-semibold mb-3">Projects</h2>
                       <p>View and manage all projects</p>
                       <Link to="/projects" className="mt-4 inline-block px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
@@ -404,6 +411,18 @@ function EnhancedMinimalApp() {
             <ProtectedRoute>
               <Suspense fallback={<div className="flex justify-center items-center h-64">Loading user management...</div>}>
                 <UserManagementPage />
+              </Suspense>
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Admin Homes & Assets Route */}
+        <Route
+          path="/dashboard/admin/homes"
+          element={
+            <ProtectedRoute>
+              <Suspense fallback={<div className="flex justify-center items-center h-64">Loading home assets...</div>}>
+                <AdminHomeAssetsManagementPage />
               </Suspense>
             </ProtectedRoute>
           }
